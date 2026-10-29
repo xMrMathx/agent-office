@@ -262,11 +262,10 @@ body.pipOn{padding-top:46vh}
 .pipChatRow input{flex:1;min-width:0;font:inherit;font-size:14px;color:#f5efef;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:11px 12px}
 .pipChatRow button{font:inherit;font-weight:700;font-size:14px;background:#D8232A;color:#fff;border-radius:9px;padding:11px 15px;flex:0 0 auto}
 #pipExpandBtn{font:inherit;font-weight:750;font-size:15px;background:#e9c979;color:#231a06;border-radius:11px;padding:13px 16px;width:100%}
-body.pipOn #hqFrame{left:50%!important;right:auto!important;top:10px!important;bottom:auto!important;width:min(94vw,560px);height:44vh;transform:translateX(-50%);z-index:60;border-radius:16px;box-shadow:0 22px 50px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.22)}
+body.pipOn #hqFrame{left:50%!important;right:auto!important;top:10px!important;bottom:auto!important;width:min(94vw,560px);height:43dvh;transform:translateX(-50%);z-index:60;border-radius:16px;box-shadow:0 22px 50px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.22)}
 body.pipOn .topbar,body.pipOn .modePill,body.pipOn .minimap,body.pipOn .chatLog,body.pipOn .bottomBar,body.pipOn .destPill,body.pipOn .toast{opacity:0;pointer-events:none}
 body.pipOn .rrail{top:auto;bottom:16px;right:12px;transform:none;z-index:61}
 body.pipOn #railLip{display:none}
-#pipVid{position:fixed;width:2px;height:2px;opacity:.01;pointer-events:none;left:0;bottom:0;z-index:-1}
 #rotateBtn.on{background:var(--gold);color:#fff;box-shadow:0 6px 20px rgba(185,151,91,.5)}
 .rrail .rsep{width:30px;height:1px;background:rgba(30,41,59,.25)}
 /* Minimap — bottom-left, like the video */
@@ -1038,7 +1037,6 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
   </div>
   <button id="pipExpandBtn" type="button">Back to the full office</button>
 </div>
-<video id="pipVid" muted playsinline aria-hidden="true"></video>
 
 <div class="topbar">
   <div class="pill brand"><div class="logo">AO</div><div><h1 id="brandTitle">Agent Office</h1><p>AO · Cre8tor VibeZ HQ — people &amp; AI crew in one live office</p></div></div>
@@ -4129,7 +4127,11 @@ function frame(ts){requestAnimationFrame(frame);const t=ts/1000;if(typeof regMov
  /* WARM LIGHT — late-afternoon sun through the north windows: a soft amber
     wash over the whole floor and a gentle warm vignette at the edges. */
  const warm=ctx.createRadialGradient(W*.42,H*.3,60,W*.5,H*.45,Math.max(W,H)*.8);warm.addColorStop(0,'rgba(255,186,92,.13)');warm.addColorStop(.6,'rgba(255,170,80,.05)');warm.addColorStop(1,'rgba(120,72,20,.07)');ctx.fillStyle=warm;ctx.fillRect(0,0,W,H);
- const mapA=cam.zoom>=MAP_ZOOM?0:cam.zoom<=MAP_ZOOM-3?1:(MAP_ZOOM-cam.zoom)/3;
+ /* PiP LAW — inside the floating window the LIVE detailed office renders
+    (crew, desks, screens), never the floor-plan map: the window is the
+    office itself, zoomed out to fit. Everywhere else the map crossfade
+    below MAP_ZOOM stands exactly as it was. */
+ const mapA=document.body.classList.contains('pipOn')?0:cam.zoom>=MAP_ZOOM?0:cam.zoom<=MAP_ZOOM-3?1:(MAP_ZOOM-cam.zoom)/3;
  if(mapA<1){
  drawFloor();
  if(!topDownView){drawBackWall(-9,-1,-7,2);drawBackWall(-1,7,-9,3);drawBackWall(11.4,19.4,-9.6,3);drawBackWall(11.4,19.4,-0.4,2)}
@@ -7628,37 +7630,42 @@ window.__hqGuide={open:openGuide,close:closeGuideAll,tab:setTab,desks:HOME_DESKS
 </script>
 <script>
 /* ===== AGENT OFFICE — PICTURE IN PICTURE =====
-   One button, two honest routes:
-   (1) REAL PiP — where the browser allows it, the live canvas is streamed
-       into a <video> and popped into the system picture-in-picture window,
-       so the office floats over the phone while the phone stays usable.
-   (2) IN-APP PiP — everywhere else, the office frame itself shrinks into
-       a big floating window at the top of the screen, the camera zooms
-       out until the WHOLE office fits inside it, and the animation keeps
-       running — the screen underneath stays free (HQ Chat included). */
+   ONE route, the one that works inside the installed app: the office
+   frame itself shrinks into a BIG floating window across the top of the
+   screen (video-call size — about 43% of the screen tall, nearly full
+   width), the camera zooms out until the WHOLE office fits inside it,
+   nothing cropped, and the office stays LIVE in there (crew moving,
+   screens running) while the screen underneath stays free — HQ Chat
+   included. The browser's system PiP is NOT used: it behaves
+   differently in every browser and never matched this window. */
 (function(){
 'use strict';
-var btn=document.getElementById('pipBtn'),vid=document.getElementById('pipVid'),home=document.getElementById('pipHome');
+var btn=document.getElementById('pipBtn'),home=document.getElementById('pipHome');
 if(!btn)return;
-var savedCam=null,savedZone=null,stream=null;
+var savedCam=null,savedView=null;
 function fitWholeOffice(){
   try{
     if(typeof resize==='function')resize();
-    /* whole building: outline x -13..22, z -12..22, run through the
-       display stretch (x1.3 / x1.04) plus a margin — fit both axes */
-    var zw=Math.min(W/47,H/37);
-    camTween=null;lotOpening=false;topDownView=true;
-    cam.tx=4.5;cam.tz=1.5;cam.zoom=Math.max(4,zw);
+    /* FIT — the whole building, nothing cropped. The floor outline is
+       x -13..22, z -12..22; run through the display stretch (x1.3 wide,
+       x1.04 deep) that is 45.5 x 35.36 screen units, centred on world
+       (4.5, 5.0). Zoom to fit BOTH axes inside the floating window,
+       less a small margin so the walls never touch its edge. */
+    var zw=Math.min((W-16)/45.5,(H-14)/35.36);
+    camTween=null;lotOpening=false;topDownView=true;rotateMode=false;
+    cam.tx=4.5;cam.tz=5.0;cam.zoom=Math.max(3.5,zw);
     if(typeof updateModeUI==='function')updateModeUI();
   }catch(e){}
 }
 function enterInApp(){
   try{if(window.__hqGuide)window.__hqGuide.close()}catch(e){}
   try{var fc=document.getElementById('folderClose');var fo=document.getElementById('folder');if(fc&&fo&&fo.classList.contains('open'))fc.click()}catch(e){}
-  savedCam={az:cam.az,tilt:cam.tilt,zoom:cam.zoom,tx:cam.tx,tz:cam.tz};savedZone=currentZone;
+  savedCam={az:cam.az,tilt:cam.tilt,zoom:cam.zoom,tx:cam.tx,tz:cam.tz};
+  savedView={td:topDownView,rm:rotateMode};
   document.body.classList.add('pipOn');home.setAttribute('aria-hidden','false');
   btn.classList.add('on');btn.setAttribute('aria-pressed','true');
-  setTimeout(fitWholeOffice,40);setTimeout(fitWholeOffice,320);
+  if(window.requestAnimationFrame)requestAnimationFrame(fitWholeOffice);
+  setTimeout(fitWholeOffice,60);setTimeout(fitWholeOffice,380);
 }
 function exitInApp(){
   document.body.classList.remove('pipOn');home.setAttribute('aria-hidden','true');
@@ -7667,25 +7674,14 @@ function exitInApp(){
     try{
       if(typeof resize==='function')resize();
       if(savedCam){camTween=null;cam.az=savedCam.az;cam.tilt=savedCam.tilt;cam.zoom=savedCam.zoom;cam.tx=savedCam.tx;cam.tz=savedCam.tz}
+      if(savedView){topDownView=savedView.td;rotateMode=savedView.rm}
       if(typeof updateModeUI==='function')updateModeUI();
     }catch(e){}
   },40);
 }
-function tryRealPiP(done){
-  try{
-    if(!document.pictureInPictureEnabled||!vid||typeof vid.requestPictureInPicture!=='function'){done(false);return}
-    var cvEl=document.getElementById('scene');if(!cvEl||!cvEl.captureStream){done(false);return}
-    if(!stream){stream=cvEl.captureStream(30);vid.srcObject=stream}
-    vid.play().then(function(){return vid.requestPictureInPicture()}).then(function(){
-      btn.classList.add('on');btn.setAttribute('aria-pressed','true');done(true);
-    }).catch(function(){done(false)});
-  }catch(e){done(false)}
-}
-if(vid)vid.addEventListener('leavepictureinpicture',function(){btn.classList.remove('on');btn.setAttribute('aria-pressed','false')});
 btn.addEventListener('click',function(){
   if(document.body.classList.contains('pipOn')){exitInApp();return}
-  if(document.pictureInPictureElement){document.exitPictureInPicture().catch(function(){});return}
-  tryRealPiP(function(real){if(!real)enterInApp()});
+  enterInApp();
 });
 var ex=document.getElementById('pipExpandBtn');if(ex)ex.addEventListener('click',function(){if(document.body.classList.contains('pipOn'))exitInApp()});
 var form=document.getElementById('pipChatForm');
@@ -7694,7 +7690,7 @@ if(form)form.addEventListener('submit',function(e){
   var inp=document.getElementById('pipChatInput');var v=inp.value.trim();if(!v)return;inp.value='';
   try{var ci=document.getElementById('chatInput');if(ci){ci.value=v;var s=document.getElementById('chatSend');if(s)s.click()}}catch(err){}
 });
-window.__aoPiP={enter:enterInApp,exit:exitInApp,on:function(){return document.body.classList.contains('pipOn')||!!document.pictureInPictureElement}};
+window.__aoPiP={enter:enterInApp,exit:exitInApp,on:function(){return document.body.classList.contains('pipOn')},fit:function(){try{var f=document.getElementById('hqFrame').getBoundingClientRect();return{on:document.body.classList.contains('pipOn'),fw:Math.round(f.width),fh:Math.round(f.height),top:Math.round(f.top),cw:(typeof W!=='undefined'?W:0),ch:(typeof H!=='undefined'?H:0),zoom:(typeof cam!=='undefined'?+cam.zoom.toFixed(2):0),tx:(typeof cam!=='undefined'?cam.tx:0),tz:(typeof cam!=='undefined'?cam.tz:0),mapView:(typeof isMapView==='function'?isMapView():null)}}catch(e){return{err:String(e)}}}};
 })();
 </script>
 <script>
