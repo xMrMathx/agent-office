@@ -822,8 +822,39 @@ body.forceLand .folder,body.forceLand .decorPanel{top:42px;bottom:52px}
 /* ===== THE WIRE — live layer UI (additive: gate, offices card, dock) =====
    Same card language as the rest of the HQ: centered floating cards,
    charcoal + gold, ✕ at the corner. Nothing here restyles anything old. */
-.wireGate{position:fixed;inset:0;z-index:86;background:rgba(8,10,18,.55);display:none;align-items:center;justify-content:center;padding:14px;touch-action:none;overscroll-behavior:none}
+.wireGate{position:fixed;inset:0;z-index:210;background:rgba(8,10,18,.55);display:none;align-items:center;justify-content:center;padding:14px;touch-action:none;overscroll-behavior:none}
 .wireGate.show{display:flex}
+/* ENTRANCE LOCK — a device with NO saved player sits at the front door
+   only: the gate is solid and every piece of the owner's office chrome
+   (top bar, chat, crew surfaces, docks) stays hidden until the visitor
+   has created their OWN player and their OWN office. The bare link can
+   never present the owner's office, name or crew. */
+body.noPlayer .wireGate{display:flex;background:#141010}
+body.noPlayer .topbar,body.noPlayer .bottomBar,body.noPlayer .chatLog,body.noPlayer .minimap,body.noPlayer .rrail,body.noPlayer #railLip,body.noPlayer .wireDock,body.noPlayer #thumbBar,body.noPlayer .modePill,body.noPlayer .toast,body.noPlayer #guidePanel,body.noPlayer #guideScrim{display:none!important}
+/* CONNECT YOUR AI — the stepped hook-up card behind every engine button */
+.museLayer{position:fixed;left:0;top:0;right:0;bottom:0;z-index:96;background:rgba(8,10,18,.62);display:none;align-items:center;justify-content:center;padding:14px;touch-action:none;overscroll-behavior:none}
+.museLayer.show{display:flex;animation:finUp .22s ease}
+.museCard{background:#fff;color:var(--ink);border-radius:16px;width:min(430px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:none;padding:18px;box-shadow:0 24px 55px rgba(15,23,42,.35);border-top:5px solid var(--gold)}
+.museCard h2{margin:3px 0 0;font-size:20px;font-weight:780;line-height:1.2}
+.museSteps{display:flex;gap:5px;margin:13px 0 4px}
+.museSteps i{flex:1;height:4px;border-radius:2px;background:#e2e8f0}
+.museSteps i.on{background:var(--gold)}
+.museStep{display:none}
+.museStep.on{display:block;animation:pvIn .2s ease}
+.museStep p{font-size:13px;color:#475569;line-height:1.55;margin:8px 0 0}
+.museStep textarea{width:100%;margin-top:10px;padding:10px 11px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:12.5px;line-height:1.5;background:#f8fafc;color:var(--ink);resize:none}
+.museBtns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.museBtns button{padding:11px 14px;font-size:13.5px}
+.museBtns .grow{flex:1}
+.museDone{display:flex;gap:8px;align-items:flex-start;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:11px;padding:10px 12px;margin-top:10px;font-size:12.5px;line-height:1.5;color:#14532d}
+.engBtn .engState{display:block;font-size:9px;font-weight:800;letter-spacing:.07em;margin-top:2px;color:#a07d2c}
+.engBtn.sel .engState{color:#15803d}
+/* ADD A PERSON — the one-by-one hire form (fresh offices) */
+.hireFormCard{margin:2px 0 10px;background:#fdf8ec;border:1px solid #e7d9b4;border-radius:13px;padding:12px 13px}
+.hireFormCard h4{margin:0;font-size:14.5px;font-weight:750}
+.hireFormCard p{margin:4px 0 0;font-size:12px;color:#475569;line-height:1.45}
+.hireFormCard label{font-size:11px;font-weight:600;display:block;margin:9px 0 3px;color:var(--muted)}
+.hireFormCard input,.hireFormCard select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font:inherit;font-size:13px;background:#fff;color:var(--ink)}
 .wireCardIn{background:#fff;color:var(--ink);border-radius:16px;width:min(430px,100%);max-height:calc(100dvh - 30px);overflow-y:auto;overscroll-behavior:none;padding:18px 18px 16px;box-shadow:0 24px 55px rgba(15,23,42,.38);border-top:5px solid var(--gold);position:relative;animation:cardIn .22s ease}
 .wireKick{font-size:9.5px;font-weight:800;letter-spacing:.18em;color:#a07d2c}
 .wireCardIn h2{margin:4px 0 0;font-size:21px;font-weight:780;line-height:1.2}
@@ -1044,12 +1075,13 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
 </div>
 <div class="musicPanel" id="musicPanel" aria-label="Office music">
   <div class="mpHead"><b>Office music</b><button class="profX" id="musicClose" aria-label="Close music panel">✕</button></div>
-  <p class="mpSub">Your three tracks, on the office loop — they play through in order and start over. For now it plays in your session; with the live wire, one person's pick plays for the whole office.</p>
+  <p class="mpSub">Your four tracks, on the office loop — they play through in order and start over. For now it plays in your session; with the live wire, one person's pick plays for the whole office.</p>
   <div class="mpRow"><span>Volume</span><input type="range" id="musicVol" min="0" max="100" value="60" aria-label="Music volume"><span class="mpVolVal" id="musicVolVal">60%</span></div>
   <div class="mpMoods">
     <button class="mpMood" data-track="0"><span class="tkCheck">✓</span>Dusty Vinyl<span class="tkDur">2:42</span></button>
     <button class="mpMood" data-track="1"><span class="tkCheck">✓</span>This and That<span class="tkDur">2:12</span></button>
     <button class="mpMood" data-track="2"><span class="tkCheck">✓</span>Almost There<span class="tkDur">2:27</span></button>
+    <button class="mpMood" data-track="3"><span class="tkCheck">✓</span>AO<span class="tkDur">2:28</span></button>
   </div>
   <button class="mpStop" id="musicStop">Stop the music</button>
   <div class="mpState" id="musicState">Music is off.</div>
@@ -1132,7 +1164,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
     <section class="fsec" data-sec="people"><h3>PEOPLE · 1 IN HQ</h3>
       <div class="item"><b class="pplName" data-pcard="craig" role="button" tabindex="0" aria-label="Open Craig Moore's profile">Craig Moore</b> — Owner · <span id="pplCraigStatus">Active</span><br><span id="pplCraigLine" style="color:#64748b">Main Floor, open floor</span><br><button class="gold" id="pplClaim" style="margin-top:6px">Claim a desk on the Main Floor</button> <button class="alt" id="pplGoDesk" style="margin-top:6px">Go to my desk</button></div>
       <h3 style="margin-top:12px">WORK WAITING ON YOUR OKAY</h3><div id="pplPending"><div class="item">Nothing waiting — finished work lands here for your okay before anyone gets paid.</div></div><h3 style="margin-top:12px">WORKERS — HIRED BY CRAIG</h3>
-      <div id="hireRows"></div></section>
+      <div id="hireRows"></div><h3 style="margin-top:12px">ADD A PERSON — HIRE CARD</h3><div class="item">Paste a hire card from your AI agent here. The card's link key must match THIS office — a card carrying any other office's key is rejected plainly, and nobody is added.<br><textarea id="hireCardText" rows="6" placeholder="HIRE CARD&#10;Name: …&#10;Role: …&#10;Look: …&#10;Voice: …&#10;Link key: …" style="width:100%;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font:inherit;font-size:12.5px" aria-label="Paste a hire card"></textarea><button class="gold full" id="hireCardBtn" style="margin-top:7px">Add this person to my office</button><p class="okmsg" id="hireCardMsg"></p></div></section>
     <section class="fsec" data-sec="alerts"><div id="pendingList"></div><div id="alertRows"></div><div class="assignBoard" id="assignBoard"><h3>ASSIGNMENTS — LIVE PROJECTS</h3><div style="font-size:12px;color:#64748b;line-height:1.45">Name a department and a project — it lands here as a live project, that crew works it in the open, and when the ideas are ready they gather in the Blueprint Room and present them to you.</div><div id="assignList"></div><label for="assignDept">Department</label><select id="assignDept"><option value="clipper">Clipper Crew</option><option value="highlights">Highlights</option><option value="rankings">Rankings</option><option value="events">Live Events</option><option value="audit">Audit &amp; Planning</option><option value="anime">Anime Refresh</option></select><label for="assignProject">Project</label><input id="assignProject" type="text" placeholder="e.g. Make Shortz VS search faster"><button class="gold full" id="assignBtn">Assign it — the department gets to work</button><p class="okmsg" id="assignMsg"></p></div><div class="inviteCard"><h4>Build the HQ together</h4><p>Invite your closest collaborators — they claim a desk, decorate their spot, and work right beside the crew.</p><div class="avaStack"><span style="background:#1e293b">C</span><span style="background:#b9975b">+</span></div><div class="icBtns"><button class="icMain" id="icInvite">Invite</button><button class="icLink" id="icCopy" aria-label="Copy the invite">⧉</button></div><p class="okmsg" id="icMsg"></p></div><div id="alertDetail" class="aDetail" style="display:none"></div></section>
     <section class="fsec" data-sec="settings"><h3>AI AGENTS RUNNING THIS OFFICE</h3><p class="engNote">Pick the agents on your phone — and not just one. Connect as many as you have and they ALL run your office at the same time: one agent or a whole team, your choice. ChatGPT, Claude, Perplexity, Meta Muse, Jarvis, Gemini, or anything else you have downloaded. Every connected agent shows on your door as one of this office's engines, so anyone visiting knows whose AI keeps the place alive.</p><div class="engRow" id="engRow">
     <button class="engBtn" data-eng="ChatGPT">ChatGPT</button>
@@ -1141,7 +1173,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
     <button class="engBtn sel" data-eng="Meta Muse">Meta Muse</button>
     <button class="engBtn" data-eng="Jarvis">Jarvis</button>
     <button class="engBtn" data-eng="Gemini">Gemini</button>
-    </div><label for="engCustom">Another agent — whatever you use</label><input id="engCustom" type="text" placeholder="Type your agent's name…"><button class="gold full" id="engApply">Add this agent</button><p class="okmsg" id="engMsg"></p><h3 style="margin-top:16px">OFFICE SETTINGS</h3><label for="officeNameInput">Office name — yours goes on the door</label><input id="officeNameInput" type="text" value="Cre∞tor VibeZ HQ"><button class="gold full" id="applyName">Put it on the door</button><p class="okmsg" id="nameMsg"></p><label for="displayNameInput">Your display name in chat</label><input id="displayNameInput" type="text" value="Craig"><h3 style="margin-top:16px">PAY LINKS — YOUR VENMO &amp; CASH APP</h3><p style="font-size:12px;color:#64748b;margin:0 0 6px">These show on your profile card, so someone in the office can pay you directly in Venmo or Cash App — render a video, get paid, no middleman. HQ never touches the money; it just shows your link.</p><label for="payVenmoInput">Venmo — @handle or full link</label><input id="payVenmoInput" type="text" placeholder="@yourhandle"><label for="payCashInput">Cash App — $cashtag or full link</label><input id="payCashInput" type="text" placeholder="$yourtag"><button class="gold full" id="applyPayLinks">Save pay links</button><p class="okmsg" id="payMsg"></p><h3 style="margin-top:16px">RENAME THE AREAS — YOUR NAMES, YOUR OFFICE</h3><div id="roomNameInputs"></div><button class="gold full" id="applyRoomNames">Save area names</button><p class="okmsg" id="roomNameMsg"></p><h3 style="margin-top:14px">CAMERA</h3><button class="full" id="setSpin">Toggle auto-spin</button><button class="full" id="setReset" style="margin-top:7px">Reset camera view</button></section>
+    </div><label for="engCustom">Another agent — whatever you use</label><input id="engCustom" type="text" placeholder="Type your agent's name…"><button class="gold full" id="engApply">Add this agent</button><p class="okmsg" id="engMsg"></p><h3 style="margin-top:16px">OFFICE SETTINGS</h3><label for="officeNameInput">Office name — yours goes on the door</label><input id="officeNameInput" type="text" value="Cre∞tor VibeZ HQ"><button class="gold full" id="applyName">Put it on the door</button><p class="okmsg" id="nameMsg"></p><label for="displayNameInput">Your display name in chat</label><input id="displayNameInput" type="text" value="Craig"><h3 style="margin-top:16px">STEP 1 — CONNECT YOUR GOOGLE ACCOUNT</h3><p style="font-size:12px;color:#64748b;margin:0 0 6px">Your office is bound to your Google account. Sign in, and the office that opens — on any device — is YOUR office: your crew, your profile, everything as you left it. Nobody else's office ever opens for your account, and yours never opens for theirs.</p><div class="item" id="googleState">Google account: <b>Not connected</b></div><button class="gold full" id="googleBtn">Connect Google account</button><button class="full" id="googleOut" style="display:none;margin-top:7px">Sign out of Google</button><p class="okmsg" id="googleMsg"></p><h3 style="margin-top:16px">STEP 2 — CONNECT YOUR AI AGENT</h3><p style="font-size:12px;color:#64748b;margin:0 0 6px">Only after Google. Your office has its own <b>Office Link Key</b> — unique to this office, different from the public office code, and revocable: regenerate it and every old card stops working. Copy the connection card into your AI agent (Meta Muse, ChatGPT, any). When you ask that AI to add a person, it answers with a hire card — paste the card in People (or in HQ Chat) and that person joins THIS office only.</p><div class="item" id="aiState">AI agent: <b>Not connected</b></div><label for="linkKeyInput">Your Office Link Key — keep it private</label><input id="linkKeyInput" type="text" readonly value=""><label for="aiCardText">Connection card — copy it into your AI agent</label><textarea id="aiCardText" readonly rows="10" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font:inherit;font-size:12px;background:#f8fafc;color:var(--ink)"></textarea><button class="gold full" id="aiCopyBtn">Copy the connection card</button><button class="full" id="aiConfirmBtn" style="margin-top:7px">I pasted it into my AI — mark it connected</button><button class="full" id="aiRegenBtn" style="margin-top:7px">Regenerate the link key (revokes the old one)</button><p class="okmsg" id="aiMsg"></p><h3 style="margin-top:16px">PAY LINKS — YOUR VENMO &amp; CASH APP</h3><p style="font-size:12px;color:#64748b;margin:0 0 6px">These show on your profile card, so someone in the office can pay you directly in Venmo or Cash App — render a video, get paid, no middleman. HQ never touches the money; it just shows your link.</p><label for="payVenmoInput">Venmo — @handle or full link</label><input id="payVenmoInput" type="text" placeholder="@yourhandle"><label for="payCashInput">Cash App — $cashtag or full link</label><input id="payCashInput" type="text" placeholder="$yourtag"><button class="gold full" id="applyPayLinks">Save pay links</button><p class="okmsg" id="payMsg"></p><h3 style="margin-top:16px">RENAME THE AREAS — YOUR NAMES, YOUR OFFICE</h3><div id="roomNameInputs"></div><button class="gold full" id="applyRoomNames">Save area names</button><p class="okmsg" id="roomNameMsg"></p><h3 style="margin-top:14px">CAMERA</h3><button class="full" id="setSpin">Toggle auto-spin</button><button class="full" id="setReset" style="margin-top:7px">Reset camera view</button></section>
     <section class="fsec" data-sec="search"><input id="folderSearch" type="text" placeholder="Search people, rooms, places…" aria-label="Search the HQ" style="margin:4px 0 10px"><h3>SEARCH RESULTS</h3><div id="searchResults"><div class="item">Type in the search field — people, rooms, meetings and places in the HQ will show up here.</div></div></section>
   </div>
   <button class="folderGear" id="folderGear" aria-label="Open settings">⚙ Settings<span>Engine, names &amp; camera ›</span></button>
@@ -1319,6 +1351,7 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
       <input id="wireName" type="text" maxlength="18" placeholder="e.g. Alex" autocomplete="off">
       <label>Pick your look — the office's own people style</label>
       <div class="wireLooks" id="wireLooks"></div>
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:11px"><label>Already have an office? Your Google account knows it</label><button class="gold" id="gateGoogleBtn" type="button" style="width:100%;padding:11px 0">Connect Google account — take me to my office</button><p class="wireNote" id="gateGoogleMsg" style="margin:7px 0 0">Sign in with the Google account your office is bound to and you land in YOUR office — crew, profile and all. New here? Just create your character above — your office is made fresh, and it is yours.</p></div>
     </div>
     <div id="wireStep2" style="display:none">
       <label for="wireBiz">Name your business — it goes on your office door</label>
@@ -1333,6 +1366,19 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
     <div class="wireBtns"><button class="alt" id="wireBack" style="display:none">Back</button><button class="gold" id="wireNext">Next — name your business</button></div>
   </div>
 </div>
+
+<script>
+/* ENTRANCE LOCK — runs the moment the gate markup exists, long before
+   the wire finishes booting: a device with NO saved player is put in
+   noPlayer mode immediately (solid front-door gate, owner's office
+   chrome hidden by the CSS above). A device WITH a saved player —
+   the owner's included — is never touched. The wire's own boot later
+   opens this same gate properly (looks, steps); creating your office
+   lifts the lock (see gateCreate + the identity pass). */
+(function(){try{var p=null;try{p=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+ if(!p||!p.officeId){document.body.classList.add('noPlayer');var g=document.getElementById('wireGate');if(g)g.classList.add('show')}
+}catch(e){}})();
+</script>
 
 <!-- THE WIRE — presence dock: which office you are standing in, and who is really here -->
 <div class="wireDock" id="wireDock"><span class="wireDot local" id="wireDot"></span><span class="wireDockTxt" id="wireDockTxt">The Wire — local preview</span><button id="wireDockBtn">Offices</button></div>
@@ -1575,7 +1621,7 @@ function viewFor(id){if(id==='overview')return{az:Math.PI/4,tilt:0.54,zoom:overv
 function clampPan(){cam.tx=Math.max(-26,Math.min(24,cam.tx));cam.tz=Math.max(-14,Math.min(24,cam.tz));}
 const modePill=document.getElementById('modePill');
 function zoneLabel(){return currentZone==='overview'?'Overview \u2014 every island, one office':NAMES[currentZone==='huddles'?'main':currentZone]&&currentZone==='main'?NAMES.main:(ZONES[currentZone]?({lobby:NAMES.lobby,main:NAMES.main,huddles:'Huddle Rooms',garden:NAMES.garden,planning:NAMES.planning,lounge:NAMES.lounge,tea:NAMES.tea,library:'The Library',movie:NAMES.movie,game:NAMES.game,gaming:NAMES.gaming})[currentZone]:'')}
-function updateModeUI(){modePill.innerHTML=(rotateMode?'<b>ROTATE</b> · drag spins the view — tap ROTATE again to lock this angle':isMapView()?'<b>MAP</b> · zoom in to walk back into the detailed office':!topDownView?'<b>SCROLL</b> · angle locked · drag scrolls at this angle · DEFAULT resets the top-down view':'<b>SCROLL</b> · top-down · drag scrolls · double-tap / double-click floor to walk there')+' · '+(typeof ORDER!=='undefined'&&Object.keys(ORDER).length?'<b>ORDERS LIVE</b> — '+Object.keys(ORDER).length+' called to '+ORDER[Object.keys(ORDER)[0]].label:WORK.active?'<b>WORK RUNNING</b> — '+(WORK.job?WORK.job.label:''):'<b>OPEN FLOOR</b> — Craig is in the office')+' · '+zoneLabel();document.getElementById('rotateBtn').classList.toggle('on',rotateMode);document.getElementById('rotateBtn').setAttribute('aria-pressed',rotateMode);document.getElementById('rotateLbl').textContent=rotateMode?'SCROLL':'ROTATE';cv.classList.toggle('rotateMode',rotateMode);drawMinimap()}
+function updateModeUI(){modePill.innerHTML=(rotateMode?'<b>ROTATE</b> · drag spins the view — tap ROTATE again to lock this angle':isMapView()?'<b>MAP</b> · zoom in to walk back into the detailed office':!topDownView?'<b>SCROLL</b> · angle locked · drag scrolls at this angle · DEFAULT resets the top-down view':'<b>SCROLL</b> · top-down · drag scrolls · double-tap / double-click floor to walk there')+' · '+(typeof ORDER!=='undefined'&&Object.keys(ORDER).length?'<b>ORDERS LIVE</b> — '+Object.keys(ORDER).length+' called to '+ORDER[Object.keys(ORDER)[0]].label:WORK.active?'<b>WORK RUNNING</b> — '+(WORK.job?WORK.job.label:''):'<b>OPEN FLOOR</b> — '+((typeof PEOPLE!=='undefined'&&PEOPLE.craig&&PEOPLE.craig.full)||'Craig')+' is in the office')+' · '+zoneLabel();document.getElementById('rotateBtn').classList.toggle('on',rotateMode);document.getElementById('rotateBtn').setAttribute('aria-pressed',rotateMode);document.getElementById('rotateLbl').textContent=rotateMode?'SCROLL':'ROTATE';cv.classList.toggle('rotateMode',rotateMode);drawMinimap()}
 function goZone(id){lotOpening=false;currentZone=id;tweenTo(viewFor(id));updateModeUI();renderZoneList()}
 document.getElementById('rotateBtn').onclick=()=>{rotateMode=!rotateMode;if(rotateMode&&topDownView){topDownView=false;cam.az=Math.PI/4;cam.tilt=0.54}updateModeUI()};
 document.getElementById('defaultBtn').onclick=()=>resetDefaultView();
@@ -2829,7 +2875,7 @@ cv.addEventListener('pointerup',endP);cv.addEventListener('pointercancel',endP);
 /* ===== Double-tap to walk — Craig only. Single tap (delayed briefly) still opens room/desk cards. ===== */
 let lastTapInfo=null,pendingTapTimer=null,pendingTapPos=null,walkTarget=null;
 let destHideTimer=null;
-function showDestLabel(name,isArea){const pill=document.getElementById('destPill');if(!pill)return;document.getElementById('destName').textContent=name||'That spot';document.getElementById('destSub').textContent=isArea?'Craig is walking there':'Walking there';pill.classList.add('show');clearTimeout(destHideTimer);destHideTimer=setTimeout(()=>pill.classList.remove('show'),2900)}
+function showDestLabel(name,isArea){const pill=document.getElementById('destPill');if(!pill)return;document.getElementById('destName').textContent=name||'That spot';document.getElementById('destSub').textContent=isArea?(((typeof PEOPLE!=='undefined'&&PEOPLE.craig&&PEOPLE.craig.full)||'Craig')+' is walking there'):'Walking there';pill.classList.add('show');clearTimeout(destHideTimer);destHideTimer=setTimeout(()=>pill.classList.remove('show'),2900)}
 function hideDestLabel(){const pill=document.getElementById('destPill');if(pill)pill.classList.remove('show')}
 const NAMED_DESKS=[{x:5.2,z:-1.4,name:"Dex's Cube \u2014 Watchdog"},{x:2.0,z:-1.4,name:"Sanaa's Cube \u2014 Catalog Hunter"},{x:-1.2,z:-1.4,name:"Unclaimed Cube"},{x:-1.2,z:2.2,name:"Tessa's Cube \u2014 Rankings"},{x:2.0,z:2.2,name:"Unclaimed Cube"},{x:5.2,z:2.2,name:"Unclaimed Cube"},{x:8.6,z:2.2,name:"Unclaimed Cube"},{x:8.6,z:-1.4,name:"Unclaimed Cube"},{x:-10.6,z:11,name:'Welcome Desk \u2014 The Lobby'},{x:-1.2,z:5.6,name:"Rico's Cube \u2014 Clipper Captain"},{x:2.0,z:5.6,name:"Unclaimed Cube \u2014 Clipper Row"},{x:5.2,z:5.6,name:"Milo's Cube \u2014 Game Testing"},{x:8.6,z:5.6,name:"Craig's Cube \u2014 Home"}];
 function areaInfoFor(wx,wz){
@@ -4051,7 +4097,7 @@ function renderBgGrid(){const dis=FX.tier==='none',faceOnly=FX.tier==='face';
 document.getElementById('bgFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);const img=new Image();img.onload=()=>{FX.photo=img;FX.photoURL=url;setFxMode('photo')};img.src=url});
 camBtn.onclick=async()=>{await toggleCam();applySelfView();if(camOn&&FX.mode!=='none')startFX();if(!camOn)stopFX()};
 /* ===== OFFICE MUSIC — the boss's own tracks, on the office loop ===== */
-const TRACKS=[{name:'Dusty Vinyl',dur:'2:42',src:'assets/music-dusty-vinyl.mp3'},{name:'This and That',dur:'2:12',src:'assets/music-this-and-that.mp3'},{name:'Almost There',dur:'2:27',src:'assets/music-almost-there.mp3'}];
+const TRACKS=[{name:'Dusty Vinyl',dur:'2:42',src:'assets/music-dusty-vinyl.mp3'},{name:'This and That',dur:'2:12',src:'assets/music-this-and-that.mp3'},{name:'Almost There',dur:'2:27',src:'assets/music-almost-there.mp3'},{name:'AO',dur:'2:28',src:'assets/music-ao.mp3'}];
 const MUS={audio:null,idx:-1,vol:.6};
 function musAudio(){if(!MUS.audio){const a=new Audio();a.preload='auto';a.volume=MUS.vol;a.addEventListener('ended',()=>{if(MUS.idx>=0)musPlay((MUS.idx+1)%TRACKS.length)});a.addEventListener('play',()=>musState());a.addEventListener('pause',()=>musState());MUS.audio=a}return MUS.audio}
 function musPlaying(){return !!(MUS.audio&&!MUS.audio.paused&&MUS.idx>=0)}
@@ -4795,7 +4841,16 @@ if(typeof objects!=='undefined')objects.push(commuteObj);
    ANY office (Craig's, anyone's) gets the identical door
    over its own data: wire/offices/<office-id>/hires. The 'craig-hq'
    fallback only covers the window before the wire has booted. */
-function officeId(){try{if(typeof OWNER_OFFICE!=='undefined'&&OWNER_OFFICE)return OWNER_OFFICE}catch(e){}return 'craig-hq'}
+function ownerProfile(prof){if(!prof)return false;var nm=String(prof.name||'').trim().toLowerCase();var bz=String(prof.business||'').trim().toLowerCase();
+ return nm==='craig'||nm==='craig moore'||nm==='mr. moore'||nm==='mr moore'||bz.indexOf('vibez')>=0}
+function officeId(){ /* PER-OFFICE, RESOLVED FROM THE PLAYER ON THIS DEVICE:
+   a genuine visitor's saved player keys the door to THEIR office — their
+   hires live there and nowhere else. The owner (no visitor profile, or
+   the owner's own saved player) keys to craig-hq, where his crew has
+   always lived. */
+ try{var prof=null;try{prof=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+ if(prof&&prof.officeId&&prof.officeId!=='craig-hq'&&!ownerProfile(prof))return prof.officeId}catch(e){}
+ return 'craig-hq'}
 function doorPath(){return 'wire/offices/'+officeId()+'/hires'}
 var SEED={
  rico:{name:'Rico',role:'Clipper Captain — leads the Clipper team (Marco, Dev) in the Numbers Lab; cuts Shortz moments into clips',slot:'clipper',look:'rico'},
@@ -4805,6 +4860,7 @@ var SEED={
  'test-six':{name:'Tessa',role:'Rankings Watch — watches rankings and Top 10 movements',slot:'rankings',look:'tessa'},
  marco:{name:'Marco',role:'Clipper — watches live streams with Rico, calls out the moments worth clipping',slot:'clipper',look:'marco'},
  dev:{name:'Dev',role:'Clipper — timestamps and captions in the Numbers Lab, readies every cut for Rico',slot:'clipper',look:'dev'}};
+var OWNER_CREW={rico:1,sanaa:1,dex:1,milo:1,'test-six':1,marco:1,dev:1,vance:1,lena:1,omar:1,kian:1,sofia:1,trey:1};
 var BALS={rico:90,sanaa:70,dex:80,milo:40};
 var WISHES={rico:['rig3','neon','leafy'],sanaa:['books','globe'],dex:['banner','goldrecord'],milo:['rig2','stringlights','trophy']};
 var LINES={
@@ -4913,7 +4969,7 @@ function despawn(id){
  for(var si=SEARCH_INDEX.length-1;si>=0;si--){if(SEARCH_INDEX[si][0]===h.rec.name)SEARCH_INDEX.splice(si,1)}
  if(arrivedSet[id]){delete arrivedSet[id];saveArrived()}
  peopleCount();
- logTalk('HQ',h.rec.name+' has left the office.','sys')}
+ if(!rekeying)logTalk('HQ',h.rec.name+' has left the office.','sys')}
 /* arrival milestones — the drive-in reads in Office Talk as it happens */
 setInterval(function(){Object.keys(hires).forEach(function(id){var h=hires[id];if(!h.arriving||!h.commuter)return;var st=h.commuter.state;
  if(st==='driveIn'&&!h.seen.drive){h.seen.drive=true;logTalk('HQ',h.rec.name+' is driving in — car is in the lot.','sys')}
@@ -4922,13 +4978,15 @@ setInterval(function(){Object.keys(hires).forEach(function(id){var h=hires[id];i
 function onRecord(id,rec){if(!rec||!rec.name)return;if(hires[id])return;instantiate(id,rec,!arrivedSet[id])}
 function onRemoved(id){despawn(id)}
 /* ---------- backends: live database, or this device — same path ---------- */
-var doorMode='boot',doorRef=null;
-function localStore(){try{return JSON.parse(localStorage.getItem('hqHiresDoor')||'{}')}catch(e){return{}}}
-function localSave(m){try{localStorage.setItem('hqHiresDoor',JSON.stringify(m))}catch(e){}}
+var doorMode='boot',doorRef=null,doorDb=null,doorKeyedPath='',rekeying=false;
+function storeKey(){var oid=officeId();return oid==='craig-hq'?'hqHiresDoor':'hqHiresDoor__'+oid}
+function localStore(){try{return JSON.parse(localStorage.getItem(storeKey())||'{}')}catch(e){return{}}}
+function localSave(m){try{localStorage.setItem(storeKey(),JSON.stringify(m))}catch(e){}}
 function doorWrite(id,rec){if(doorMode==='live'&&doorRef){doorRef.child(id).set(rec)}else{var m=localStore();m[id]=rec;localSave(m);onRecord(id,rec)}}
 function doorRemove(id){if(doorMode==='live'&&doorRef){doorRef.child(id).remove()}else{var m=localStore();delete m[id];localSave(m);try{var rm=JSON.parse(localStorage.getItem('hqHiresRemoved')||'[]');if(rm.indexOf(id)<0){rm.push(id);localStorage.setItem('hqHiresRemoved',JSON.stringify(rm))}}catch(e){} onRemoved(id)}}
-function seedIfEmpty(existing){if(existing&&Object.keys(existing).length)return;Object.keys(SEED).forEach(function(id){doorWrite(id,SEED[id])})}
-function goLocal(){if(doorMode!=='boot')return;doorMode='local';
+function seedIfEmpty(existing){if(officeId()!=='craig-hq')return; /* a fresh office starts EMPTY — no seeded crew, ever; its owner adds people one by one */
+ if(existing&&Object.keys(existing).length)return;Object.keys(SEED).forEach(function(id){doorWrite(id,SEED[id])})}
+function goLocal(){if(doorMode!=='boot')return;doorMode='local';doorKeyedPath=doorPath();
  /* FOUNDERS ALWAYS ARRIVE — seed every founding hire that is missing,
     not only when the store is totally empty: another module can write
     a record (Marco, Dev) before this door finishes booting, and the
@@ -4937,10 +4995,10 @@ function goLocal(){if(doorMode!=='boot')return;doorMode='local';
     name call to any of them had nobody to move. A founder the owner
     deliberately removed stays removed (tombstone in doorRemove). */
  var removed={};try{(JSON.parse(localStorage.getItem('hqHiresRemoved')||'[]')).forEach(function(id){removed[id]=true})}catch(e){}
- var before=localStore();Object.keys(SEED).forEach(function(id){if(!before[id]&&!removed[id])doorWrite(id,SEED[id])});
+ var before=localStore();if(officeId()==='craig-hq'){Object.keys(SEED).forEach(function(id){if(!before[id]&&!removed[id])doorWrite(id,SEED[id])})}
  var m=localStore();Object.keys(m).forEach(function(id){onRecord(id,m[id])});
  logTalk('HQ','The hire door is running on this device (local preview) — same records, same arrival; it goes live with the wire.','sys')}
-function goLive(db){if(doorMode!=='boot')return;doorMode='live';doorRef=db.ref(doorPath());
+function goLive(db){if(doorMode!=='boot')return;doorMode='live';doorDb=db;doorKeyedPath=doorPath();doorRef=db.ref(doorPath());
  doorRef.on('child_added',function(s){onRecord(s.key,s.val())});
  doorRef.on('child_removed',function(s){onRemoved(s.key)});
  doorRef.once('value',function(s){seedIfEmpty(s.val()||{})});
@@ -4956,13 +5014,51 @@ function loadFs(src){return new Promise(function(res,rej){var s=document.createE
  },400);
  setTimeout(function(){goLocal()},12000);
 })();
-window.addEventListener('storage',function(e){if(e.key!=='hqHiresDoor'||doorMode!=='local')return;var m=localStore();
+window.addEventListener('storage',function(e){if((e.key!=='hqHiresDoor'&&e.key!==storeKey())||doorMode!=='local')return;var m=localStore();
  Object.keys(m).forEach(function(id){if(!hires[id])onRecord(id,m[id])});
  Object.keys(hires).forEach(function(id){if(!m[id])onRemoved(id)})});
+/* ---------- HIRE CARDS — STEP 3 of the connect flow ----------
+   A hire card is what the owner's own AI agent hands back (see the
+   connection card in Settings). Pasted here — in HQ Chat or in the
+   People paste box — it is checked against THIS office's Office Link
+   Key (published by the wire as window.__hqLinkKey): the right key
+   adds that ONE person to THIS office only, through this same door;
+   a wrong or absent key is rejected plainly and nobody is added.
+   Accepting the first valid card also completes the AI connection. */
+function slotFromRole(role){var r=' '+(role||'').toLowerCase()+' ';
+ if(/clip|stream|reel|video/.test(r))return 'clipper';if(/catalog|show|movie|title/.test(r))return 'highlights';
+ if(/watch|health|audit|check/.test(r))return 'audit';if(/game|test|joust|bug/.test(r))return 'gaming';
+ if(/rank|chart|top 10/.test(r))return 'rankings';if(/sales|store|order|payout/.test(r))return 'sales';
+ if(/merch|design|seller|shop/.test(r))return 'merch';if(/event/.test(r))return 'events';if(/anime/.test(r))return 'anime';return 'library'}
+function acceptHireCard(v,echo){
+ if(!v||!/hire card/i.test(v))return false;
+ var LABELS=['Office','Name','Role','Job','Look','Voice','Link key','Key'];
+ function fld(label){var m=v.match(new RegExp(label+'\\s*:\\s*','i'));if(!m)return '';
+  var rest=v.slice(m.index+m[0].length);var end=rest.length;
+  LABELS.forEach(function(L){if(L.toLowerCase()===label.toLowerCase())return;var mm=rest.match(new RegExp('\\b'+L.replace(' ','\\s')+'\\s*:','i'));if(mm&&mm.index<end)end=mm.index});
+  return rest.slice(0,end).trim().replace(/[\s,;]+$/,'')}
+ var nm=fld('Name'),role=fld('Role')||fld('Job'),look=fld('Look'),voice=fld('Voice'),key=fld('Link key')||fld('Key');
+ if(echo){var dn=document.getElementById('displayNameInput');var who=(dn&&dn.value.trim())||'Craig';appendMsg(who,v,true)}
+ var want='';try{want=(window.__hqLinkKey&&__hqLinkKey.get)?__hqLinkKey.get(officeId()):''}catch(e){}
+ if(!nm){logTalk('HQ','That hire card has no Name on it \u2014 nobody was added. A hire card needs a Name, a Role, a Look, a Voice and this office\u2019s link key.','sys');return true}
+ if(!want||!key||key!==want){logTalk('HQ','Hire card rejected \u2014 its link key does not match this office, so nobody was added. A card only lands in the one office whose key it carries.','sys');return true}
+ var rec={name:nm,role:role||'New hire',slot:slotFromRole(role),look:slug(look||'dev'),voice:voice||''};
+ doorWrite(slug(nm),rec);
+ try{if(window.__hqLinkKey&&__hqLinkKey.markConnected)__hqLinkKey.markConnected(officeId(),'hire-card')}catch(e){}
+ logTalk('HQ','Hire card accepted \u2014 '+nm+' is on this office\u2019s list'+(voice?(', voice: '+voice):'')+'. Watch the lot.','sys');
+ return true}
+var hcb=document.getElementById('hireCardBtn');
+if(hcb)hcb.onclick=function(){var ta=document.getElementById('hireCardText');var t=ta?ta.value.trim():'';var msg=document.getElementById('hireCardMsg');
+ if(!t){if(msg)msg.textContent='Paste a hire card first.';return}
+ var before=Object.keys(hires).length;
+ if(acceptHireCard(t,false)){
+  if(Object.keys(hires).length>before){if(msg)msg.textContent='Added \u2014 they are on this office\u2019s list and arriving through the front door.';if(ta)ta.value=''}
+  else if(msg)msg.textContent='That card was not accepted \u2014 Office Talk says why, plainly (a missing name, or a link key that is not this office\u2019s).'}};
 /* chat is a hiring channel too: "hire Name · Role · slot · look" */
 var _origSendChat=sendChat;
 sendChat=function(){
  var inp=document.getElementById('chatInput');var v=inp?inp.value.trim():'';
+ if(acceptHireCard(v,true)){if(inp)inp.value='';return}
  var hm=v.match(/^hire\s+(.+)$/i),fm=v.match(/^(?:unhire|remove hire)\s+(.+)$/i);
  if(hm){var parts=hm[1].split(/\s*[·|]\s*|\s*,\s*/);var nm=(parts[0]||'').trim();
   if(nm){var rec={name:nm,role:(parts[1]||'New hire').trim()||'New hire',slot:slug(parts[2]||'library'),look:slug(parts[3]||'dev')};
@@ -4970,8 +5066,23 @@ sendChat=function(){
    logTalk('HQ','Hiring '+nm+' — the record is on the office list. Watch the lot.','sys');return}}
  if(fm){var id2=slug(fm[1].trim());if(hires[id2]){doorRemove(id2);if(inp)inp.value='';appendMsg('Craig',v,true);return}}
  _origSendChat()};
-window.__hqHires={mode:function(){return doorMode},path:function(){return doorPath()},office:function(){return officeId()},
- add:function(rec){var id=slug(rec&&rec.name);doorWrite(id,rec);return id},
+function rekey(){var p=doorPath();if(!doorMode||doorMode==='boot'||p===doorKeyedPath)return;
+ rekeying=true;Object.keys(hires).slice().forEach(function(id){despawn(id)});rekeying=false;
+ if(doorMode==='live'&&doorDb){if(doorRef){try{doorRef.off()}catch(e){}} doorRef=doorDb.ref(p);
+  doorRef.on('child_added',function(s){onRecord(s.key,s.val())});
+  doorRef.on('child_removed',function(s){onRemoved(s.key)});
+  doorRef.once('value',function(s){seedIfEmpty(s.val()||{})});}
+ else{var m=localStore();Object.keys(m).forEach(function(id){onRecord(id,m[id])})}
+ doorKeyedPath=p}
+window.__hqHires={mode:function(){return doorMode},path:function(){return doorPath()},office:function(){return officeId()},rekey:rekey,
+ add:function(rec){var id=slug(rec&&rec.name);
+  /* ONE-BY-ONE LAW — in any office that is not Craig's, the app's own
+     crew backstops may not write Craig's people in: a fresh office
+     starts EMPTY, and its owner adds people one by one himself. (The
+     owner's own hiring — chat "hire …" — writes through doorWrite
+     directly and is never gated.) */
+  if(officeId()!=='craig-hq'&&OWNER_CREW[id])return id;
+  doorWrite(id,rec);return id},
  remove:function(id){doorRemove(id)},
  list:function(){var o={};Object.keys(hires).forEach(function(k){o[k]=hires[k].rec});return o}};
 })();
@@ -5384,7 +5495,12 @@ var Store={offices:{},links:{}};
 function saveLocal(){try{localStorage.setItem('hqWireOffices',JSON.stringify(Store.offices));localStorage.setItem('hqWireLinks',JSON.stringify(Store.links))}catch(e){}}
 function loadLocal(){try{Store.offices=JSON.parse(localStorage.getItem('hqWireOffices')||'{}')}catch(e){Store.offices={}} try{Store.links=JSON.parse(localStorage.getItem('hqWireLinks')||'{}')}catch(e){Store.links={}}}
 function pairKey(a,b){return [a,b].sort().join('__')}
-function seedOwnerOffice(){if(!Store.offices[OWNER_OFFICE]){Store.offices[OWNER_OFFICE]={id:OWNER_OFFICE,ownerName:'Craig',business:'Cre∞tor VibeZ HQ',look:'craig',code:'VIBEZ1',createdAt:Date.now()};if(BACK.mode==='live')BACK.putOffice(Store.offices[OWNER_OFFICE]);else saveLocal()}}
+function seedOwnerOffice(){if(!Store.offices[OWNER_OFFICE]){Store.offices[OWNER_OFFICE]={id:OWNER_OFFICE,ownerName:'Craig',business:'Cre∞tor VibeZ HQ',look:'craig',code:'VIBEZ1',ownerEmail:'craigjrbb@gmail.com',createdAt:Date.now()};if(BACK.mode==='live')BACK.putOffice(Store.offices[OWNER_OFFICE]);else saveLocal()}
+ /* the home office's account of record rides on its own office record —
+    the connect flow matches a signing-in account against office records
+    generically (any owner's record can carry their account the same
+    way); backfill it onto the existing home record once. */
+ var ex=Store.offices[OWNER_OFFICE];if(ex&&!ex.ownerEmail){ex.ownerEmail='craigjrbb@gmail.com';if(BACK.mode==='live')BACK.putOffice(ex);else saveLocal()}}
 function myHomeId(){return (sessionActive&&profile)?profile.officeId:OWNER_OFFICE}
 function linkedIds(id){var out=[];Object.keys(Store.links).forEach(function(k){if(!Store.links[k])return;var p=k.split('__');if(p[0]===id&&p[1]!==id)out.push(p[1]);if(p[1]===id&&p[0]!==id)out.push(p[0])});return out}
 function isLinked(a,b){return a===b||!!Store.links[pairKey(a,b)]}
@@ -5415,7 +5531,8 @@ function loadScript(src){return new Promise(function(res,rej){var s=document.cre
 var remoteObjs={};
 function myName(){return (sessionActive&&profile)?profile.name:'Craig'}
 function myLook(){return (sessionActive&&profile)?profile.look:'craig'}
-function publishPresence(){if(!currentOffice)return;var p={uid:uid,name:myName(),look:myLook(),office:currentOffice,ts:Date.now(),x:0,z:0};if(typeof craigObj!=='undefined'&&craigObj){p.x=+craigObj.cx.toFixed(2);p.z=+craigObj.cz.toFixed(2)} BACK.setPresence(p)}
+function publishPresence(){if(!profile)return; /* no player made yet = not in any office — never publish a presence wearing the owner's name/look */
+ if(!currentOffice)return;var p={uid:uid,name:myName(),look:myLook(),office:currentOffice,ts:Date.now(),x:0,z:0};if(typeof craigObj!=='undefined'&&craigObj){p.x=+craigObj.cx.toFixed(2);p.z=+craigObj.cz.toFixed(2)} BACK.setPresence(p)}
 function drawRemoteFigure(o,t,mode){var cfg=o.cfg;var u=cam.zoom*.44*1.18;var p=proj(o.cx,.08,o.cz);
  ctx.save();ctx.beginPath();ctx.ellipse(p[0],p[1]+2,.30*u,.08*u,0,0,7);ctx.fillStyle='rgba(15,23,42,.20)';ctx.fill();ctx.restore();
  var bob=mode==='walk'?Math.abs(Math.sin(t*10+cfg.ph))*.05*u:Math.sin(t*1.6+cfg.ph)*.012*u;
@@ -5490,8 +5607,12 @@ function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value
  var oid='ofc-'+rnd(6);profile={id:'u-'+rnd(8),name:name,business:biz,look:gateLook,officeId:oid,createdAt:Date.now()};uid=profile.id;
  try{localStorage.setItem('hqVisitor',JSON.stringify(profile))}catch(e){}
  var rec={id:oid,ownerName:name,business:biz,look:gateLook,code:rnd(6).toUpperCase(),createdAt:Date.now()};Store.offices[oid]=rec;BACK.putOffice(rec);
+ if(authUser&&authUser.email)bindAccount(authUser.email,oid); /* signed in at the entrance: this account owns the new office, on every device */
+ ensureLinkKey(oid,false);
  sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
- reskin();closeGate();
+ reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
+ document.body.classList.remove('noPlayer'); /* entrance lock lifts — this device now has its OWN player and its OWN office */
+ closeGate();
  var target=pendingVisit||oid;if(pendingVisit&&pendingVisit!==oid)linkOffices(oid,pendingVisit);
  pendingVisit=null;enterOffice(target,{teleport:true});
  logTalk(name,'Just opened '+biz+' — walking into my office for the first time.','me');
@@ -5517,7 +5638,7 @@ function renderWireUI(){var myRec=Store.offices[myHomeId()];var cur=Store.office
  else{if(dt)dt.textContent=(BACK.mode==='live'?'Live · ':'Local preview · ')+((cur&&(cur.business||cur.name))||(currentOffice===OWNER_OFFICE?'Cre∞tor VibeZ HQ':currentOffice))+(currentOffice!==myHomeId()?' · visiting':'')+(here.length>1?' · '+here.length+' here':'');if(db)db.textContent='Offices'}
  var hl=$('wireHereList');if(hl){var rows=here.map(function(p){return '<div class="wireHereRow"><span class="wDot"></span><span><b>'+esc(p.name)+'</b>'+(p.uid===uid?' · you':' · in this office now')+'</span></div>'}).join('');hl.innerHTML=rows||'<div class="wireNote">Just you so far.</div>'}
  var ol=$('wireOfficeList');if(ol){var ids=Object.keys(Store.offices);ol.innerHTML=ids.map(function(id){var o=Store.offices[id];var isCur=id===currentOffice,linked=isLinked(id,myHomeId())||id===myHomeId();
-   return '<div class="wireOffRow"><div style="min-width:0"><b>'+esc(o.business||o.name||o.id)+'</b><span>'+esc(o.ownerName||'')+(typeof o.plot==='number'?' · Plot '+(o.plot+1):'')+(o.locked?' · locked':'')+(isCur?' · you are here':linked?' · connected':' · not connected yet')+'</span></div>'+(isCur?'<button class="alt" disabled style="opacity:.55">Here</button>':linked?'<button class="gold" data-enter="'+id+'">Walk in</button>':'<button class="alt" data-link="'+id+'">Link</button>')+'</div>'}).join('')||'<div class="wireNote">No offices yet.</div>';
+   return '<div class="wireOffRow"><div style="min-width:0"><b>'+esc(o.business||o.name||o.id)+'</b><span>'+esc(o.ownerName||'')+(typeof o.plot==='number'?' · Plot '+(o.plot+1):'')+(o.locked?' · locked':'')+(isCur?' · you are here':linked?' · connected':' · not connected yet')+'</span></div>'+(isCur?'<button class="alt" disabled style="opacity:.55">Here</button>':linked?'<button class="gold" data-enter="'+id+'">Walk in</button>':'<span class="wireNote" style="white-space:nowrap;align-self:center">Join with their code</span>')+'</div>'}).join('')||'<div class="wireNote">No offices yet.</div>';
   ol.querySelectorAll('[data-enter]').forEach(function(b){b.onclick=function(){var id=b.dataset.enter;$('wireCard').classList.remove('show');enterOffice(id,{teleport:true});logTalk('Doorway','You walked through — welcome to '+(Store.offices[id]?Store.offices[id].business:id)+'.','sys')}});
   ol.querySelectorAll('[data-link]').forEach(function(b){b.onclick=function(){linkOffices(myHomeId(),b.dataset.link);cardMsg('Connected — the doorway in the Lobby now links both offices, both ways.',true)}})}
  var mc=$('wireMyCode');if(mc)mc.textContent=myRec?myRec.code:'······';
@@ -5564,13 +5685,137 @@ function bootWire(){loadLocal();BACK=LocalBack;seedOwnerOffice();
   if(sessionActive&&profile)reskin();
   if(visitId){pendingVisit=visitId;
    if(profile){sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){} reskin();linkOffices(profile.officeId,visitId);enterOffice(visitId,{})}
-   else{enterOffice(visitId,{});openGate(false)}}
-  else if(profile&&sessionActive){enterOffice(profile.officeId,{})}
-  else{welcomeBack=!!profile;enterOffice(OWNER_OFFICE,{})}
+   else{ /* INVITE LINK, NO PLAYER YET — entrance first: you make your
+            player, then gateCreate walks you into the office that
+            invited you, as yourself. Until then you are in NO office —
+            never inside the owner's, never wearing his profile. */
+    openGate(false)}}
+  else if(profile){ /* A SAVED PLAYER walks straight into THEIR OWN office —
+       Craig's devices included: his saved player is his, and the office
+       on his profile is his office. No gate, no detour, exactly as his
+       saved entry has always worked. */
+   sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
+   reskin();enterOffice(profile.officeId||OWNER_OFFICE,{})}
+  else{ /* NO SAVED PLAYER — THE BARE LINK IS AN ENTRANCE, NEVER AN OFFICE.
+       Create your character, name your business, pick your plot; you
+       land in your own fresh office. The owner's office (VIBEZ1), his
+       crew and his "Mr. Moore" profile never load for an uninvited
+       visitor, and joining his office happens only by his office code
+       or an invite link — never by default. */
+   openGate(false)}
   publishPresence();setInterval(publishPresence,1500);syncTick();setInterval(syncTick,2200);renderWireUI()};
  if(WIRE_FIREBASE_CONFIG){loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js').then(function(){return loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js')}).then(function(){try{firebase.initializeApp(WIRE_FIREBASE_CONFIG);LiveBack.db=firebase.database();BACK=LiveBack;seedOwnerOffice()}catch(e){BACK=LocalBack} finish()}).catch(function(){BACK=LocalBack;finish()})}
  else finish()}
 bootWire();
+/* ---------- CONNECT — his order: (1) GOOGLE FIRST, (2) AI AGENT, (3) HIRE CARDS ----------
+   Step 1: Firebase Auth Google sign-in. The account is BOUND to one
+   office: wire/accounts/<email-key> → officeId (mirrored on this device
+   in local preview). Signing in adopts that office as your player —
+   its record, its crew (the doors re-key to it), its profile. If no
+   binding exists yet, the flow looks for an office record that names
+   this account as its owner (ownerEmail on the record — the owner's
+   own data, carried the same way for every office) and binds to that
+   office. The mechanic is identical for every owner: no account, name
+   or office is special-cased anywhere in the flow.
+   Step 2: each office record carries its own linkKey — unique per
+   office, NOT the public office code, regenerable (regenerating
+   revokes the old key and un-marks the AI connection). The connection
+   card is generated from the signed-in owner's own office record:
+   office name, owner name, office link, key, and the hire-card format
+   his AI must answer in. AI shows "connected" only when the owner
+   confirms the paste OR the first valid hire card is accepted.
+   Step 3 lives in the hires door: a pasted hire card is checked
+   against THIS office's key (window.__hqLinkKey) — right key, the
+   person joins this office only; wrong or absent key, rejected. */
+var OFFICE_URL='https://muse.ai/s/agent-office-xaxj6spmicea2/tn2kaEGs_DMDZD2iJRspaUpGhNO6lcC72sIviMIuw3I';
+var authUser=null,authInst=null,authTried=false;
+function emailKey(e){return String(e||'').toLowerCase().replace(/[^a-z0-9]/g,'_')}
+function acctLocal(){try{return JSON.parse(localStorage.getItem('hqWireAccounts')||'{}')}catch(e){return{}}}
+function bindAccount(email,officeId){var k=emailKey(email);var rec={email:email,officeId:officeId,at:Date.now()};
+ if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).set(rec);return}catch(e){}}
+ var m=acctLocal();m[k]=rec;try{localStorage.setItem('hqWireAccounts',JSON.stringify(m))}catch(e){}}
+function readBinding(email,cb){var k=emailKey(email);
+ if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).once('value',function(s){cb(s.val()||null)});return}catch(e){}}
+ cb(acctLocal()[k]||null)}
+function myOfficeRec(){return Store.offices[myHomeId()]||null}
+function ensureLinkKey(oid,regen){var rec=Store.offices[oid];if(!rec)return linkKeyFor(oid);
+ if(rec.linkKey&&!regen){try{localStorage.setItem('hqLinkKey_'+oid,rec.linkKey)}catch(e){} return rec.linkKey}
+ var key='AO-'+rnd(4).toUpperCase()+'-'+rnd(4).toUpperCase()+'-'+rnd(4).toUpperCase();
+ rec.linkKey=key;rec.linkKeyAt=Date.now();if(regen){rec.aiConnected=false;delete rec.aiConnectedVia}
+ try{BACK.putOffice(rec)}catch(e){}
+ try{localStorage.setItem('hqLinkKey_'+oid,key)}catch(e){}
+ return key}
+function linkKeyFor(oid){var rec=Store.offices[oid];if(rec&&rec.linkKey)return rec.linkKey;
+ if(rec)return ensureLinkKey(oid,false);
+ try{return localStorage.getItem('hqLinkKey_'+oid)||''}catch(e){return ''}}
+function markAiConnected(oid,via){var rec=Store.offices[oid];if(!rec)return;
+ if(!rec.aiConnected){rec.aiConnected=true;rec.aiConnectedVia=via;rec.aiConnectedAt=Date.now();try{BACK.putOffice(rec)}catch(e){}}
+ renderConnectUI()}
+window.__hqLinkKey={get:function(oid){return linkKeyFor(oid)},markConnected:function(oid,via){markAiConnected(oid,via||'hire-card')}};
+function connectionCard(){var rec=myOfficeRec();var oid=myHomeId();var key=ensureLinkKey(oid,false);
+ var biz=rec?(rec.business||rec.name||oid):oid;var owner=rec?(rec.ownerName||''):((profile&&profile.name)||'');
+ return 'You are connecting to my office in Agent Office (AO).\n\nOffice: '+biz+'\nOwner: '+owner+'\nOffice link: '+OFFICE_URL+'\nOffice Link Key: '+key+'\n\nWhen I ask you to add a person to my office, answer with exactly one hire card in this format, and nothing else around it:\n\nHIRE CARD\nOffice: '+biz+'\nName: <the person\u2019s name>\nRole: <their job in the office>\nLook: <one of: rico, marco, dev, sanaa, dex, milo, tessa, craig>\nVoice: <a voice name or a short voice description>\nLink key: '+key+'\n\nI paste that card into my office and the person is added to THIS office only. The link key is private \u2014 it proves the card belongs to my office. A card carrying any other key is rejected. Never share this key with anyone else.'}
+function renderConnectUI(){
+ var gs=$('googleState');if(gs)gs.innerHTML=authUser?('Google account: <b>'+esc(authUser.email)+'</b> \u2014 connected. Any device signed in with this account opens the office bound to it.'):('Google account: <b>Not connected</b>');
+ var gb=$('googleBtn');if(gb)gb.style.display=authUser?'none':'';
+ var go=$('googleOut');if(go)go.style.display=authUser?'':'none';
+ var rec=myOfficeRec();var oid=myHomeId();
+ var ai=$('aiState');if(ai){if(!authUser)ai.innerHTML='AI agent: <b>Locked \u2014 connect Google first (Step 1)</b>';
+  else if(rec&&rec.aiConnected)ai.innerHTML='AI agent: <b>Connected</b> \u2014 '+(rec.aiConnectedVia==='hire-card'?'its first hire card was accepted by this office.':'you confirmed the paste.');
+  else ai.innerHTML='AI agent: <b>Not connected</b> \u2014 copy the card below into your AI, then confirm the paste, or let its first hire card land.'}
+ var lk=$('linkKeyInput');if(lk&&document.activeElement!==lk)lk.value=authUser?ensureLinkKey(oid,false):'';
+ var ct=$('aiCardText');if(ct&&document.activeElement!==ct)ct.value=authUser?connectionCard():'Connect Google (Step 1) first \u2014 your connection card is generated from your own office, in your name.';
+}
+function adoptOffice(oid,user,tries){var rec=Store.offices[oid];
+ if(!rec&&(tries||0)<6){setTimeout(function(){adoptOffice(oid,user,(tries||0)+1)},1500);return}
+ rec=rec||{id:oid,business:'Your office',ownerName:(user&&user.displayName)||'Owner',look:'craig'};
+ profile={id:uid,name:rec.ownerName||(user&&user.displayName)||'Owner',business:rec.business||'',look:rec.look||'craig',officeId:oid,createdAt:Date.now(),email:user?user.email:''};
+ try{localStorage.setItem('hqVisitor',JSON.stringify(profile))}catch(e){}
+ sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
+ reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
+ try{closeGate()}catch(e){}
+ enterOffice(oid,{teleport:true});renderConnectUI();
+ try{logTalk('HQ','Google sign-in \u2014 '+(user?user.email:'your account')+' is bound to '+rec.business+'. This is your office, on this device too.','sys')}catch(e){}}
+function resolveAccount(user){if(!user||!user.email)return;
+ readBinding(user.email,function(b){
+  if(b&&b.officeId){adoptOffice(b.officeId,user);return}
+  var ownedId=null;Object.keys(Store.offices).forEach(function(id){var r=Store.offices[id];if(r&&r.ownerEmail&&String(r.ownerEmail).toLowerCase()===String(user.email).toLowerCase())ownedId=id});
+  if(ownedId){bindAccount(user.email,ownedId);adoptOffice(ownedId,user);return}
+  if(profile&&profile.officeId){bindAccount(user.email,profile.officeId);renderConnectUI();
+   try{logTalk('HQ','Google connected \u2014 '+user.email+' is now bound to your office ('+(Store.offices[profile.officeId]?Store.offices[profile.officeId].business:profile.officeId)+'). Sign in with it on any device and this office opens.','sys')}catch(e){}
+   return}
+  openGate(false);var m=$('gateGoogleMsg');if(m)m.textContent='Signed in as '+user.email+' \u2014 now create your character and your office below; this account will own it.'})}
+function authBoot(){if(authTried)return;authTried=true;
+ var start=function(){try{if(typeof firebase==='undefined'||!firebase.auth)return;
+   var app=null;try{app=firebase.app('authDoor')}catch(e){try{app=firebase.initializeApp(WIRE_FIREBASE_CONFIG,'authDoor')}catch(e2){}}
+   if(!app)return;authInst=app.auth?app.auth():null;if(!authInst)return;
+   try{var rr=authInst.getRedirectResult();if(rr&&rr.catch)rr.catch(function(){})}catch(e){}
+   authInst.onAuthStateChanged(function(u){authUser=u||null;renderConnectUI();if(u)resolveAccount(u)});
+  }catch(e){}};
+ if(typeof firebase!=='undefined'&&firebase.auth){start();return}
+ loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js').then(function(){return loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js')}).then(start).catch(function(){})}
+function googleSignIn(){var msg=function(t){var m=$('googleMsg');if(m)m.textContent=t;var g=$('gateGoogleMsg');if(g)g.textContent=t};
+ var go=function(){if(!authInst){msg('Google sign-in could not start here \u2014 it needs the live connection. Check the network and try again.');return}
+  try{var prov=new firebase.auth.GoogleAuthProvider();
+   authInst.signInWithPopup(prov).catch(function(err){var code=err&&err.code?String(err.code):'';
+    if(code.indexOf('popup-blocked')>=0||code.indexOf('popup-closed')>=0||code.indexOf('cancelled-popup')>=0){msg('The sign-in popup was blocked \u2014 taking you to Google sign-in instead\u2026');try{authInst.signInWithRedirect(prov)}catch(e){msg('Google sign-in did not start: '+(err&&err.message?err.message:code))}}
+    else msg('Google sign-in did not finish: '+(err&&err.message?err.message:code))});
+  }catch(e){msg('Google sign-in did not start on this device.')}};
+ if(authInst){go();return}
+ authBoot();var n=0;var iv=setInterval(function(){n++;if(authInst){clearInterval(iv);go()}else if(n>16){clearInterval(iv);msg('Google sign-in needs the live wire \u2014 it turns on with the same Firebase connection as the rest of the office, and it is not reachable from here right now.')}},500)}
+(function wireConnectUI(){
+ var gb=$('googleBtn');if(gb)gb.onclick=googleSignIn;
+ var go=$('googleOut');if(go)go.onclick=function(){try{if(authInst)authInst.signOut()}catch(e){} authUser=null;renderConnectUI();var m=$('googleMsg');if(m)m.textContent='Signed out. Your office stays bound to the account \u2014 sign back in and it opens.'};
+ var gg=$('gateGoogleBtn');if(gg)gg.onclick=googleSignIn;
+ var ac=$('aiCopyBtn');if(ac)ac.onclick=function(){var ct=$('aiCardText');if(!ct)return;var done=function(){var m=$('aiMsg');if(m)m.textContent='Connection card copied \u2014 paste it into your AI agent. Your AI is marked connected when you confirm the paste below, or when its first hire card is accepted.'};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(ct.value).then(done,function(){ct.select();try{document.execCommand('copy')}catch(e){} done()});
+  else{ct.select();try{document.execCommand('copy')}catch(e){} done()}};
+ var acf=$('aiConfirmBtn');if(acf)acf.onclick=function(){var m=$('aiMsg');if(!authUser){if(m)m.textContent='Connect Google first (Step 1) \u2014 then this step unlocks.';return} markAiConnected(myHomeId(),'confirm');if(m)m.textContent='Marked connected \u2014 your AI holds this office\u2019s card and key. When it gives you a hire card, paste it in People.'};
+ var arg=$('aiRegenBtn');if(arg)arg.onclick=function(){var m=$('aiMsg');if(!authUser){if(m)m.textContent='Connect Google first (Step 1).';return} var k=ensureLinkKey(myHomeId(),true);renderConnectUI();if(m)m.textContent='New link key: '+k+' \u2014 the old key is revoked; hire cards carrying it will be rejected, and the AI shows not-connected until the new card is pasted. Copy the new connection card into your AI.'};
+ authBoot();renderConnectUI();setInterval(renderConnectUI,5000);
+})();
+window.__hqConnect={state:function(){var rec=myOfficeRec();return{google:authUser?authUser.email:null,office:myHomeId(),linkKey:linkKeyFor(myHomeId()),aiConnected:!!(rec&&rec.aiConnected),aiVia:(rec&&rec.aiConnectedVia)||null}},signIn:googleSignIn,card:connectionCard,adopt:adoptOffice};
+
 /* Verification surface — read/write handles on the wire for the rig */
 window.__hqWire={state:function(){return{mode:BACK.mode,uid:uid,currentOffice:currentOffice,sessionActive:sessionActive,profile:profile?{name:profile.name,business:profile.business,look:profile.look,officeId:profile.officeId}:null,offices:Store.offices,links:Object.keys(Store.links).filter(function(k){return Store.links[k]}),present:lastPres.map(function(p){return{name:p.name,office:p.office,uid:p.uid}}),portalTarget:portalTarget()?portalTarget().id:null,gateOpen:$('wireGate').classList.contains('show')}},
  openGate:function(p){openGate(!!p)},gateStep:function(){return gateStep},
@@ -5847,10 +6092,11 @@ var SCRIPT=[
  ['Marco','That\u2019s three staged off Neon\u2019s live and we\u2019re still watching — the stream\u2019s not done and neither are we.'],
  ['Rico','Neon batch is cut — the best moments from his live, staged in Activity for your okay, Craig. Nothing posts until you say so.','stage','the closing run — best of the live']
 ];
-function playLine(){if(NEON.stage>=SCRIPT.length){clearInterval(NEON.timer);NEON.timer=null;return}
+function playLine(){if(window.__hqFreshOffice&&window.__hqFreshOffice()){clearInterval(NEON.timer);NEON.timer=null;return} /* a fresh office has no Clipper crew — the watch stops the moment this device belongs to a new owner */
+ if(NEON.stage>=SCRIPT.length){clearInterval(NEON.timer);NEON.timer=null;return}
  var L=SCRIPT[NEON.stage++];try{logTalk(L[0],L[1],L[2]==='sys'?'sys':'')}catch(e){}
  if(L[2]==='stage'&&L[3]){NEON.staged.push('Neon live — '+L[3]);renderNeonBoard()}}
-function startNeon(){if(NEON.started)return;NEON.started=true;ensureClippers();renderNeonBoard();
+function startNeon(){if(NEON.started)return;if(window.__hqFreshOffice&&window.__hqFreshOffice())return;NEON.started=true;ensureClippers();renderNeonBoard();
  /* the Numbers Lab big screen IS the Kick live now — the team's assigned
     watch target (Neon, live per Craig's word tonight). The screen reads
     this state; it never labels a stream live on its own. */
@@ -5861,7 +6107,8 @@ function startNeon(){if(NEON.started)return;NEON.started=true;ensureClippers();r
  var iv=setInterval(function(){NEON.tries++;var ok=false;try{ok=startWork('Neon live — clipping the best moments',[],14,175000)}catch(e){}
   if(ok||NEON.tries>8)clearInterval(iv)},4000);
  playLine();NEON.timer=setInterval(playLine,9500)}
-setTimeout(startNeon,3200);
+setTimeout(function(){if(window.__hqFreshOffice&&window.__hqFreshOffice())return; /* a fresh office has no Clipper crew — nobody is watching anything until its owner hires people */
+ startNeon()},3200);
 window.__hqNeon={crew:CREW_NAMES.slice(),streamer:'Neon',start:startNeon,staged:function(){return NEON.staged.slice()},watching:function(){return NEON.started}};
 })();
 </script>
@@ -6336,12 +6583,17 @@ function finishClip(id,rec){var P=window.__hqProposals;if(!P)return;var cur=null
     and the owner's Okay on it is the release (the two-gate pay point) */
  try{if(typeof PENDING!=='undefined'&&typeof renderPending==='function'){PENDING.push({id:pendingSeq++,label:'Finished clip: '+rec.title,who:['rico'],amt:14,at:Date.now(),kind:'clip',sourceStreamer:rec.source||'Neon',sourcePlatform:rec.sourcePlatform||'kick',sourceChannel:rec.sourceChannel||'n3on',credit:credit});renderPending();if(typeof updateEconUI==='function')updateEconUI()}}catch(e){}
  museLast={title:rec.title,note:'the finished clip is staged in Activity — preview it, and your Okay there is the release.'};museWork=null;
- museSay('The clip is made, Craig — "'+rec.title+'" is staged in Activity with its preview on the row. The preview is the source it was cut from; nothing posts until your preview-okay. Credit on the post: '+credit+'.')}
+ museSay('The clip is made, Craig — "'+rec.title+'" is staged in Activity. Under your screen-to-clip law it stays held until the preview on its row IS the cut itself — the live channel page never stands in for the clip — and only then does your okay post it. Credit on the post: '+credit+'.')}
 
 /* ---------- (5) previews tell the truth ---------- */
 function bindPendingSources(){try{if(typeof PENDING==='undefined')return;var K=window.__hqKick||{};
  PENDING.forEach(function(it){if(!it||it.sourceChannel)return;var kind='';try{kind=previewKind(it)}catch(e){}
-  if(kind==='clip'&&K.live&&K.channel){it.kind='clip';it.sourceStreamer=it.sourceStreamer||K.target;it.sourcePlatform=K.platform||'kick';it.sourceChannel=K.channel;
+  /* SCREEN-TO-CLIP BINDING — an item only binds to the assigned live when
+     the item itself is ABOUT that streamer (its label names them). A
+     generic job that merely finished while a live was on never gets
+     dressed up as a cut from that live. */
+  var aboutStreamer=!K.target||String(it.label||'').toLowerCase().indexOf(String(K.target).toLowerCase())>=0;
+  if(kind==='clip'&&K.live&&K.channel&&aboutStreamer){it.kind='clip';it.sourceStreamer=it.sourceStreamer||K.target;it.sourcePlatform=K.platform||'kick';it.sourceChannel=K.channel;
    if(!it.credit){var w=(it.who&&it.who[0])?nice(it.who[0]):'Rico';it.credit=w+' from Shortz VS'}}})}catch(e){}}
 setInterval(bindPendingSources,2000);
 var origPvBox=(typeof pvBoxHTML==='function')?pvBoxHTML:null;
@@ -7735,5 +7987,406 @@ window.__aoPiP={enter:enterInApp,exit:exitInApp,on:function(){return document.bo
  check();setTimeout(check,600);
 })();
 </script>
-</body>
+<script>
+/* ===== SCREEN-TO-CLIP BINDING LAW — the preview IS the clip, or the work is held =====
+   Craig's order, word for word: "When they show me the work, it has to be
+   showing exactly what they're going to be clipping for me before we post
+   it. And it should be showing in the actual office where they're watching
+   these at — which room they were in. Whatever's on that screen needs to
+   be live so they can watch it and then clip from there."
+
+   One subject, end to end: the live on the Numbers Lab screen (the room
+   where the Clipper crew watches) → the watching → the cut → the preview.
+   This module enforces it at the pay gate:
+   (1) A SOURCE-BOUND clip item (bound to a named live: it carries a
+       source streamer/channel, or its label names the assigned streamer)
+       may only preview THE ACTUAL CUT ITSELF — a playable clip attached
+       to the item (clipSrc). The preview of a bound clip is never the
+       channel page: a live channel embed is not the cut, and an offline
+       placeholder ("n3on is offline") is not the cut either.
+   (2) A bound clip with no cut attached is HELD: it is pulled out of the
+       "WAITING ON YOUR OKAY" pay presentation in Activity and People,
+       its Okay/pay path is refused, and its row says plainly why — the
+       cut itself has to be sitting in the preview first. Generic,
+       non-source-bound work keeps its existing previews untouched.
+   (3) THE SCREEN TELLS THE TRUTH — the assigned channel's real live
+       state is probed from Kick itself. A definitive OFFLINE flips
+       window.__hqKick.live off: the Numbers Lab screen drops to standby,
+       the pinned player hides, the watch hold releases, and the Neon
+       board stops calling it live. A definitive LIVE restores it. An
+       unreachable probe changes nothing (unknown is never dressed up
+       as live or as offline).
+   (4) Real cut previews keep the finder credit line:
+       "Credit: <Name> from Shortz VS". */
+(function(){
+function $(id){return document.getElementById(id)}
+function escS(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function kindOf(p){try{return previewKind(p)}catch(e){return ''}}
+function cutOf(p){if(!p)return '';var c=p.clipSrc||p.cutSrc||p.clipUrl||'';return typeof c==='string'?c.trim():''}
+function assignedTarget(){var K=window.__hqKick||{};return K.target?String(K.target):''}
+function isBound(p){if(!p)return false;if(p.sourceChannel||p.sourceStreamer)return true;var t=assignedTarget();if(t&&String(p.label||'').toLowerCase().indexOf(t.toLowerCase())>=0)return true;return false}
+function isBoundClip(p){return !!p&&kindOf(p)==='clip'&&isBound(p)}
+function isHeldClip(p){return isBoundClip(p)&&!cutOf(p)}
+function streamerOf(p){return (p&&(p.sourceStreamer))||assignedTarget()||'the assigned streamer'}
+function creditOf(p){if(p&&p.credit)return p.credit;var w='Rico';try{if(p&&p.who&&p.who.length&&typeof namesOf==='function'){var n=namesOf(p.who).split(',')[0];if(n)w=n}}catch(e){}return w+' from Shortz VS'}
+function sourceLine(p){return streamerOf(p)+'\u2019s live on Kick \u2014 the live on the Numbers Lab screen, in the room where the crew watched it'}
+function cutBoxHTML(p,cut){
+ var isFile=/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(cut);
+ var media=isFile
+  ? '<video data-pvframe="'+p.id+'" src="'+escS(cut)+'" controls playsinline preload="metadata" style="width:100%;height:100%;display:block;background:#000"></video>'
+  : '<iframe data-pvframe="'+p.id+'" src="'+escS(cut)+'" title="The finished clip \u2014 exactly what posts" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen style="width:100%;height:100%;border:0"></iframe>';
+ return '<div class="pvBox open" data-pvbox="'+p.id+'"><div class="pvVid">'+media+'</div>'
+  +'<div class="pvBar"><div class="pvBarTx">THE CLIP \u2014 exactly what posts if you okay it \u00b7 Cut from '+escS(sourceLine(p))+' \u00b7 Credit: '+escS(creditOf(p))+'</div></div></div>'}
+function heldBoxHTML(p){
+ return '<div class="pvBox open" data-pvbox="'+p.id+'"><div class="pvDoc" style="border-color:#e8c4c4">'
+ +'<div class="pvDocHead" style="background:#fdf0f0;border-bottom-color:#eecaca"><div class="pvDocT" style="color:#991b1b">HELD \u2014 NO FINISHED CUT STAGED</div>'
+ +'<div class="pvDocS">Source: '+escS(sourceLine(p))+'</div></div>'
+ +'<div class="pvRow"><div class="pvTx">The preview here has to BE the clip that would post \u2014 the actual cut itself, playable. A channel page \u2014 live or offline \u2014 is not the cut, so nothing is shown in its place, and this work stays off your okay until the cut itself is attached.</div></div>'
+ +'<div class="pvDocFoot" style="background:#fdf0f0;border-top-color:#eecaca;color:#991b1b">Credit on the post: '+escS(creditOf(p))+'</div></div></div>'}
+function heldRowHTML(p){
+ var who='';try{if(p.who&&p.who.length&&typeof namesOf==='function')who=namesOf(p.who)}catch(e){}
+ return '<span class="aChip" style="background:#f1f5f9;color:#64748b">\u25c9</span><div class="aBody"><b>'+escS(p.label)+'</b>'
+ +'<span>'+(who?('By '+escS(who)+' \u00b7 '):'')+'<span style="color:#991b1b;font-weight:700">HELD \u2014 not ready for your okay</span></span>'
+ +'<span>The cut itself \u2014 cut from '+escS(sourceLine(p))+' \u2014 has to be sitting in this preview before this can be okayed or paid. A channel page never stands in for it.</span>'
+ +(p.credit?'<span>Credit on the post: '+escS(p.credit)+'</span>':'')+'</div>'}
+/* (1) the preview gate — wraps the current pvBoxHTML last, so every
+   surface that renders a work preview (Activity rows, People rows, the
+   detail view, alert detail) gets the same law */
+var prevPvBox=(typeof pvBoxHTML==='function')?pvBoxHTML:null;
+if(prevPvBox){pvBoxHTML=function(p){try{
+   if(p&&isBoundClip(p)){
+    if(typeof PV_OPEN==='undefined'||!PV_OPEN.has(p.id))return '<div class="pvBox" data-pvbox="'+p.id+'"></div>';
+    var cut=cutOf(p);
+    if(cut)return cutBoxHTML(p,cut);
+    return heldBoxHTML(p);
+   }
+  }catch(e){}
+  return prevPvBox(p)}}
+/* (2) the presentation gate — held clips leave the pay list */
+var prevRenderPending=(typeof renderPending==='function')?renderPending:null;
+if(prevRenderPending){renderPending=function(){
+  prevRenderPending();
+  try{
+   if(typeof PENDING==='undefined')return;
+   var held=PENDING.filter(isHeldClip);
+   held.forEach(function(p){
+    document.querySelectorAll('[data-pvbox="'+p.id+'"]').forEach(function(box){
+     var row=null;try{row=box.closest?((box.closest('.arow')||box.closest('.item'))):null}catch(e){}
+     if(row&&!row.getAttribute('data-held')){row.setAttribute('data-held','1');row.innerHTML=heldRowHTML(p)}
+    });
+   });
+   var al=$('pendingList');
+   if(al&&held.length&&!al.querySelector('[data-ok]')){var h=al.querySelector('h3');if(h)h.textContent='HELD \u2014 NOT READY FOR YOUR OKAY'}
+  }catch(e){}
+ }}
+/* (2b) the pay gate itself refuses a held clip, even from a stale row */
+var prevOkay=(typeof okayPending==='function')?okayPending:null;
+if(prevOkay){okayPending=function(id){var p=null;try{p=PENDING.find(function(x){return x.id===id})}catch(e){}
+  if(p&&isHeldClip(p)){try{logTalk('HQ','"'+p.label+'" is held \u2014 no finished cut is staged in its preview, so it cannot be okayed or paid yet. The cut itself has to be in the preview first.','sys')}catch(e){}return}
+  return prevOkay(id)}}
+/* (3) the screen tells the truth — probe the assigned channel itself */
+var lvProbe={channel:'',state:'unknown',at:0};
+function parseLive(j){
+ if(!j||typeof j!=='object')return 'unknown';
+ if(j.data&&typeof j.data==='object'&&j.data.is_live!==undefined)return j.data.is_live?'live':'offline';
+ var ls=null,has=false;
+ if('livestream' in j){has=true;ls=j.livestream}
+ else if(j.data&&typeof j.data==='object'&&'livestream' in j.data){has=true;ls=j.data.livestream}
+ if(!has)return 'unknown';
+ if(!ls)return 'offline';
+ if(ls.is_live===false)return 'offline';
+ return 'live'}
+function fixBoard(){var K=window.__hqKick||{};if(!K.offlineVerified||K.live)return;var b=$('neonBoard');if(b){var h=b.querySelector('h3');if(h&&h.textContent.indexOf('NOT LIVE')<0)h.textContent=String(K.target||'STREAMER').toUpperCase()+' \u2014 NOT LIVE \u00b7 CLIPPER CREW STANDING BY'}}
+function applyProbe(state){
+ lvProbe.state=state;lvProbe.at=Date.now();
+ var K=window.__hqKick;if(!K||!K.channel)return;
+ if(state==='offline'&&K.live){K.live=false;K.offlineVerified=true;fixBoard();
+  try{logTalk('HQ',(K.target||'The assigned streamer')+'\u2019s Kick is showing OFFLINE \u2014 the Numbers Lab screen is on standby, and nothing from it is being presented as live clipping work. When the live is really on, the screen lights back up and the crew clips from there.','sys')}catch(e){}}
+ else if(state==='live'&&K.offlineVerified&&!K.live){K.live=true;
+  try{logTalk('HQ',(K.target||'The assigned streamer')+' is LIVE on Kick again \u2014 the Numbers Lab screen has it, the Clipper crew is watching in the room, and cuts stage from that screen.','sys')}catch(e){}}}
+function probeKick(){
+ var K=window.__hqKick||{};var ch=K.channel;if(!ch)return;
+ lvProbe.channel=ch;
+ var done=false;
+ var to=setTimeout(function(){if(!done){done=true;lvProbe.state='unknown';lvProbe.at=Date.now()}},7000);
+ var ctrl=('AbortController' in window)?new AbortController():null;
+ if(ctrl)setTimeout(function(){try{ctrl.abort()}catch(e){}},7000);
+ try{
+  fetch('https://kick.com/api/v2/channels/'+encodeURIComponent(ch),{cache:'no-store',signal:ctrl?ctrl.signal:undefined})
+   .then(function(r){return r&&r.ok?r.json():null})
+   .then(function(j){if(done)return;done=true;clearTimeout(to);applyProbe(parseLive(j))})
+   .catch(function(){if(done)return;done=true;clearTimeout(to);lvProbe.state='unknown';lvProbe.at=Date.now()});
+ }catch(e){if(!done){done=true;clearTimeout(to);lvProbe.state='unknown';lvProbe.at=Date.now()}}}
+setTimeout(probeKick,5000);
+setInterval(probeKick,60000);
+setInterval(fixBoard,5000);
+window.__hqClipLaw={boundClip:isBoundClip,heldClip:isHeldClip,cutOf:cutOf,probe:probeKick,liveness:function(){return{channel:lvProbe.channel,state:lvProbe.state,at:lvProbe.at}}};
+})();
+</script>
+
+<script>
+/* ===== THE GUIDE WEARS THE PLAYER, NEVER THE OWNER =====
+   The Guide's header and Me page ship with the owner's face and name
+   ("Mr. Moore") baked in — right for Craig, wrong for everybody else.
+   A visitor with their own saved player gets THEIR name, THEIR look
+   and THEIR business on those surfaces. The owner's own profile (his
+   saved player, his office VIBEZ1, his name) is left exactly as it is,
+   and a device with no player never reaches the Guide at all — the
+   entrance gate stands in front of it. */
+(function(){
+/* FRESH OFFICE — a saved player whose office is NOT Craig's: their office
+   started EMPTY (the doors never seed it) and fills one hire at a time. */
+function freshOffice(){try{var prof=null;try{prof=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+ if(!prof||!prof.officeId||prof.officeId==='craig-hq')return false;
+ var nm=String(prof.name||'').trim().toLowerCase();var bz=String(prof.business||'').trim().toLowerCase();
+ if(nm==='craig'||nm==='craig moore'||nm==='mr. moore'||nm==='mr moore'||bz.indexOf('vibez')>=0)return false;
+ return true}catch(e){return false}}
+window.__hqFreshOffice=freshOffice;
+function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function freshPass(){
+ if(!freshOffice())return;
+ try{
+  /* People panel — the workers here are hired by YOU, and the way in is visible */
+  var sec=document.querySelector('.fsec[data-sec="people"]');
+  if(sec){sec.querySelectorAll('h3').forEach(function(h){if(h.textContent.indexOf('HIRED BY CRAIG')>=0)h.textContent='WORKERS — HIRED BY YOU'});
+   if(!document.getElementById('freshHireCard')){var rows=document.getElementById('hireRows');
+    if(rows){var card=document.createElement('div');card.className='item';card.id='freshHireCard';
+     card.innerHTML='<b>Your office starts empty — no crew is assigned to you.</b><br><span style="color:#64748b">Add people one by one, the same way this office was built by its first owner: in Chat, type <b>hire Name · Role · slot · look</b> — for example <b>hire Alex · Editor · library · dev</b>. Slots: clipper · highlights · audit · gaming · rankings · events · anime · library · lobby · sales · merch. Looks: rico · marco · dev · sanaa · dex · milo · tessa · craig. Every person you add is saved to <b>your office only</b> and arrives through the front door.</span>';
+     rows.parentNode.insertBefore(card,rows)}}}
+  /* Guide — no borrowed crew lists: your hires, or an honest empty */
+  var mine=[];try{var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine.push(L[k])})}catch(e){}
+  var emptyHTML='<p class="gNote">No crew yet — your office starts empty. Add people one by one: in Chat, type \u201chire Name \u00b7 Role \u00b7 slot \u00b7 look\u201d.</p>';
+  var rowsHTML=mine.length?mine.map(function(r){return '<div class="gRow" style="cursor:default"><span class="meta"><b>'+escH(r.name)+'</b><span>'+escH(String(r.role||'Worker').split('\u2014')[0].trim())+'</span></span></div>'}).join(''):emptyHTML;
+  var pl=document.getElementById('gPeopleList');if(pl&&pl.innerHTML!==rowsHTML)pl.innerHTML=rowsHTML;
+  var pin=document.getElementById('gHomePinned');if(pin&&pin.innerHTML!==rowsHTML)pin.innerHTML=rowsHTML;
+  document.querySelectorAll('#guidePanel h4').forEach(function(h){if(h.textContent.indexOf('Crew \u2014 in the office now')===0)h.textContent='Crew \u2014 in the office now \u00b7 '+(mine.length+1)});
+  /* Crew Board — same law */
+  var cr=document.getElementById('crewRows');
+  if(cr&&(mine.length===0)&&!document.getElementById('freshCrewNote')){cr.innerHTML='<div class="item" id="freshCrewNote" style="color:#64748b">No crew yet — your office starts empty. Add people one by one through the hires door (in Chat: hire Name \u00b7 Role \u00b7 slot \u00b7 look).</div>'}
+ }catch(e){}
+}
+function personalize(){
+ freshPass();
+ try{
+  var W=window.__hqWire;if(!W||!W.state)return;
+  var st=W.state();if(!st.profile||!st.sessionActive)return;
+  document.body.classList.remove('noPlayer'); /* a saved player in their own session is never entrance-locked */
+  var prof=st.profile;
+  var ownerId=null;var offs=st.offices||{};Object.keys(offs).forEach(function(id){if(offs[id]&&offs[id].code==='VIBEZ1')ownerId=id});
+  if(ownerId&&prof.officeId===ownerId)return; /* the owner's own office — his Guide is his */
+  if(/^(craig|craig moore|mr\.? moore)$/i.test(String(prof.name||'').trim()))return; /* the owner himself */
+  var nm=String(prof.name||'').trim();if(!nm)return;
+  var pic='assets/profile/'+(prof.look||'craig')+'.png';
+  var head=document.querySelector('#guidePanel .gHead .who b');if(head&&head.textContent!==nm)head.textContent=nm;
+  var hp=document.querySelector('#guidePanel .gHead .mePic img');if(hp&&hp.getAttribute('src')!==pic){hp.src=pic;hp.alt=nm}
+  var meB=document.querySelector('#guidePanel .gMeProfile b');if(meB&&meB.textContent!==nm)meB.textContent=nm;
+  var meF=document.querySelector('#guidePanel .gMeProfile .meFig img');if(meF&&meF.getAttribute('src')!==pic){meF.src=pic;meF.alt=nm+' — profile picture'}
+  var role=document.querySelector('#guidePanel .gMeProfile .meRole');if(role&&prof.business&&role.textContent!==prof.business)role.textContent=prof.business;
+  var bsub=document.querySelector('.brand p');if(bsub&&prof.business){var bt='AO · '+prof.business+' — people & AI crew in one live office';if(bsub.textContent!==bt)bsub.textContent=bt}
+ }catch(e){}
+}
+setTimeout(personalize,1500);setInterval(personalize,3000);
+window.__hqGuideIdentity={refresh:personalize};
+})();
+</script>
+
+<!-- CONNECT YOUR AI — the stepped hook-up card -->
+<section class="museLayer" id="museLayer" aria-label="Connect your AI to this office">
+  <div class="museCard">
+    <div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:0;flex:1"><div class="prKicker">CONNECT YOUR AI</div><h2 id="museTitle">Connect Meta Muse</h2></div><button class="prX" id="museClose" aria-label="Close the connect card">✕</button></div>
+    <div class="museSteps" id="museSteps"><i class="on"></i><i></i><i></i></div>
+    <div class="museStep on" data-mstep="1">
+      <p id="museStep1Tx">First, confirm this is the AI you use — open it and sign in with your own account. That's what ties it to you and to your office. Nothing connects until you do this.</p>
+      <div class="museBtns"><button class="gold grow" id="museOpenBtn">Open Meta Muse — sign in</button></div>
+      <div class="museBtns"><button class="alt grow" id="museStep1Next">I signed in — next step</button></div>
+    </div>
+    <div class="museStep" data-mstep="2">
+      <p>This is your OFFICE CONNECTION CARD — your office, its code, you as owner, and this engine. Open your AI app, paste the card into its chat, and tell it: “This is my office.” From then on, when you talk to it about your office, it knows exactly what you mean — and when you ask it to add a person, it answers with a hire card for this office only.</p>
+      <textarea id="museMsg" rows="6" readonly aria-label="The message to paste into your AI"></textarea>
+      <div class="museBtns"><button class="gold grow" id="museCopyBtn">Copy the message</button><button class="alt grow" id="museStep2Next">I pasted it — next step</button></div>
+      <p class="okmsg" id="museCopyMsg"></p>
+    </div>
+    <div class="museStep" data-mstep="3">
+      <p id="museStep3Tx">Last step — finish the connection and this AI goes on your office door as one of its engines, running your office alongside any others you connect.</p>
+      <div class="museBtns"><button class="alt" id="museBackBtn">Back</button><button class="gold grow" id="museFinishBtn">Finish — connect Meta Muse</button></div>
+    </div>
+    <div class="museStep" data-mstep="done">
+      <div class="museDone"><span>✓</span><div id="museDoneTx">Connected — this AI is on your office door and running your office.</div></div>
+      <div class="museBtns"><button class="alt grow" id="museOpenBtn2">Open my AI</button><button class="alt grow" id="museDisconnectBtn">Disconnect</button><button class="gold grow" id="museDoneBtn">Done</button></div>
+      <p class="okmsg" id="museDoneMsg"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ===== CONNECT YOUR AI + ONE-BY-ONE HIRING, PER OFFICE =====
+   (1) ENGINE BUTTONS ARE DOORS, NOT TOGGLES. Tapping an AI in Settings
+   (Meta Muse above all) opens the stepped hook-up above: open your AI
+   and sign in with YOUR account → copy the office message into its
+   chat (that message is how your AI knows your office, your code, and
+   how hiring works) → finish, and only then is it marked connected
+   and put on the door. A connected AI reopens the card as a status
+   view with a Disconnect. Nothing about a tap is silent anymore.
+   (2) ENGINES ARE PER OFFICE. The owner's office keeps Meta Muse
+   connected, as it has always been. A FRESH office starts with NO AI
+   connected — its owner connects their own, one at a time, and the
+   set is saved under that office's own key on this device.
+   (3) ADD A PERSON FORM. A fresh office's People panel carries a real
+   form (name · role · slot · look) whose Add button writes through
+   the same hire command the owner's chat uses — one person at a time,
+   into YOUR office only, arriving through the front door. */
+(function(){
+function $(id){return document.getElementById(id)}
+function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function prof(){try{return JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){return null}}
+function myOfficeId(){var p=prof();if(p&&p.officeId&&!window.__hqFreshOffice)return p.officeId;if(p&&p.officeId)return p.officeId;return 'craig-hq'}
+function isFresh(){try{return !!window.__hqFreshOffice&&__hqFreshOffice()}catch(e){return false}}
+function storeKey(){return 'hqEngines2__'+myOfficeId()}
+function loadSaved(){try{var v=JSON.parse(localStorage.getItem(storeKey())||'null');return Array.isArray(v)?v:null}catch(e){return null}}
+function save(){try{localStorage.setItem(storeKey(),JSON.stringify(officeEngines))}catch(e){}}
+var connected={}; /* name -> true, mirrors officeEngines for the status UI */
+function markConnected(){connected={};officeEngines.forEach(function(n){connected[n]=true});paintStates()}
+function paintStates(){document.querySelectorAll('.engBtn').forEach(function(b){var s=b.querySelector('.engState');if(!s){s=document.createElement('span');s.className='engState';b.appendChild(s)}s.textContent=connected[b.dataset.eng]?'● CONNECTED':'TAP TO CONNECT'})}
+/* ---------- per-office engine init ---------- */
+var engInit=false;
+function initEngines(){
+ if(engInit)return;
+ try{
+  if(!isFresh()&&!prof()){ /* no player on this device yet — the gate is
+     still up. Do NOT lock in the owner's engine set: whoever creates
+     an office here gets their own init when their profile exists. */
+   markConnected();return}
+  if(isFresh()){
+   var saved=loadSaved();
+   officeEngines=saved?saved.slice():[];
+   engInit=true;markConnected();renderEngines();markConnected();
+   var em=$('engMsg');if(em)em.textContent=officeEngines.length?('Connected to YOUR office: '+officeEngines.join(', ')+'.'):('No AI connected to your office yet — tap Meta Muse above and the card walks you through hooking yours up.');
+  }else{
+   var savedC=loadSaved();if(savedC&&savedC.length)officeEngines=savedC.slice();
+   engInit=true;markConnected();renderEngines();markConnected();
+  }
+ }catch(e){}
+}
+setTimeout(initEngines,1200);setInterval(function(){if(!engInit)initEngines()},2500);
+/* ---------- the connect card ---------- */
+var SITES={'Meta Muse':'https://www.meta.ai','ChatGPT':'https://chatgpt.com','Claude':'https://claude.ai','Perplexity':'https://www.perplexity.ai','Gemini':'https://gemini.google.com'};
+var curEng='Meta Muse',curStep=1;
+function officeFacts(){var p=prof()||{};var biz=p.business||'my office';var code='—';
+ try{var W=window.__hqWire;if(W&&W.state){var st=W.state();var offs=st.offices||{};var rec=offs[p.officeId||myOfficeId()];if(rec&&rec.code)code=rec.code}}catch(e){}
+ return{biz:biz,code:code,name:p.name||''}}
+function buildMsg(){var f=officeFacts();
+ /* THE OFFICE CONNECTION CARD — the same card the Settings Step 2
+    generates (office, owner, office link, this office's private link
+    key, the hire-card format), with this office's public code and the
+    engine being connected named on it. */
+ var base='';try{if(window.__hqConnect&&__hqConnect.card)base=__hqConnect.card()}catch(e){}
+ if(base&&base.indexOf('Office Link Key')>=0){
+  return base.replace('\n\nWhen I ask','\nOffice code: '+f.code+'\nEngine: '+curEng+'\n\nWhen I ask')}
+ return 'OFFICE CONNECTION CARD\nOffice: '+f.biz+'\nOffice code: '+f.code+'\nOwner: '+(f.name||'Owner')+'\nEngine: '+curEng+'\n\nYou are the AI engine for MY office — when I talk to you about my office, this is the office I mean.\n\nWhen I ask you to add a person to my office, answer with exactly one hire card:\n\nHIRE CARD\nOffice: '+f.biz+'\nName: <the person\u2019s name>\nRole: <their job in the office>\nLook: <one of: rico, marco, dev, sanaa, dex, milo, tessa, craig>\n\nI paste that card into my office and the person is added to THIS office only. One person at a time — I add my crew myself, nobody is pre-assigned.'}
+function showStep(n){curStep=n;
+ document.querySelectorAll('.museStep').forEach(function(s){s.classList.toggle('on',String(n)===s.dataset.mstep||(n==='done'&&s.dataset.mstep==='done'))});
+ var bar=$('museSteps');if(bar){var idx=n==='done'?3:n;[].forEach.call(bar.children,function(d,i){d.className=i<idx?'on':''})}}
+function openConnect(name){
+ curEng=name||'Meta Muse';
+ $('museTitle').textContent=connected[curEng]?curEng+' — connected':('Connect '+curEng);
+ $('museOpenBtn').textContent='Open '+curEng+' — sign in';
+ $('museFinishBtn').textContent='Finish — connect '+curEng;
+ $('museStep3Tx').textContent='Last step — finish the connection and '+curEng+' goes on your office door as one of its engines, running your office alongside any others you connect.';
+ var ta=$('museMsg');if(ta)ta.value=buildMsg();
+ var cm=$('museCopyMsg');if(cm)cm.textContent='';
+ var dm=$('museDoneMsg');if(dm)dm.textContent='';
+ $('museDoneTx').textContent=curEng+' is connected — it is on your office door and running your office. Talk to it in its own chat about your office ("'+officeFacts().biz+'") and it knows the place; the hire cards it gives you paste straight into People or HQ Chat here.';
+ $('museLayer').classList.add('show');
+ showStep(connected[curEng]?'done':1);
+}
+function closeConnect(){$('museLayer').classList.remove('show')}
+window.__hqMuseConnect={open:openConnect,connected:function(){return Object.keys(connected)},isFresh:isFresh};
+document.querySelectorAll('.engBtn').forEach(function(b){
+ b.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();openConnect(b.dataset.eng)},true);
+});
+var ea=$('engApply');
+if(ea)ea.addEventListener('click',function(e){var v=($('engCustom')?$('engCustom').value.trim():'');if(!v)return;e.preventDefault();e.stopImmediatePropagation();openConnect(v)},true);
+$('museClose').onclick=closeConnect;
+$('museLayer').addEventListener('click',function(e){if(e.target===$('museLayer'))closeConnect()});
+$('museOpenBtn').onclick=function(){var u=SITES[curEng];if(u)window.open(u,'_blank','noopener');else{var cm=$('museCopyMsg');$('museStep1Tx').textContent='Open the '+curEng+' app on your phone and sign in with your own account — then come back here for the next step.'}};
+$('museOpenBtn2').onclick=function(){var u=SITES[curEng];if(u)window.open(u,'_blank','noopener')};
+$('museStep1Next').onclick=function(){showStep(2)};
+$('museStep2Next').onclick=function(){showStep(3)};
+$('museBackBtn').onclick=function(){showStep(2)};
+$('museCopyBtn').onclick=function(){
+ var ta=$('museMsg');var done=function(){$('museCopyMsg').textContent='Copied — paste it into your '+curEng+' chat.'};
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(done,function(){ta.select();try{document.execCommand('copy')}catch(e){}done()})}
+ else{ta.select();try{document.execCommand('copy')}catch(e){}done()}
+};
+$('museFinishBtn').onclick=function(){
+ if(officeEngines.indexOf(curEng)<0)officeEngines.push(curEng);
+ connected[curEng]=true;save();renderEngines();markConnected();
+ try{if(window.__hqLinkKey&&__hqLinkKey.markConnected)__hqLinkKey.markConnected(myOfficeId(),'confirm')}catch(e){} /* the Settings Step 2 state agrees: this office's AI is connected */
+ var em=$('engMsg');if(em)em.textContent='On the door — running this office: '+officeEngines.join(', ')+'. All active at once.';
+ try{logTalk('HQ',curEng+' is connected to this office — it is on the door as one of its engines now.','sys')}catch(e){}
+ showStep('done');
+};
+$('museDisconnectBtn').onclick=function(){
+ if(officeEngines.length<=1){$('museDoneMsg').textContent='Your office needs at least one engine — connect another before switching this one off.';return}
+ officeEngines=officeEngines.filter(function(n){return n!==curEng});delete connected[curEng];save();renderEngines();markConnected();
+ var em=$('engMsg');if(em)em.textContent='On the door — running this office: '+officeEngines.join(', ')+'. All active at once.';
+ closeConnect();
+};
+$('museDoneBtn').onclick=closeConnect;
+/* ---------- add-a-person form (fresh offices, one by one) ---------- */
+var SLOTS=['clipper','highlights','audit','gaming','rankings','events','anime','library','lobby','sales','merch'];
+var LOOKS=['rico','marco','dev','sanaa','dex','milo','tessa','craig'];
+function hireFormPass(){
+ if(!isFresh())return;
+ if(document.getElementById('hireFormCard'))return;
+ var rows=document.getElementById('hireRows');if(!rows||!rows.parentNode)return;
+ var card=document.createElement('div');card.className='hireFormCard';card.id='hireFormCard';
+ card.innerHTML='<h4>Add a person — one at a time</h4><p>Your office started empty. Every person here is somebody YOU add: fill this in, tap Add, and they arrive through the front door into your office only.</p>'
+ +'<label for="hfName">Name</label><input id="hfName" type="text" maxlength="18" placeholder="e.g. Alex" autocomplete="off">'
+ +'<label for="hfRole">Role — what they do</label><input id="hfRole" type="text" maxlength="60" placeholder="e.g. Clipper — watches live streams and cuts clips" autocomplete="off">'
+ +'<label for="hfSlot">Slot — where they work</label><select id="hfSlot">'+SLOTS.map(function(s){return '<option value="'+s+'">'+s+'</option>'}).join('')+'</select>'
+ +'<label for="hfLook">Look</label><select id="hfLook">'+LOOKS.map(function(s){return '<option value="'+s+'">'+s+'</option>'}).join('')+'</select>'
+ +'<button class="gold full" id="hfAdd" style="margin-top:11px">Add this person to my office</button><p class="okmsg" id="hfMsg"></p>';
+ rows.parentNode.insertBefore(card,rows);
+ $('hfAdd').onclick=function(){
+  var nm=$('hfName').value.trim(),role=$('hfRole').value.trim()||'New hire',slot=$('hfSlot').value,look=$('hfLook').value,msg=$('hfMsg');
+  if(nm.length<2){msg.textContent='Give them a name first — two letters or more.';msg.style.color='#b91c1c';return}
+  var cmd='hire '+nm+' · '+role+' · '+slot+' · '+look;
+  var inp=$('chatInput');
+  try{
+   if(inp&&typeof sendChat==='function'){inp.value=cmd;sendChat();if(inp)inp.value=''}
+   else if(window.__hqHires&&__hqHires.add){__hqHires.add({name:nm,role:role,slot:slot,look:look})}
+   msg.textContent=nm+' is on the way in — watch the lot, they come through the front door.';msg.style.color='#047857';
+   $('hfName').value='';$('hfRole').value='';
+  }catch(e){msg.textContent='That did not go through — try the same line in HQ Chat: '+cmd;msg.style.color='#b91c1c'}
+ };
+}
+setTimeout(hireFormPass,1800);setInterval(hireFormPass,4000);
+/* FRESH OFFICE, CLEAN LOG — while a visitor sat at the entrance gate,
+   the owner's crew (seeded behind the lock, never visible) may have
+   left lines in Office Talk. A fresh office's log starts clean: those
+   lines are wiped once, so the first thing a new owner reads in their
+   own office is their own arrival — never Craig's crew talking. */
+var logCleaned=false;
+setInterval(function(){if(!isFresh())return;
+ /* one-time full wipe (lines left from behind the gate) */
+ if(!logCleaned){logCleaned=true;
+  try{var cl=$('clBody');if(cl)cl.innerHTML=''}catch(e){}
+  try{var ch=$('chatList');if(ch){Array.prototype.slice.call(ch.children).forEach(function(n){if(!n.classList||!n.classList.contains('chatHint'))n.remove()})}}catch(e){}}
+ /* recurring: no Craig-crew voice ever speaks in a fresh office —
+    strip any line from one of his people who is not YOUR hire, and
+    take down his Neon watch board if it rendered here */
+ try{var mine={};var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine[String(L[k].name||'').toUpperCase()]=1});
+  var CREW=['RICO','MARCO','DEV','SANAA','DEX','MILO','TESSA','VANCE','LENA','OMAR','KIAN','SOFIA','TREY'];
+  document.querySelectorAll('#clBody .clLine, #chatList .msg').forEach(function(n){var b=n.querySelector('b');if(!b)return;var who=b.textContent.trim().toUpperCase();if(CREW.indexOf(who)>=0&&!mine[who]){n.remove();return}
+   /* system lines that report on one of Craig's people by name (a
+      meeting of his crew wrapping up, a watch staging) are his
+      office's business too — they do not run in a fresh office */
+   var tx=n.textContent||'';for(var ci=0;ci<CREW.length;ci++){var cn=CREW[ci];if(mine[cn])continue;var cap=cn.charAt(0)+cn.slice(1).toLowerCase();if(tx.indexOf(cap)>=0||tx.indexOf(cn)>=0){n.remove();break}}});
+  var nb=document.getElementById('neonBoard');if(nb)nb.remove();
+ }catch(e){}
+},2500);
+})();
+</script>
+<script>window.addEventListener('load',function(){if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}});</script></body>
 </html>
