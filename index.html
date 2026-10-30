@@ -1107,7 +1107,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v46";(function(){try{var k="aoFreshV46";if(sessionStorage.getItem(k))return;fetch("version.txt",{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){if(t.trim()&&t.trim()!=="v46"){sessionStorage.setItem(k,"1");location.reload();}}).catch(function(){});}catch(e){}})();</script></head>
+<script>window.AO_BUILD="v47";(function(){try{var k="aoFreshV47";if(sessionStorage.getItem(k))return;fetch("version.txt",{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){if(t.trim()&&t.trim()!=="v47"){sessionStorage.setItem(k,"1");location.reload();}}).catch(function(){});}catch(e){}})();</script></head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
 
@@ -5714,21 +5714,29 @@ function lookLabel(k){return LOOK_LABELS[k]||'Classic look'}
 /* ---------- office registry + links (local store; live store mirrors it) ---------- */
 var Store={offices:{},links:{}};
 function saveLocal(){try{localStorage.setItem('hqWireOffices',JSON.stringify(Store.offices));localStorage.setItem('hqWireLinks',JSON.stringify(Store.links))}catch(e){}}
-function loadLocal(){try{Store.offices=JSON.parse(localStorage.getItem('hqWireOffices')||'{}')}catch(e){Store.offices={}} try{Store.links=JSON.parse(localStorage.getItem('hqWireLinks')||'{}')}catch(e){Store.links={}}}
+function loadLocal(){try{Store.offices=JSON.parse(localStorage.getItem('hqWireOffices')||'{}')}catch(e){Store.offices={}} Object.keys(Store.offices).forEach(function(k){if(!validOfficeId(k))delete Store.offices[k]}); try{Store.links=JSON.parse(localStorage.getItem('hqWireLinks')||'{}')}catch(e){Store.links={}}}
 function pairKey(a,b){return [a,b].sort().join('__')}
+function validOfficeId(x){return typeof x==='string'&&x.length>1&&x!=='undefined'&&x!=='null'}
 function seedOwnerOffice(){if(!Store.offices[OWNER_OFFICE]){Store.offices[OWNER_OFFICE]={id:OWNER_OFFICE,ownerName:'Craig',business:'Cre∞tor VibeZ HQ',look:'craig',code:'VIBEZ1',ownerEmail:'craigjrbb@gmail.com',createdAt:Date.now()};if(BACK.mode==='live')BACK.putOffice(Store.offices[OWNER_OFFICE]);else saveLocal()}
- /* the home office's account of record rides on its own office record —
-    the connect flow matches a signing-in account against office records
-    generically (any owner's record can carry their account the same
-    way); backfill it onto the existing home record once. */
- var ex=Store.offices[OWNER_OFFICE];if(ex&&!ex.ownerEmail){ex.ownerEmail='craigjrbb@gmail.com';if(BACK.mode==='live')BACK.putOffice(ex);else saveLocal()}}
+ /* IDENTITY MERGE — the home office's identity rides ON its office
+    record: the connect flow matches a signing-in account against
+    office records (ownerEmail), and adopting an office reads its
+    business, owner name, look and code off the same record. The
+    doors (hires, levels, proposals) write their own subtrees onto
+    this record, and a record that reached the wire carrying only
+    door data has no identity to match or adopt. So: any identity
+    field the record is missing is filled in here and written back
+    through the backend — the door subtrees already on the record
+    ride along untouched, because the whole record is what is
+    written. A record that is already whole is left exactly as is. */
+ var ex=Store.offices[OWNER_OFFICE];if(ex){var ident={id:OWNER_OFFICE,ownerName:'Craig',business:'Cre∞tor VibeZ HQ',look:'craig',code:'VIBEZ1',ownerEmail:'craigjrbb@gmail.com'};var dirty=false;Object.keys(ident).forEach(function(k){if(!ex[k]){ex[k]=ident[k];dirty=true}});if(dirty){if(BACK.mode==='live')BACK.putOffice(ex);else saveLocal()}}}
 function myHomeId(){return (sessionActive&&profile)?profile.officeId:OWNER_OFFICE}
 function linkedIds(id){var out=[];Object.keys(Store.links).forEach(function(k){if(!Store.links[k])return;var p=k.split('__');if(p[0]===id&&p[1]!==id)out.push(p[1]);if(p[1]===id&&p[0]!==id)out.push(p[0])});return out}
 function isLinked(a,b){return a===b||!!Store.links[pairKey(a,b)]}
 /* ---------- backends ---------- */
 var BACK={mode:'local'};
 var LocalBack={mode:'local',
- putOffice:function(o){Store.offices[o.id]=o;saveLocal()},
+ putOffice:function(o){if(!o||!validOfficeId(o.id))return;Store.offices[o.id]=o;saveLocal()},
  putLink:function(a,b){Store.links[pairKey(a,b)]=true;saveLocal()},
  setPresence:function(p){var all={};try{all=JSON.parse(localStorage.getItem('hqWirePresence')||'{}')}catch(e){all={}} var now=Date.now();Object.keys(all).forEach(function(k){if(now-(all[k].ts||0)>25000)delete all[k]});all[p.uid]=p;try{localStorage.setItem('hqWirePresence',JSON.stringify(all))}catch(e){}},
  readPresence:function(){var all={};try{all=JSON.parse(localStorage.getItem('hqWirePresence')||'{}')}catch(e){all={}} var now=Date.now();return Object.keys(all).map(function(k){return all[k]}).filter(function(p){return now-(p.ts||0)<25000})},
@@ -5737,13 +5745,13 @@ var LocalBack={mode:'local',
  syncRegistry:function(){loadLocal();seedOwnerOffice()}
 };
 var LiveBack={mode:'live',db:null,chatRef:null,
- putOffice:function(o){Store.offices[o.id]=o;this.db.ref('wire/offices/'+o.id).set(o)},
+ putOffice:function(o){if(!o||!validOfficeId(o.id))return;Store.offices[o.id]=o;this.db.ref('wire/offices/'+o.id).set(o)},
  putLink:function(a,b){Store.links[pairKey(a,b)]=true;this.db.ref('wire/links/'+pairKey(a,b)).set(true)},
  setPresence:function(p){var r=this.db.ref('wire/presence/'+p.office+'/'+p.uid);r.set(p);r.onDisconnect().remove()},
  readPresence:function(){return LIVE_PRESENCE},
  pushChat:function(m){this.db.ref('wire/chat/'+m.office).push(m)},
  readChat:function(){return []},
- syncRegistry:function(){var self=this;this.db.ref('wire/offices').once('value',function(s){var v=s.val()||{};Object.keys(v).forEach(function(k){Store.offices[k]=v[k]});seedOwnerOffice()});this.db.ref('wire/links').once('value',function(s){var v=s.val()||{};Object.keys(v).forEach(function(k){Store.links[k]=v[k]})})},
+ syncRegistry:function(){var self=this;this.db.ref('wire/offices').once('value',function(s){var v=s.val()||{};Object.keys(v).forEach(function(k){if(validOfficeId(k))Store.offices[k]=v[k]});seedOwnerOffice()});this.db.ref('wire/links').once('value',function(s){var v=s.val()||{};Object.keys(v).forEach(function(k){Store.links[k]=v[k]})})},
  attachChat:function(officeId,fn){if(this.chatRef){try{this.chatRef.off()}catch(e){} this.chatRef=null} this.chatRef=this.db.ref('wire/chat/'+officeId).limitToLast(40);this.chatRef.on('child_added',function(s){fn(s.val())})}
 };
 var LIVE_PRESENCE=[];
@@ -5954,7 +5962,7 @@ var OFFICE_URL='https://muse.ai/s/agent-office-xaxj6spmicea2/tn2kaEGs_DMDZD2iJRs
 var authUser=null,authInst=null,authTried=false;
 function emailKey(e){return String(e||'').toLowerCase().replace(/[^a-z0-9]/g,'_')}
 function acctLocal(){try{return JSON.parse(localStorage.getItem('hqWireAccounts')||'{}')}catch(e){return{}}}
-function bindAccount(email,officeId){var k=emailKey(email);var rec={email:email,officeId:officeId,at:Date.now()};
+function bindAccount(email,officeId){if(!validOfficeId(officeId))return; /* a binding to nowhere is worse than no binding at all — it strands the account on a phantom office at every sign-in, on every device */ var k=emailKey(email);var rec={email:email,officeId:officeId,at:Date.now()};
  if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).set(rec);return}catch(e){}}
  var m=acctLocal();m[k]=rec;try{localStorage.setItem('hqWireAccounts',JSON.stringify(m))}catch(e){}}
 function readBinding(email,cb){var k=emailKey(email);
@@ -5989,7 +5997,7 @@ function renderConnectUI(){
  var lk=$('linkKeyInput');if(lk&&document.activeElement!==lk)lk.value=authUser?ensureLinkKey(oid,false):'';
  var ct=$('aiCardText');if(ct&&document.activeElement!==ct)ct.value=authUser?connectionCard():'Connect Google (Step 1) first \u2014 your connection card is generated from your own office, in your name.';
 }
-function adoptOffice(oid,user,tries){var rec=Store.offices[oid];
+function adoptOffice(oid,user,tries){if(!validOfficeId(oid))return;var rec=Store.offices[oid];
  if(!rec&&(tries||0)<6){setTimeout(function(){adoptOffice(oid,user,(tries||0)+1)},1500);return}
  rec=rec||{id:oid,business:'Your office',ownerName:(user&&user.displayName)||'Owner',look:'craig'};
  profile={id:uid,name:rec.ownerName||(user&&user.displayName)||'Owner',business:rec.business||'',look:rec.look||'craig',officeId:oid,createdAt:Date.now(),email:user?user.email:''};
@@ -6000,14 +6008,26 @@ function adoptOffice(oid,user,tries){var rec=Store.offices[oid];
  try{closeGate()}catch(e){}
  enterOffice(oid,{teleport:true});renderConnectUI();
  try{logTalk('HQ','Google sign-in \u2014 '+(user?user.email:'your account')+' is bound to '+rec.business+'. This is your office, on this device too.','sys')}catch(e){}}
-function resolveAccount(user){if(!user||!user.email)return;
+function resolveAccount(user,tries){if(!user||!user.email)return;
  readBinding(user.email,function(b){
-  if(b&&b.officeId){adoptOffice(b.officeId,user);return}
-  var ownedId=null;Object.keys(Store.offices).forEach(function(id){var r=Store.offices[id];if(r&&r.ownerEmail&&String(r.ownerEmail).toLowerCase()===String(user.email).toLowerCase())ownedId=id});
+  /* A binding is followed ONLY when it names a real office. A binding
+     written in a bad moment can carry the literal word "undefined" —
+     following it adopted a phantom office and stranded the owner at
+     this door on every sign-in. An unusable binding is ignored, the
+     office records are searched instead, and a match found there
+     re-binds the account to the right office — the bad record heals
+     itself on the owner's next sign-in. */
+  if(b&&validOfficeId(b.officeId)){adoptOffice(b.officeId,user);return}
+  var ownedId=null;Object.keys(Store.offices).forEach(function(id){var r=Store.offices[id];if(r&&validOfficeId(id)&&r.ownerEmail&&String(r.ownerEmail).toLowerCase()===String(user.email).toLowerCase())ownedId=id});
   if(ownedId){bindAccount(user.email,ownedId);adoptOffice(ownedId,user);return}
-  if(profile&&profile.officeId){bindAccount(user.email,profile.officeId);renderConnectUI();
+  if(profile&&validOfficeId(profile.officeId)){bindAccount(user.email,profile.officeId);renderConnectUI();
    try{logTalk('HQ','Google connected \u2014 '+user.email+' is now bound to your office ('+(Store.offices[profile.officeId]?Store.offices[profile.officeId].business:profile.officeId)+'). Sign in with it on any device and this office opens.','sys')}catch(e){}
    return}
+  /* The office records may still be arriving from the wire — the home
+     office's identity lands with the first syncs. A signed-in owner
+     gets a few seconds of retries before being treated as brand new,
+     so a slow wire never costs him his office. */
+  if(BACK.mode==='live'&&(tries||0)<4){var gm=$('gateGoogleMsg');if(gm)gm.textContent='Signed in as '+user.email+' \u2014 finding your office\u2026';setTimeout(function(){resolveAccount(user,(tries||0)+1)},2000);return}
   openGate(false);var m=$('gateGoogleMsg');if(m)m.textContent='Signed in as '+user.email+' \u2014 now create your character and your office below; this account will own it.'})}
 /* Plain-words sign-in reporting: whatever Google/Firebase answers —
    success, refusal or silence — is said HERE, on the entrance screen
