@@ -13,7 +13,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:,">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Agent Office (AO) — Cre8tor VibeZ HQ</title>
+<title>Agent Office (AO)</title>
 <script>
 /* RETURNING-PLAYER CHECK — runs in the head, before a single element
    of the page is parsed or painted. A device with a saved player is
@@ -27,7 +27,7 @@
 window.__hqSavedPlayerEarly=null;
 try{var __sp=null;try{__sp=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
  if(__sp&&__sp.officeId){window.__hqSavedPlayerEarly=__sp;document.documentElement.classList.add('hqReturning')}
- else{document.documentElement.classList.add('hqNew')}}catch(e){document.documentElement.classList.add('hqNew')}
+ else{document.documentElement.classList.add('hqNew');document.documentElement.classList.add('freshLock')}}catch(e){document.documentElement.classList.add('hqNew');document.documentElement.classList.add('freshLock')}
 </script>
 <style>
 :root{--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--gold:#b9975b;--gold2:#d4af6a;--char:#1e293b;--soft:#f1f5f9}
@@ -886,6 +886,29 @@ html.hqReturning .wireGate{display:none!important}
 html.hqReturning .wireGate.hqPreviewOK{display:flex!important}
 html.hqNew .wireGate{display:flex;background:#141010}
 html.hqNew .topbar,html.hqNew .bottomBar,html.hqNew .chatLog,html.hqNew .minimap,html.hqNew .rrail,html.hqNew #railLip,html.hqNew .wireDock,html.hqNew #thumbBar,html.hqNew .modePill,html.hqNew .toast,html.hqNew #guidePanel,html.hqNew #guideScrim{display:none!important}
+/* FRESH LOCK — a device with NO saved player and NO sign-in sees ONLY
+   the neutral tutorial + entrance: every other surface in the app
+   (the office floor, the owner's picture, name, crew, cards, District
+   view, docks — all of it) is display:none from the first frame until
+   the visitor has made their OWN player and office, or the owner's
+   own Google sign-in has resolved his own office. The class rides on
+   <html> from the head check and is lifted by the fresh-scrub pass
+   the moment a saved player exists on this device. */
+html.freshLock #appWrap>*:not(#wireGate){display:none!important}
+html.freshLock body>*:not(#appWrap){display:none!important}
+html.freshLock img[src*="profile/craig"]{display:none!important}
+/* TUTORIAL — the first thing a new player sees: one idea per screen,
+   plain words, Next through six short steps, Start at the end drops
+   them into character creation. Neutral second-person throughout. */
+.tutStep{display:none}
+.tutStep.on{display:block;animation:pvIn .2s ease}
+.tutStep p{font-size:13.5px;line-height:1.6;color:#475569;margin:9px 0 0}
+.tutStep p b{color:var(--ink)}
+.tutList{margin:10px 0 0;padding:0;list-style:none}
+.tutList li{font-size:13.5px;line-height:1.55;color:#475569;padding:7px 0 7px 16px;border-top:1px solid #eef2f7;position:relative}
+.tutList li:first-child{border-top:0}
+.tutList li::before{content:"";position:absolute;left:1px;top:14px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.tutList li b{color:var(--ink)}
 /* CONNECT YOUR AI — the stepped hook-up card behind every engine button */
 .museLayer{position:fixed;left:0;top:0;right:0;bottom:0;z-index:96;background:rgba(8,10,18,.62);display:none;align-items:center;justify-content:center;padding:14px;touch-action:none;overscroll-behavior:none}
 .museLayer.show{display:flex;animation:finUp .22s ease}
@@ -1107,7 +1130,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v48";(function(){try{var k='aoFreshV48';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
+<script>window.AO_BUILD="v49";(function(){try{var k='aoFreshV49';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
@@ -1347,7 +1370,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
   <h2>Invite to Cre<span class="inf">∞</span>tor VibeZ HQ</h2>
   <p>Your office, your name on the door. Send this to whoever's joining the HQ and they walk into the same building, with the whole AI crew already at work.</p>
   <div class="box" id="inviteText">You're invited to Cre∞tor VibeZ HQ — infinite creation.
-Our virtual office: Craig + the AI crew (Dex, Rico, Marco, Dev, Sanaa, Milo and Tessa).
+Our virtual office: Craig + the AI crew (Dex, Rico, Marco, Dev, Sanaa, Milo, Tessa, the Merch and Sales teams, and Eli, Mara, Hugo and Rhea hunting movies & shows under Sanaa).
 Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blueprint Room.</div>
   <div class="rowBtns"><button class="gold" id="copyBtn">Copy invite</button><button class="alt" id="closeInvite">Back to the office</button></div>
   <p id="copyMsg" style="margin:8px 0 0;font-size:12px;color:#047857;font-weight:600"></p>
@@ -1407,10 +1430,46 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
   <div class="wireCardIn wireScroll">
     <button class="wireX" id="wireGateX" aria-label="Close" style="display:none">✕</button>
     <div class="wireKick">FIRST TIME HERE</div>
-    <h2 id="wireGateTitle">Create your character</h2>
-    <p class="wireSub" id="wireGateSub">Pick who you are in the office — then name your business, and that business becomes your office, connected to the one that invited you.</p>
-    <div class="wireStepDots" id="wireDots"><i class="on"></i><i></i><i></i></div>
-    <div id="wireStep1">
+    <h2 id="wireGateTitle">Welcome — let's walk through it</h2>
+    <p class="wireSub" id="wireGateSub">A quick walk-through first — then you make your character and name your business.</p>
+    <div class="wireStepDots" id="wireDots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="wireTutorial">
+      <div class="tutStep on" data-tut="1">
+        <p>This app gives you <b>your own office</b> for your business or your big project.</p>
+        <p>Your office sits in this building, with your name on the door. Inside, you walk around, talk to your crew, and get real work done.</p>
+        <p>New here? This quick walk-through shows you how it all starts — six short steps, then you set up. It takes about a minute.</p>
+      </div>
+      <div class="tutStep" data-tut="2">
+        <p>First, you <b>make your character</b> — the person who walks around the office as you.</p>
+        <p>You give your character a name and <b>pick a look</b>. That is who everyone in the office sees when you walk in.</p>
+      </div>
+      <div class="tutStep" data-tut="3">
+        <p>Next, you <b>name your business</b> — or your big project, if that is what this office is for.</p>
+        <p>That name goes on your office door, and <b>that business becomes your office</b>.</p>
+        <p>No business name, no office — and no office means no entry. So this step matters.</p>
+      </div>
+      <div class="tutStep" data-tut="4">
+        <p>After your office is made, you <b>connect your Google account</b>.</p>
+        <p>That is how the app knows you. Sign in with the same Google account on your phone, and <b>your own office opens</b> — yours only, every time.</p>
+        <p>You can connect it right on the character screen, or later in Settings.</p>
+      </div>
+      <div class="tutStep" data-tut="5">
+        <p>Once you are inside, it is simple:</p>
+        <ul class="tutList">
+          <li><b>Double-tap the floor</b> to walk there.</li>
+          <li><b>Tap the AO tab</b> on the left edge to open the <b>HQ Guide</b> menu — rooms, people and settings live there.</li>
+          <li><b>HQ Chat talks back</b> — type a message or an order, and the office answers and moves.</li>
+          <li><b>Tap a person</b> to talk to them and see their card.</li>
+        </ul>
+      </div>
+      <div class="tutStep" data-tut="6">
+        <p>You can also <b>visit other people's offices</b> — but only with their <b>office code</b>, or an <b>invite</b> from them.</p>
+        <p>Enter a code in Offices &amp; connections, and a doorway opens in your Lobby. Walk through it to visit, walk back the same way.</p>
+        <p>No code and no invite means no visit. Your office works the same way — only people you invite can come in.</p>
+        <p><b>Ready?</b> Tap Start and make your character.</p>
+      </div>
+    </div>
+    <div id="wireStep1" style="display:none">
       <label for="wireName">Your name — it rides over your character</label>
       <input id="wireName" type="text" maxlength="18" placeholder="e.g. Alex" autocomplete="off">
       <label>Pick your look</label>
@@ -1427,7 +1486,7 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
       <p class="wireNote">Tap “Create my office” and you land inside it, at the front door.</p>
     </div>
     <p class="wireMsg" id="wireGateMsg"></p>
-    <div class="wireBtns"><button class="alt" id="wireBack" style="display:none">Back</button><button class="gold" id="wireNext">Next — name your business</button></div>
+    <div class="wireBtns"><button class="alt" id="wireBack" style="display:none">Back</button><button class="gold" id="wireNext">Next</button></div>
   </div>
 </div>
 
@@ -1788,15 +1847,48 @@ function drawPixel(sx,sy,s,cfg,t,mode,wx,wz){
  if(spr){const iw=spr.im.naturalWidth,ih=spr.im.naturalHeight;const dw=spr.w?spr.w*u:spr.h*u*iw/ih,dh=spr.w?spr.w*u*ih/iw:spr.h*u;
   ctx.save();ctx.translate(0,-dh/2+.04*u);if(rot)ctx.rotate(rot);ctx.drawImage(spr.im,-dw/2,-dh/2,dw,dh);ctx.restore()}
  ctx.restore();
- /* name pill */
- const lx=sx,ly=sy-topU*u;const phMode=isPhoneView();const nameFs=phMode?Math.max(12.5,u*.30):Math.max(9,u*.20);ctx.font='650 '+nameFs+'px system-ui,sans-serif';const nameW=ctx.measureText(cfg.name).width;const dotExtra=cfg.isMe?12:0;const pw=nameW+(phMode?18:14)+dotExtra,ph=phMode?Math.max(23,u*.44):Math.max(16,u*.30);const lyA=pillPlace(lx,ly,pw,ph);rr(lx-pw/2,lyA-ph/2,pw,ph,ph/2);ctx.fillStyle=cfg.label;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.2;ctx.stroke();
- if(cfg.isMe){const dc=myStatus.mode==='Active'?'#22c55e':myStatus.mode==='Busy'?'#f59e0b':'#f97316';ctx.beginPath();ctx.arc(lx-pw/2+9,lyA,3.4,0,7);ctx.fillStyle=dc;ctx.fill();if(myStatus.mode==='Away'){ctx.beginPath();ctx.arc(lx-pw/2+9,lyA,3.4,0,7);ctx.strokeStyle='#fff';ctx.lineWidth=1.4;ctx.stroke()}}
- text(cfg.name,lx+dotExtra/2,lyA+1,nameFs,cfg.labelText||'#fff','center',650);
- if(cfg.streak){const fx=lx+pw/2+5,fy=ly-2;px(fx-3,fy-7,6,5,'#ea580c');px(fx-2,fy-2,4,6,'#f59e0b');px(fx-1,fy+3,2,3,'#fbbf24')}
+ /* name pill — REGISTERED, never drawn here. Every figure hands its
+    plate to the frame's single nameplate pass (drawNameplates, below),
+    which draws exactly one plate per person, locked to that figure.
+    Drawing inline in depth order was the glitch: the old stack shoved
+    plates rows away from their people whenever the crew clustered, and
+    reshuffled the whole stack every frame as the sort order flipped —
+    the jitter, flicker, sliding piles and doubles in the recording. */
+ queuePlate(cfg,sx,sy,u,topU);
 }
-/* Frame-level pill registry — name pills & labels never sit on top of each other */
-const pillRects=[];
-function pillPlace(cx,cy,w,h){let yy=cy;for(let i=0;i<5;i++){const r={x1:cx-w/2,x2:cx+w/2,y1:yy-h/2,y2:yy+h/2};if(!pillRects.some(o=>r.x1<o.x2-2&&r.x2>o.x1+2&&r.y1<o.y2-1&&r.y2>o.y1+1)){pillRects.push(r);return yy}yy-=h+3}pillRects.push({x1:cx-w/2,x2:cx+w/2,y1:yy-h/2,y2:yy+h/2});return yy}
+/* ===== NAMEPLATES — one pass, one plate per person, locked on =====
+   Figures register their plate during the object pass; this pass runs
+   once per frame, after every figure is drawn, and paints the plates:
+   · DEDUPED by name — if a person is ever drawn twice in a frame (a
+     desk body plus a commute walker, a local plus a remote), the first
+     registration wins and only one plate exists. Ever.
+   · ANCHORED to whole pixels at the figure's own head — no sub-pixel
+     swimming while walking.
+   · DE-OVERLAP stays attached: a crowded plate may shift at most two
+     rows up/down or half a width sideways from its own person — never
+     the old unbounded stack that piled names over the wrong room. The
+     slot a plate used last frame is tried first (hysteresis), and the
+     pass order is sorted by anchor, not draw order, so a cluster holds
+     still instead of reshuffling every frame. */
+const plateQueue=[];const plateByKey={};
+function clearPlates(){plateQueue.length=0;for(const k in plateByKey)delete plateByKey[k]}
+function queuePlate(cfg,sx,sy,u,topU){if(!cfg||!cfg.name)return;const key=String(cfg.name).toUpperCase();if(plateByKey[key])return;const e={key:key,cfg:cfg,x:Math.round(sx),y:Math.round(sy-topU*u),u:u};plateByKey[key]=e;plateQueue.push(e)}
+function drawNameplates(){
+ const phMode=isPhoneView();
+ const items=plateQueue.map(e=>{const fs=phMode?Math.max(12.5,e.u*.30):Math.max(9,e.u*.20);ctx.font='650 '+fs+'px system-ui,sans-serif';const w=ctx.measureText(e.cfg.name).width;const dot=(e.cfg.isMe||e.cfg._remote)?12:0;return{e:e,fs:fs,dot:dot,pw:w+(phMode?18:14)+dot,ph:phMode?Math.max(23,e.u*.44):Math.max(16,e.u*.30),px:e.x,py:e.y}});
+ items.sort((a,b)=>a.e.y-b.e.y||a.e.x-b.e.x||(a.e.key<b.e.key?-1:a.e.key>b.e.key?1:0));
+ const placed=[];
+ const hits=(x,y,w,h)=>placed.some(r=>x-w/2<r.x2-2&&x+w/2>r.x1+2&&y-h/2<r.y2-1&&y+h/2>r.y1+1);
+ items.forEach(it=>{const h=it.ph,offs=[[0,0],[0,-(h+3)],[0,(h+3)],[0,-2*(h+3)],[0,2*(h+3)],[-(it.pw/2+4),-(h/2+2)],[(it.pw/2+4),-(h/2+2)],[-(it.pw/2+4),(h/2+2)],[(it.pw/2+4),(h/2+2)]];const last=(typeof it.e.cfg._pillSlot==='number')?it.e.cfg._pillSlot:0;const order=[last];for(let i=0;i<offs.length;i++)if(i!==last)order.push(i);let done=false;
+  for(const si of order){const o=offs[si]||offs[0];const x=it.e.x+o[0],y=it.e.y+o[1];if(!hits(x,y,it.pw,it.ph)){it.px=x;it.py=y;it.e.cfg._pillSlot=si;done=true;break}}
+  if(!done){it.px=it.e.x;it.py=it.e.y;it.e.cfg._pillSlot=0}
+  placed.push({x1:it.px-it.pw/2,x2:it.px+it.pw/2,y1:it.py-it.ph/2,y2:it.py+it.ph/2})});
+ items.forEach(it=>{const cfg=it.e.cfg,lx=it.px,lyA=it.py;rr(lx-it.pw/2,lyA-it.ph/2,it.pw,it.ph,it.ph/2);ctx.fillStyle=cfg.label;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.2;ctx.stroke();
+  if(cfg.isMe){const dc=myStatus.mode==='Active'?'#22c55e':myStatus.mode==='Busy'?'#f59e0b':'#f97316';ctx.beginPath();ctx.arc(lx-it.pw/2+9,lyA,3.4,0,7);ctx.fillStyle=dc;ctx.fill();if(myStatus.mode==='Away'){ctx.beginPath();ctx.arc(lx-it.pw/2+9,lyA,3.4,0,7);ctx.strokeStyle='#fff';ctx.lineWidth=1.4;ctx.stroke()}}
+  else if(cfg._remote){ctx.beginPath();ctx.arc(lx-it.pw/2+9,lyA,3.4,0,7);ctx.fillStyle='#22c55e';ctx.fill()}
+  text(cfg.name,lx+it.dot/2,lyA+1,it.fs,cfg.labelText||'#fff','center',650);
+  if(cfg.streak){const fx=lx+it.pw/2+5,fy=it.e.y-2;px(fx-3,fy-7,6,5,'#ea580c');px(fx-2,fy-2,4,6,'#f59e0b');px(fx-1,fy+3,2,3,'#fbbf24')}});
+ clearPlates()}
 /* ===== Decor drawing kit (pixel style) ===== */
 function drawScreen(x,z,y,sc){const p=proj(x,y,z);const w=.82*cam.zoom*sc,h=.50*cam.zoom*sc;
  /* screen glow pooling on the desk + a soft halo behind the panel */
@@ -1890,7 +1982,7 @@ function drawSofa(x,z,w){drawShadow(x,z+.1,w);isoBox(x,z,w,.95,.42,'#8ca6d9');is
  const tp=proj(x,0.45,z+0.1);px(tp[0]-.3*cam.zoom,tp[1]-.02*cam.zoom,.16*cam.zoom,.04*cam.zoom,'rgba(255,255,255,.25)')}
 function drawArmchair(x,z){drawShadow(x,z+.05,.8);isoBox(x,z,.78,.8,.4,'#7a6a58');isoBox(x,z-.34,.78,.18,.78,'#8a7a66');isoBox(x-.3,z,.16,.8,.58,'#8a7a66');isoBox(x+.3,z,.16,.8,.58,'#8a7a66');isoBox(x,z-.02,.5,.55,.1,'#96836c',.4);const bp=proj(x,.82,z-.34);ctx.strokeStyle='rgba(40,30,18,.3)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(bp[0]-.3*cam.zoom,bp[1]);ctx.lineTo(bp[0]+.3*cam.zoom,bp[1]);ctx.stroke()}
 function drawDeskLamp(x,z){const p=proj(x,.82,z);const u=cam.zoom;px(p[0]-.03*u,p[1]-.3*u,.05*u,.3*u,'#475569');ctx.beginPath();ctx.moveTo(p[0],p[1]-.3*u);ctx.lineTo(p[0]+.14*u,p[1]-.44*u);ctx.lineTo(p[0]+.2*u,p[1]-.34*u);ctx.closePath();ctx.fillStyle='#b9975b';ctx.fill();ctx.beginPath();ctx.arc(p[0]+.15*u,p[1]-.3*u,.16*u,0,7);ctx.fillStyle='rgba(253,224,130,.28)';ctx.fill()}
-function labelPill(txt,x,z,y,scale){const p=proj(x,y||0,z);const phM=isPhoneView();const lFs=phM?Math.max(12,cam.zoom*.30*(scale||1)):Math.max(9,cam.zoom*.21*(scale||1));ctx.font='650 '+lFs+'px system-ui,sans-serif';const tw=ctx.measureText(txt).width+(phM?17:13),ph2=phM?Math.max(22,cam.zoom*.42*(scale||1)):Math.max(15,cam.zoom*.29*(scale||1));const py2=pillPlace(p[0],p[1],tw,ph2);rr(p[0]-tw/2,py2-ph2/2,tw,ph2,ph2/2);ctx.fillStyle='rgba(255,255,255,.94)';ctx.fill();ctx.strokeStyle='#d8cfc0';ctx.stroke();text(txt,p[0],py2+1,lFs,'#475569','center',650)}
+function labelPill(txt,x,z,y,scale){const p=proj(x,y||0,z);const phM=isPhoneView();const lFs=phM?Math.max(12,cam.zoom*.30*(scale||1)):Math.max(9,cam.zoom*.21*(scale||1));ctx.font='650 '+lFs+'px system-ui,sans-serif';const tw=ctx.measureText(txt).width+(phM?17:13),ph2=phM?Math.max(22,cam.zoom*.42*(scale||1)):Math.max(15,cam.zoom*.29*(scale||1));const py2=p[1];/* one destination label at a time — drawn at its own spot, no stacking registry (that registry was the nameplate glitch) */rr(p[0]-tw/2,py2-ph2/2,tw,ph2,ph2/2);ctx.fillStyle='rgba(255,255,255,.94)';ctx.fill();ctx.strokeStyle='#d8cfc0';ctx.stroke();text(txt,p[0],py2+1,lFs,'#475569','center',650)}
 /* Zone and room names live ON the floor itself — soft, low-contrast,
    Gather-style. No white billboard pills anywhere on the floor. */
 function floorText(txt,x,z,color,scale){const p=proj(x,0.03,z);const phM=isPhoneView();text(txt,p[0],p[1],Math.min(phM?14:11,cam.zoom*(phM?.30:.23)*(scale||1)),color||'rgba(71,85,105,.42)','center',750)}
@@ -3690,7 +3782,7 @@ function openAlertDetail(aid){const a=ALERTS.find(x=>x.aid===aid);if(!a)return;i
  const d=alertDetailData(a);const det=document.getElementById('alertDetail');if(!det)return;
  det.innerHTML=detailShell({ico:a.ico,bg:a.bg,fg:a.fg,title:a.t,sub:a.d,facts:factRows([['Who',d.who],['When',fmtClock(a.at||Date.now())],['Where',d.where]]),origin:originHTML(convoForAlert(a)),story:d.story,specTitle:d.specTitle,spec:d.spec,extra:d.extra||''});
  showDetail()}
-function crewArea(k){return {rico:'Numbers Lab \u2014 Clipper Department',marco:'Numbers Lab \u2014 Clipper Department',dev:'Numbers Lab \u2014 Clipper Department',sanaa:'Catalog workspace \u2014 the Library',dex:'Audit \u2014 Deep Work Den',tessa:'Rankings \u2014 Numbers Lab',milo:'Game Testing \u2014 Gaming Room rigs',vance:'Merch Studio \u2014 the Lobby',lena:'Merch Studio \u2014 the Lobby',omar:'Merch Studio \u2014 the Spring store desk',kian:'Sales Desk \u2014 south of the Main Floor',sofia:'Sales Desk \u2014 south of the Main Floor',trey:'Sales Desk \u2014 south of the Main Floor'}[k]||'Main Floor'}
+function crewArea(k){return {rico:'Numbers Lab \u2014 Clipper Department',marco:'Numbers Lab \u2014 Clipper Department',dev:'Numbers Lab \u2014 Clipper Department',sanaa:'Catalog workspace \u2014 the Library',dex:'Audit \u2014 Deep Work Den',tessa:'Rankings \u2014 Numbers Lab',milo:'Game Testing \u2014 Gaming Room rigs',vance:'Merch Studio \u2014 the Lobby',lena:'Merch Studio \u2014 the Lobby',omar:'Merch Studio \u2014 the Spring store desk',kian:'Sales Desk \u2014 south of the Main Floor',sofia:'Sales Desk \u2014 south of the Main Floor',trey:'Sales Desk \u2014 south of the Main Floor',eli:'At the office door \u2014 waiting to be let in',mara:'At the office door \u2014 waiting to be let in',hugo:'At the office door \u2014 waiting to be let in',rhea:'At the office door \u2014 waiting to be let in'}[k]||'Main Floor'}
 function kindStory(kind,p){switch(kind){
  case 'clip':return 'Finished and staged for your okay. The work itself is below — watch it before a single VibeZ moves.';
  case 'rankings':return 'The board was rebuilt from the latest numbers. The refreshed board is below, so you can see exactly what you are paying for.';
@@ -4365,18 +4457,22 @@ function drawMapView(t){
  ZORDER.forEach(id=>{const s=ZONES[id];const nm=id==='huddles'?'HUDDLE ROOMS':(NAMES[id]||id).toUpperCase();text(nm,MX(s.cx),MY(s.cz+(id==='main'?3.4:3.1)),Math.max(10,mz*.42),'rgba(71,85,105,.75)','center',750)});
  ROOMS.forEach(r=>{if(mz<13)return;text(NAMES[r.id]||r.id,MX(r.cx),MY(r.cz),Math.max(8.5,mz*.30),'rgba(71,85,105,.6)','center',650)});
  text('THE GROUNDS',MX(-24),MY(23.6),Math.max(9,mz*.34),'rgba(71,85,105,.55)','center',700);
- objects.forEach(o=>{if(!o.mapName||o.mapVisible===false)return;const px2=MX(o.x),py2=MY(o.z);const r=Math.max(8,mz*.52);ctx.beginPath();ctx.arc(px2,py2,r,0,7);ctx.fillStyle=o.mapColor||'#334155';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();text(o.mapName[0],px2,py2+1,r*1.05,'#fff','center',800);ctx.font='700 '+Math.max(9,mz*.34)+'px system-ui,sans-serif';const tw=ctx.measureText(o.mapName).width+10;rr(px2-tw/2,py2-r-Math.max(15,mz*.62),tw,Math.max(15,mz*.62),7);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();text(o.mapName,px2,py2-r-Math.max(15,mz*.62)/2+1,Math.max(9,mz*.34),'#334155','center',700)});
+ const _seenP={};objects.forEach(o=>{if(!o.mapName||o.mapVisible===false||_seenP[o.mapName])return;_seenP[o.mapName]=1;const px2=MX(o.x),py2=MY(o.z);const r=Math.max(8,mz*.52);ctx.beginPath();ctx.arc(px2,py2,r,0,7);ctx.fillStyle=o.mapColor||'#334155';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();text(o.mapName[0],px2,py2+1,r*1.05,'#fff','center',800);ctx.font='700 '+Math.max(9,mz*.34)+'px system-ui,sans-serif';const tw=ctx.measureText(o.mapName).width+10;rr(px2-tw/2,py2-r-Math.max(15,mz*.62),tw,Math.max(15,mz*.62),7);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();text(o.mapName,px2,py2-r-Math.max(15,mz*.62)/2+1,Math.max(9,mz*.34),'#334155','center',700)});
 }
 /* ===== Boot + frame ===== */
 resize();cam.zoom=lotZoom();addEventListener('resize',resize);tickClock();setInterval(tickClock,20000);
-cam.zoom=lotZoom();/* PHONE APP OPENING — on a phone the office opens on the heart of the floor (Main Floor, Desk Row) at the phone framing, NOT on the wide lot view: the screen is filled, big and readable, from the first frame. Pan and zoom still reach the lot and every room. */
-if(isPhoneView()){lotOpening=false;currentZone='main';cam.tx=3.5;cam.tz=2.5;cam.zoom=fitZoom()}
+/* APP START = PARKING LOT — every start, phone included: the camera
+   opens on the lot, zoomed out over the whole lot (both space columns,
+   the road, the entry walk, the front door) while the arrivals play.
+   Nothing at boot re-centres into the office; the first drag, tap or
+   zone pick ends the opening exactly as it always has. */
+lotOpening=true;cam.tx=-21.5;cam.tz=11.5;cam.zoom=lotZoom();
 renderZoneList();updateModeUI();updateDecorUI();updateShiftUI();setInterval(updateShiftUI,60000);drawMinimap();renderPending();updateEconUI();
 const micData=new Uint8Array(64);
 function frame(ts){requestAnimationFrame(frame);const t=ts/1000;if(typeof regMover==='function'&&typeof craigObj!=='undefined'&&craigObj)regMover(craigObj);if(spinning&&!camTween)cam.az+=.0035;
  if(followCam&&craigObj&&!camTween){cam.tx+=(craigObj.x-cam.tx)*.07;cam.tz+=(craigObj.z-cam.tz)*.07}
  if(camTween){camTween.k+=.045;const k=camTween.k>=1?1:1-Math.pow(1-camTween.k,3);['az','tilt','zoom','tx','tz'].forEach(key=>{cam[key]=camTween.from[key]+(camTween.to[key]-camTween.from[key])*k});if(camTween.k>=1)camTween=null}
- pillRects.length=0;
+ clearPlates();
  ctx.fillStyle='#dde5ee';ctx.fillRect(0,0,W,H);
  const grd=ctx.createRadialGradient(W/2,H*.38,80,W/2,H*.5,Math.max(W,H)*.75);grd.addColorStop(0,'rgba(255,255,255,.18)');grd.addColorStop(1,'rgba(100,116,139,.10)');ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
  /* WARM LIGHT — late-afternoon sun through the north windows: a soft amber
@@ -4393,6 +4489,10 @@ function frame(ts){requestAnimationFrame(frame);const t=ts/1000;if(typeof regMov
  const sorted=[...objects].sort((a,b)=>(proj(a.x,0,a.z)[2]+(a.mapName?.35:0))-(proj(b.x,0,b.z)[2]+(b.mapName?.35:0)));sorted.forEach(o=>{try{o.draw(t)}catch(e){}});
  if(typeof drawWalkMarker==='function')drawWalkMarker(t);
  drawGongFX(t);
+ /* nameplates: one deduped pass over the finished floor, detailed view
+    only — while the map crossfade runs, the map's own labels are the
+    one set on screen, so a name can never render twice at once */
+ if(mapA===0)drawNameplates();else clearPlates();
  }
  if(mapA>0){ctx.save();ctx.globalAlpha=mapA;drawMapView(t);ctx.restore()}
  drawConfetti();
@@ -4979,7 +5079,7 @@ function targetInside(c){for(const m of MOVERS){if(m.mapName===c.name&&m.cx!==un
 function startArrival(c,delay){c.state='wait';c.at=performance.now()/1000+delay;c.car.show=false;c.walker.show=false;COMMUTE_HIDE[c.name]=true}
 function beginDriveIn(c){c.state='driveIn';c.car.show=true;c.car.x=-28.5;c.car.z=26;c.car.queue=[{x:-28.5,z:11},{x:-22.75,z:11},{x:-22.75,z:c.space.z},{x:c.space.x,z:c.space.z}]}
 function beginWalkIn(c){c.state='walkIn';c.walker.show=true;c.walker.x=c.space.x+0.4;c.walker.z=c.space.z;const tgt=targetInside(c);c.walker.queue=[{x:-19.9,z:11},{x:-16.8,z:11},{x:-13.9,z:11},{x:-12.2,z:11}].concat(insideRoute(-12.2,11,tgt.x,tgt.z))}
-function beginWalkOut(c){const from=targetInside(c);c.state='walkOut';c.walker.show=true;c.walker.x=from.x;c.walker.z=from.z;c.walker.queue=insideRoute(from.x,from.z,-12.2,11).concat([{x:-13.9,z:11},{x:-16.8,z:11},{x:-19.9,z:11},{x:c.space.x+0.4,z:c.space.z}])}
+function beginWalkOut(c){const from=targetInside(c);c.state='walkOut';c.walker.show=true;COMMUTE_HIDE[c.name]=true;/* the inside body hides for the whole walk out — without this the same person (and name) stood at their desk AND walked to the car at once */c.walker.x=from.x;c.walker.z=from.z;c.walker.queue=insideRoute(from.x,from.z,-12.2,11).concat([{x:-13.9,z:11},{x:-16.8,z:11},{x:-19.9,z:11},{x:c.space.x+0.4,z:c.space.z}])}
 function beginDriveOut(c){c.state='driveOut';c.walker.show=false;c.car.queue=[{x:-22.75,z:c.space.z},{x:-22.75,z:11},{x:-28.5,z:11},{x:-28.5,z:26}]}
 (function bootCommutes(){let k=0;COMMUTERS.forEach(c=>{if(c.name==='CRAIG'){startArrival(c,0.3)}
  else if(commuterOn(c)){startArrival(c,1.2+k*3.4);k++}
@@ -5069,7 +5169,7 @@ var SEED={
  'test-six':{name:'Tessa',role:'Rankings Watch — watches rankings and Top 10 movements',slot:'rankings',look:'tessa'},
  marco:{name:'Marco',role:'Clipper — watches live streams with Rico, calls out the moments worth clipping',slot:'clipper',look:'marco'},
  dev:{name:'Dev',role:'Clipper — timestamps and captions in the Numbers Lab, readies every cut for Rico',slot:'clipper',look:'dev'}};
-var OWNER_CREW={rico:1,sanaa:1,dex:1,milo:1,'test-six':1,marco:1,dev:1,vance:1,lena:1,omar:1,kian:1,sofia:1,trey:1};
+var OWNER_CREW={rico:1,sanaa:1,dex:1,milo:1,'test-six':1,marco:1,dev:1,vance:1,lena:1,omar:1,kian:1,sofia:1,trey:1,eli:1,mara:1,hugo:1,rhea:1};
 var BALS={rico:90,sanaa:70,dex:80,milo:40};
 var WISHES={rico:['rig3','neon','leafy'],sanaa:['books','globe'],dex:['banner','goldrecord'],milo:['rig2','stringlights','trophy']};
 var LINES={
@@ -5078,6 +5178,7 @@ var LINES={
  audit:['Health check — Shortz VS is green','Every rig, every room — checked','If it breaks, I see it first','Watchdog pass done — all quiet','Dashboards green across the board'],
  gaming:['New JOUST build on the rig — running it now','Found what works — and what does not','Agents are learning the lane — testing the counters','Match notes go straight to Craig','Bug hunt: found one, wrote it plain'],
  merch:['Designing at the screens — mascot tees for Shortz VS','Colorways, variants, and the next drop','The Spring store stays stocked and listed'],
+ hunters:['Waiting at the office door — ready to hunt movies & shows for Shortz VS once I am let in','At the door with my assignment — Sanaa\u2019s standard: not in the catalog, plays free, complete','Waiting to be let in — no desk yet','At the door — my finds get Sanaa\u2019s three-part check before anything counts','Waiting at the door — ready when Craig says go'],
  sales:['Running the daily sales report — Shortz VS store','Units, revenue, best seller — counted, not guessed','Store open — products still in draft, watching for the first sale','Orders and units tracked as they land','Payouts tracked to the cent'],
  generic:['On the job — first pass underway','Working my section','Checking in with the crew','Heads down on the current run']};
 var DESCS={
@@ -5086,6 +5187,7 @@ var DESCS={
  audit:'Runs the health checks on Shortz VS and the office around the clock, and reports problems first. Slot: the Audit cube.',
  gaming:'Plays the JOUST builds, hunts bugs, and reports in plain words what works and what does not. Slot: the Gaming Room rigs.',
  merch:'Designs the Shortz VS mascot tees and runs the Spring storefront — designs, colorways, listings. Slot: the Merch Studio.',
+ hunters:'Hunts movies and shows Shortz VS does not have yet, verifies each one is not already in the catalog and actually plays before it counts, and brings the finds to Craig for the green light. WAITING AT THE OFFICE DOOR — no desk yet, until Craig lets them in.',
  sales:'Tracks the Shortz VS store on Amaze — orders, units, revenue and payouts — and posts the daily sales report with the real numbers only. Slot: the Sales Desk.',
  generic:'A hired hand on Craig\u2019s projects, working from their slot in the office.'};
 var SLOTS={
@@ -5098,7 +5200,8 @@ var SLOTS={
  gaming:{seat:{x:5.2,z:6.36},huddle:{x:16.5,z:-0.7,mode:'sit'}},
  library:{seat:{x:14,z:17.3},huddle:{x:14,z:17.3,mode:'sit'}},
  lobby:{seat:{x:-10.6,z:11.76},huddle:{x:-10.6,z:11.76,mode:'sit'}},
- sales:{seat:{x:7.4,z:8.15},huddle:{x:7.4,z:8.15,mode:'sit'}}};
+ sales:{seat:{x:7.4,z:8.15},huddle:{x:7.4,z:8.15,mode:'sit'}},
+ hunters:{seat:{x:-10.4,z:13.1},huddle:{x:-10.4,z:13.1,mode:'sit'}}};
 var LOOK_LABEL={rico:'#065f46',sanaa:'#b45309',dex:'#1f2937',milo:'#334155',dev:'#9d174d',marco:'#1d4ed8',craig:'#111827',tessa:'#8a2326',muse:'#9a4a1f',vance:'#1f2937',lena:'#b45309',omar:'#1d4ed8',kian:'#0f766e',sofia:'#7c2d12',trey:'#334155'};
 var LOOK_OUTFIT={rico:'#059669',sanaa:'#b45309',dex:'#1f2937',milo:'#475569',dev:'#be185d',marco:'#2563eb',craig:'#1e293b',tessa:'#a3272e',muse:'#c96f4a',vance:'#1f2937',lena:'#b45309',omar:'#2563eb',kian:'#0f766e',sofia:'#9a3412',trey:'#475569'};
 /* Sanaa takes the Highlights cube, Dex the Audit cube — their desk
@@ -5126,8 +5229,8 @@ function peopleCount(){var h=document.querySelector('.fsec[data-sec="people"] h3
    team's people under it, then the next title — one list, scrolled top
    to bottom. Rows land in their team's block no matter what order the
    hire door delivers them in; a block with nobody in it is removed. */
-var PPL_GROUPS=[['sales','SALES TEAM'],['merch','MERCH TEAM'],['clipper','CLIPPER TEAM'],['hq','HQ TEAM']];
-function pplGroupKey(slot){return slot==='sales'?'sales':slot==='merch'?'merch':slot==='clipper'?'clipper':'hq'}
+var PPL_GROUPS=[['sales','SALES TEAM'],['merch','MERCH TEAM'],['hunters','HUNT TEAM'],['clipper','CLIPPER TEAM'],['hq','HQ TEAM']];
+function pplGroupKey(slot){return slot==='sales'?'sales':slot==='merch'?'merch':slot==='hunters'?'hunters':slot==='clipper'?'clipper':'hq'}
 function pplGroupEl(key){var wrap=document.getElementById('hireRows');if(!wrap)return null;
  var g=document.getElementById('pplGroup_'+key);if(g)return g;
  g=document.createElement('div');g.className='pplGroup';g.id='pplGroup_'+key;
@@ -5703,7 +5806,7 @@ var sessionActive=false;try{sessionActive=sessionStorage.getItem('hqWireSession'
 var OWNER_OFFICE='craig-hq';
 var currentOffice=OWNER_OFFICE, pendingVisit=null, welcomeBack=false;
 /* ---------- looks — the office's own people, as character choices ---------- */
-var LOOK_KEYS=['rico','milo','craig','dex','sanaa','marco','dev'];
+var LOOK_KEYS=['rico','milo','dex','sanaa','marco','dev','tessa']; /* neutral looks only — the owner's own look ('craig': his face, his figure) is NEVER offered to a new player */
 var LOOK_EXTRA={rico:{name:'RICO',hair:'capRed',outfit:'#059669',pants:'#064e3b',skin:'#e8b88a',label:'#065f46',ph:.7},milo:{name:'MILO',hair:'spiky',outfit:'#475569',pants:'#1e293b',skin:'#f0c8a0',label:'#334155',ph:4.9}};
 function lookCfg(k){if(PEOPLE[k])return PEOPLE[k];if(LOOK_EXTRA[k])return LOOK_EXTRA[k];var a=agentByKey(k);return a?a.cfg:null}
 /* NEUTRAL LOOK LABELS — the entrance picker names the LOOK, never a
@@ -5769,10 +5872,8 @@ function drawRemoteFigure(o,t,mode){var cfg=o.cfg;var u=cam.zoom*.44*1.18;var p=
  var bob=mode==='walk'?Math.abs(Math.sin(t*10+cfg.ph))*.05*u:Math.sin(t*1.6+cfg.ph)*.012*u;
  var spr=SPRITES[o.look+'-stand'];
  if(spr){var dh=1.72*u,dw=dh*spr.naturalWidth/Math.max(1,spr.naturalHeight);ctx.drawImage(spr,p[0]-dw/2,p[1]-bob-dh+.04*u,dw,dh)}
- var ly=p[1]-1.94*u;ctx.font='650 '+Math.max(9,u*.20)+'px system-ui,sans-serif';var nameW=ctx.measureText(cfg.name).width;var pw=nameW+14+12,ph=Math.max(16,u*.30);var lyA=pillPlace(p[0],ly,pw,ph);
- rr(p[0]-pw/2,lyA-ph/2,pw,ph,ph/2);ctx.fillStyle=cfg.label;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.2;ctx.stroke();
- ctx.beginPath();ctx.arc(p[0]-pw/2+9,lyA,3.4,0,7);ctx.fillStyle='#22c55e';ctx.fill();
- text(cfg.name,p[0]+6,lyA+1,Math.max(9,u*.20),cfg.labelText||'#fff','center',650)}
+ /* plate via the same single nameplate pass as everyone else */
+ cfg._remote=true;queuePlate(cfg,p[0],p[1],u,1.94)}
 function ensureRemote(p){var o=remoteObjs[p.uid];
  if(!o){var lc=lookCfg(p.look)||{label:'#334155',ph:1};
   o={uid:p.uid,look:p.look,tx:p.x,tz:p.z,cx:p.x,cz:p.z,x:p.x,z:p.z,queue:[],curKey:'',lastT:0,mapName:String(p.name||'Guest').toUpperCase(),mapColor:lc.label,mapVisible:true,cfg:{name:String(p.name||'Guest').toUpperCase(),label:lc.label,labelText:'#fff',ph:lc.ph||1},
@@ -5822,17 +5923,30 @@ function reskin(){if(!profile)return;var nm=String(profile.name||'Guest').slice(
  var dn=$('displayNameInput');if(dn)dn.value=nm;
  var pc=$('pplCraigStatus');if(pc&&pc.closest){var it=pc.closest('.item');if(it){var bb=it.querySelector('b');if(bb)bb.textContent=nm}}}
 /* ---------- the gate ---------- */
-var gateStep=1,gateLook=null,gatePreview=false;
+var gateStep=0,gateLook=null,gatePreview=false,gateTut=1; /* gateStep 0 = the TUTORIAL — the first thing a new player sees, before character creation (steps 1-3) */
+var TUT_TITLES=['Welcome — let\u2019s walk through it','Make your character','Name your business','Connect your Google account','Inside your office','Visiting other offices'];
+var TUT_SUBS=['Step 1 of 6 · What this app is','Step 2 of 6 · Your character is you, inside the office','Step 3 of 6 · Your business becomes your office','Step 4 of 6 · So the app knows you on your phone','Step 5 of 6 · Walking, the Guide menu, chat, and talking to people','Step 6 of 6 · Other offices open only by code or invite'];
 function buildLooks(){var w=$('wireLooks');if(!w||w.children.length)return;w.innerHTML=LOOK_KEYS.map(function(k){return '<button type="button" class="wireLook" data-look="'+k+'"><img src="assets/char-'+k+'-head.png" alt="'+esc(lookLabel(k))+' look"><span>'+esc(lookLabel(k))+'</span></button>'}).join('');
  w.querySelectorAll('[data-look]').forEach(function(b){b.onclick=function(){gateLook=b.dataset.look;w.querySelectorAll('.wireLook').forEach(function(x){x.classList.toggle('sel',x===b)});gateMsg('')}})}
 function gateMsg(t,ok){var m=$('wireGateMsg');if(m){m.textContent=t||'';m.className='wireMsg'+(ok?' ok':'')}}
-function gateShowStep(){[1,2,3].forEach(function(i){var el=$('wireStep'+i);if(el)el.style.display=i===gateStep?'':'none'});
- var dots=$('wireDots');if(dots)[].forEach.call(dots.children,function(d,i){d.className=i<gateStep?'on':''});
- $('wireBack').style.display=gateStep>1?'':'none';
+function gateShowStep(){var tut=$('wireTutorial');
+ if(gateStep===0){ /* TUTORIAL — one idea per screen, before any setup */
+  if(tut)tut.style.display='';[1,2,3].forEach(function(i){var el=$('wireStep'+i);if(el)el.style.display='none'});
+  if(tut)tut.querySelectorAll('.tutStep').forEach(function(s){s.classList.toggle('on',+s.dataset.tut===gateTut)});
+  var dots0=$('wireDots');if(dots0){if(dots0.children.length!==6)dots0.innerHTML='<i></i><i></i><i></i><i></i><i></i><i></i>';[].forEach.call(dots0.children,function(d,i){d.className=i<gateTut?'on':''})}
+  $('wireBack').style.display=gateTut>1?'':'none';
+  $('wireGateTitle').textContent=TUT_TITLES[gateTut-1];
+  var gs=$('wireGateSub');if(gs)gs.textContent=TUT_SUBS[gateTut-1];
+  $('wireNext').textContent=gateTut<6?'Next':'Start — create my character';return}
+ if(tut)tut.style.display='none';
+ [1,2,3].forEach(function(i){var el=$('wireStep'+i);if(el)el.style.display=i===gateStep?'':'none'});
+ var dots=$('wireDots');if(dots){if(dots.children.length!==3)dots.innerHTML='<i></i><i></i><i></i>';[].forEach.call(dots.children,function(d,i){d.className=i<gateStep?'on':''})}
+ $('wireBack').style.display=''; /* in setup steps Back always shows: step 1 goes back to the tutorial's last screen */
  $('wireGateTitle').textContent=gateStep===1?'Create your character':gateStep===2?'Name your business':'Your office is ready';
+ var gs2=$('wireGateSub');if(gs2)gs2.textContent=gateStep===1?'Pick who you are in the office — then name your business, and that business becomes your office, connected to the one that invited you.':gateStep===2?'That name goes on your office door — and that business becomes your office.':'Check it over — then your office opens.';
  $('wireNext').textContent=gateStep===1?'Next — name your business':gateStep===2?'Next — review':'Create my office'}
 function openGate(preview){if(!preview&&window.__hqSavedPlayerEarly){closeGate();return} /* the entrance is for strangers only — a device with a saved player is never gated, whoever asks */
- gatePreview=!!preview;gateStep=1;gateLook=null;buildLooks();var w=$('wireLooks');if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.remove('sel')});
+ gatePreview=!!preview;gateStep=0;gateTut=1;gateLook=null;buildLooks();var w=$('wireLooks');if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.remove('sel')});
  $('wireGateX').style.display=gatePreview?'':'none';gateMsg('');gateShowStep();var g=$('wireGate');g.classList.add('show');g.classList.toggle('hqPreviewOK',!!preview)}
 function closeGate(){var g=$('wireGate');g.classList.remove('show');g.classList.remove('hqPreviewOK')}
 function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value.trim();
@@ -5852,12 +5966,13 @@ function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value
  barNote('Your office is open: '+biz+'. The doorway in your Lobby connects it to the office that invited you.',true);renderWireUI()}
 function linkOffices(a,b){if(!a||!b||a===b)return;BACK.putLink(a,b);renderWireUI()}
 $('wireNext').onclick=function(){
+ if(gateStep===0){gateMsg('');if(gateTut<6){gateTut++;gateShowStep()}else{gateStep=1;gateShowStep();var nm0=$('wireName');if(nm0)setTimeout(function(){nm0.focus()},60)}return}
  if(gateStep===1){var nm=$('wireName').value.trim();if(nm.length<2){gateMsg('Give your character a name first — two letters or more.');return} if(!gateLook){gateMsg('Pick a look — tap one of the looks above.');return} gateMsg('');gateStep=2;gateShowStep();var bz=$('wireBiz');if(bz)setTimeout(function(){bz.focus()},60);return}
  if(gateStep===2){var b2=$('wireBiz').value.trim();if(b2.length<2){gateMsg('Name your business — that name goes on your office door.');return} gateMsg('');
   $('wireReview').innerHTML='You are <b>'+esc($('wireName').value.trim())+'</b> · your look: <b>'+esc(lookLabel(gateLook))+'</b><br>Your business: <b>'+esc(b2)+'</b><br>Your office: this same building, <b>'+esc(b2)+'</b> on the door — connected by invite, doorway in the Lobby.';
   gateStep=3;gateShowStep();return}
  gateCreate()};
-$('wireBack').onclick=function(){if(gateStep>1){gateStep--;gateMsg('');gateShowStep()}};
+$('wireBack').onclick=function(){if(gateStep===0){if(gateTut>1){gateTut--;gateMsg('');gateShowStep()}return} if(gateStep===1){gateStep=0;gateTut=6;gateMsg('');gateShowStep();return} if(gateStep>1){gateStep--;gateMsg('');gateShowStep()}};
 $('wireGateX').onclick=function(){if(gatePreview)closeGate()};
 /* ---------- offices card ---------- */
 var lastPres=[];
@@ -5867,8 +5982,8 @@ function renderWireUI(){var myRec=Store.offices[myHomeId()];var cur=Store.office
  var here=lastPres.filter(function(p){return p.office===currentOffice});
  var dot=$('wireDot'),dt=$('wireDockTxt'),db=$('wireDockBtn');
  if(dot)dot.className='wireDot'+(BACK.mode==='live'?'':' local');
- if(welcomeBack&&profile){if(dt)dt.textContent='Welcome back, '+profile.name+' — '+profile.business+' is yours';if(db)db.textContent='Enter'}
- else{if(dt)dt.textContent=(BACK.mode==='live'?'Live · ':'Local preview · ')+((cur&&(cur.business||cur.name))||(currentOffice===OWNER_OFFICE?'Cre∞tor VibeZ HQ':currentOffice))+(currentOffice!==myHomeId()?' · visiting':'')+(here.length>1?' · '+here.length+' here':'');if(db)db.textContent='Offices'}
+ if(welcomeBack&&profile){if(dt){var wb=(profile.business&&profile.business!=='undefined'&&profile.business!=='null')?profile.business:'';dt.textContent='Welcome back, '+profile.name+(wb?' — '+wb+' is yours':'')}if(db)db.textContent='Enter'}
+ else{if(dt){var biz=(cur&&(cur.business||cur.name))||'';if(!biz||biz==='undefined'||biz==='null')biz=(currentOffice===OWNER_OFFICE?'Cre∞tor VibeZ HQ':'');dt.textContent=(BACK.mode==='live'?'Live':'Local preview')+(biz?' · '+biz:'')+(currentOffice!==myHomeId()?' · visiting':'')+(here.length>1?' · '+here.length+' here':'')}if(db)db.textContent='Offices'}
  var hl=$('wireHereList');if(hl){var rows=here.map(function(p){return '<div class="wireHereRow"><span class="wDot"></span><span><b>'+esc(p.name)+'</b>'+(p.uid===uid?' · you':' · in this office now')+'</span></div>'}).join('');hl.innerHTML=rows||'<div class="wireNote">Just you so far.</div>'}
  var ol=$('wireOfficeList');if(ol){var ids=Object.keys(Store.offices);ol.innerHTML=ids.map(function(id){var o=Store.offices[id];var isCur=id===currentOffice,linked=isLinked(id,myHomeId())||id===myHomeId();
    return '<div class="wireOffRow"><div style="min-width:0"><b>'+esc(o.business||o.name||o.id)+'</b><span>'+esc(o.ownerName||'')+(typeof o.plot==='number'?' · Plot '+(o.plot+1):'')+(o.locked?' · locked':'')+(isCur?' · you are here':linked?' · connected':' · not connected yet')+'</span></div>'+(isCur?'<button class="alt" disabled style="opacity:.55">Here</button>':linked?'<button class="gold" data-enter="'+id+'">Walk in</button>':'<span class="wireNote" style="white-space:nowrap;align-self:center">Join with their code</span>')+'</div>'}).join('')||'<div class="wireNote">No offices yet.</div>';
@@ -6093,7 +6208,7 @@ window.__hqConnect={state:function(){var rec=myOfficeRec();return{google:authUse
 
 /* Verification surface — read/write handles on the wire for the rig */
 window.__hqWire={state:function(){return{mode:BACK.mode,uid:uid,currentOffice:currentOffice,sessionActive:sessionActive,profile:profile?{name:profile.name,business:profile.business,look:profile.look,officeId:profile.officeId}:null,offices:Store.offices,links:Object.keys(Store.links).filter(function(k){return Store.links[k]}),present:lastPres.map(function(p){return{name:p.name,office:p.office,uid:p.uid}}),portalTarget:portalTarget()?portalTarget().id:null,gateOpen:$('wireGate').classList.contains('show')}},
- openGate:function(p){openGate(!!p)},gateStep:function(){return gateStep},
+ openGate:function(p){openGate(!!p)},gateStep:function(){return gateStep},gateTut:function(){return gateTut},
  submitGate:function(name,look,biz){openGate(true);var w=$('wireLooks');gateLook=look;if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.toggle('sel',x.dataset.look===look)});$('wireName').value=name;$('wireBiz').value=biz;gateCreate()},
  offices:function(){return Store.offices},enterOffice:function(id){enterOffice(id,{teleport:true})},connect:function(code){var f=null;Object.keys(Store.offices).forEach(function(id){if(Store.offices[id].code===String(code).toUpperCase())f=Store.offices[id]});if(f)linkOffices(myHomeId(),f.id);return f?f.id:null},
  chatSend:wireChatSend,reset:function(){try{localStorage.removeItem('hqVisitor');sessionStorage.removeItem('hqWireSession')}catch(e){}}};
@@ -7099,6 +7214,10 @@ function cbDeptTask(NAME){var K=window.__hqKick||{};
  if(NAME==='VANCE')return 'Designing the next mascot tee \u2014 Merch Studio';
  if(NAME==='LENA')return 'Colorways and variants \u2014 Merch Studio';
  if(NAME==='OMAR')return 'Running the Spring store \u2014 the shop desk, Merch Studio';
+ if(NAME==='ELI')return 'Waiting at the office door \u2014 Movie Hunter (movies), waiting to be let in';
+ if(NAME==='MARA')return 'Waiting at the office door \u2014 Show Hunter (shows & full seasons), waiting to be let in';
+ if(NAME==='HUGO')return 'Waiting at the office door \u2014 Movie Hunter (classics & deep cuts), waiting to be let in';
+ if(NAME==='RHEA')return 'Waiting at the office door \u2014 Show Hunter (new & trending), waiting to be let in';
  if(NAME==='KIAN')return 'Running the daily sales report \u2014 Sales Desk';
  if(NAME==='SOFIA')return 'Tracking orders & units \u2014 Sales Desk';
  if(NAME==='TREY')return 'Tracking money & payouts \u2014 Sales Desk';
@@ -7491,6 +7610,105 @@ window.__hqSales={crew:SALES_CREW,daily:function(){return window.__hqSalesDaily}
 
 </script>
 
+
+<script>
+/* =====================================================================
+   THE MOVIE & SHOW HUNTERS — SECOND TEAM: Eli (Movie Hunter — movies),
+   Mara (Show Hunter — shows and full seasons), Hugo (Movie Hunter —
+   classics and deep cuts) and Rhea (Show Hunter — new and trending).
+   Hired through the same door as everyone else (slot: hunters).
+   OWNER'S DOOR RULE: they WAIT AT THE OFFICE DOOR — names and
+   assignments on the door board, no desks — until he lets them in. Sanaa
+   the Catalog Hunter RUNS this team: every title they find gets her
+   three-part check — (1) not already in the catalog, (2) actually
+   plays free, no age lock and no region block, (3) complete and
+   correctly numbered — before anything is proposed. Finds ride the
+   same content-find lane as hers; if it does not pass, it does not
+   count.
+   ===================================================================== */
+(function(){
+'use strict';
+/* --- waiting seats AT THE OFFICE DOOR (south wall of the Lobby, just inside the front door) \u2014 the four wait here, no desks, until the owner lets them in --- */
+try{
+ var DS=(window.__hqDepts&&window.__hqDepts.seats)||null;
+ if(DS){
+  if(!DS.ELI)DS.ELI={x:-11.4,z:13.1,lines:['Waiting at the office door \u2014 Movie Hunter: feature films for Shortz VS, to Sanaa\u2019s standard','At the door, waiting to be let in \u2014 no desk yet','Waiting at the door \u2014 my assignment: movies, checked against the whole catalog, free and playable']};
+  if(!DS.MARA)DS.MARA={x:-10.4,z:13.1,lines:['Waiting at the office door \u2014 Show Hunter: series and full seasons for Shortz VS, to Sanaa\u2019s standard','At the door, waiting to be let in \u2014 no desk yet','Waiting at the door \u2014 my assignment: shows and full seasons, every episode there and numbered right']};
+  if(!DS.HUGO)DS.HUGO={x:-9.4,z:13.1,lines:['Waiting at the office door \u2014 Deep-Cut Hunter: classics, hidden gems and complete collections, to Sanaa\u2019s standard','At the door, waiting to be let in \u2014 no desk yet','Waiting at the door \u2014 my assignment: classics and deep cuts, verified free and playable']};
+  if(!DS.RHEA)DS.RHEA={x:-8.4,z:13.1,lines:['Waiting at the office door \u2014 Fresh Hunter: new releases and trending titles for Shortz VS, to Sanaa\u2019s standard','At the door, waiting to be let in \u2014 no desk yet','Waiting at the door \u2014 my assignment: new and trending, complete and numbered right']};
+ }
+ /* --- crew board + levels pick them up --- */
+ if(typeof window.__hqRegisterCrew==='function'){
+  window.__hqRegisterCrew([['eli','Eli','Movie Hunter \u00b7 Movie Hunters'],['mara','Mara','Show Hunter \u00b7 Movie Hunters'],['hugo','Hugo','Deep-Cut Hunter \u00b7 Movie Hunters'],['rhea','Rhea','Fresh Hunter \u00b7 Movie Hunters']]);
+ }
+ /* --- profile-card figures (looks from the existing look set) --- */
+ if(typeof PROF_FIGURES!=='undefined'){
+  if(!PROF_FIGURES.eli)PROF_FIGURES.eli={img:'assets/profile/eli.png',role:'Movie Hunter \u00b7 Movie Hunters'};
+  if(!PROF_FIGURES.mara)PROF_FIGURES.mara={img:'assets/profile/mara.png',role:'Show Hunter \u00b7 Movie Hunters'};
+  if(!PROF_FIGURES.hugo)PROF_FIGURES.hugo={img:'assets/profile/hugo.png',role:'Deep-Cut Hunter \u00b7 Movie Hunters'};
+  if(!PROF_FIGURES.rhea)PROF_FIGURES.rhea={img:'assets/profile/rhea.png',role:'Fresh Hunter \u00b7 Movie Hunters'};
+ }
+}catch(e){}
+/* --- the door board: who is waiting at the door, and their assignments --- */
+function drawHuntBoard2(x,z){try{
+ var p=proj(x,1.45,z);var w=3.1*cam.zoom,h=1.5*cam.zoom;
+ rr(p[0]-w/2,p[1]-h/2,w,h,6);ctx.fillStyle='#0f172a';ctx.fill();
+ ctx.fillStyle='#eef2fb';ctx.fillRect(p[0]-w/2+5,p[1]-h/2+5,w-10,h-10);
+ text('WAITING AT THE DOOR \u00b7 MOVIE & SHOW HUNTERS',p[0],p[1]-h*.27,Math.min(12,w*.06),'#92400e','center',800);
+ text('Eli \u00b7 feature films   Mara \u00b7 series & seasons',p[0],p[1]+1,Math.min(12,w*.055),'#334155','center',700);
+ text('Hugo \u00b7 classics & deep cuts   Rhea \u00b7 new & trending \u00b7 to Sanaa\u2019s standard',p[0],p[1]+h*.28,Math.min(11,w*.052),'#64748b','center',600);
+}catch(e){}}
+function hunters2Build(){
+ try{
+  if(typeof objects==='undefined'||typeof isoBox!=='function')return false;
+  /* AT THE DOOR \u2014 the owner's standing rule: the hunter four WAIT at
+     the office door until he greenlights them in. NO desks, no Library
+     row: a waiting bench just inside the front door (south wall of the
+     Lobby) and the door board carrying their names + assignments. */
+  objects.push({x:-9.9,z:13.35,draw:function(){try{
+   isoBox(-9.9,13.42,3.9,0.5,0.42,'#5b4632');isoBox(-9.9,13.42,4.0,0.56,0.07,'#6d573f',0.42);
+   [-11.4,-10.4,-9.4,-8.4].forEach(function(dx){isoBox(dx,13.3,0.8,0.4,0.5,'#3a4150')});
+  }catch(e){}}});
+  /* the door board standing by the bench: names + assignments showing */
+  objects.push({x:-9.9,z:12.6,draw:function(){try{isoBox(-9.9,12.6,0.09,0.09,1.15,'#4b5563');drawHuntBoard2(-9.9,12.6)}catch(e){}}});
+  return true;
+ }catch(e){return false}
+}
+if(!hunters2Build()){var h2Tries=0;var h2Iv=setInterval(function(){h2Tries++;if(hunters2Build()||h2Tries>20)clearInterval(h2Iv)},600)}
+/* --- the hires: through the door, once, wherever this office opens --- */
+var HUNTER2_CREW=[
+ {name:'Eli',role:'Movie Hunter \u2014 hunts feature films for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in \u2014 Sanaa\u2019s standard',slot:'hunters',look:'rico'},
+ {name:'Mara',role:'Show Hunter \u2014 hunts series and full seasons for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in \u2014 Sanaa\u2019s standard',slot:'hunters',look:'tessa'},
+ {name:'Hugo',role:'Deep-Cut Hunter \u2014 hunts classics, hidden gems, and complete collections for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in \u2014 Sanaa\u2019s standard',slot:'hunters',look:'milo'},
+ {name:'Rhea',role:'Fresh Hunter \u2014 hunts new releases and trending titles for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in \u2014 Sanaa\u2019s standard',slot:'hunters',look:'sanaa'}];
+var h2HireTries=0;
+var h2HireIv=setInterval(function(){h2HireTries++;
+ var H=window.__hqHires;
+ if(!H||!H.add||!H.list){if(h2HireTries>40)clearInterval(h2HireIv);return}
+ clearInterval(h2HireIv);
+ var have={};try{var L=H.list();Object.keys(L).forEach(function(k){have[String(L[k].name||'').toLowerCase()]=true})}catch(e){}
+ HUNTER2_CREW.forEach(function(rec,i){
+  if(have[rec.name.toLowerCase()])return;
+  setTimeout(function(){try{H.add({name:rec.name,role:rec.role,slot:rec.slot,look:rec.look})}catch(e){}},3400+i*1800)});
+},700);
+/* --- Sanaa announces the team once all four are in the building --- */
+var h2RepTries=0;
+var h2RepIv=setInterval(function(){h2RepTries++;
+ var H=window.__hqHires,ready=0;
+ try{if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(k){if(['eli','mara','hugo','rhea'].indexOf(String(L[k].name||'').toLowerCase())>=0)ready++})}}catch(e){}
+ if(ready>=4||h2RepTries>50){clearInterval(h2RepIv);if(ready<1)return;
+  try{if(typeof ALERTS!=='undefined'){
+   var t='Movie & Show Hunters \u2014 Eli, Mara, Hugo and Rhea are waiting at the door',ex=null;
+   for(var i=0;i<ALERTS.length;i++)if(ALERTS[i].t===t)ex=ALERTS[i];
+   if(!ex){ALERTS.unshift({ico:'\u25a4',bg:'#fef3c7',fg:'#92400e',t:t,d:'Eli (feature films), Mara (series & full seasons), Hugo (classics & deep cuts) and Rhea (new & trending) are WAITING AT THE OFFICE DOOR \u2014 no desks yet, until Craig lets them in. Their assignments stand, under Sanaa: every find gets her three-part check (not already in the catalog, actually plays free with no age or region lock, and complete and correctly numbered) before anything is proposed.',unread:true,at:Date.now()});if(typeof updateBadge==='function')updateBadge();if(typeof renderAlerts==='function')renderAlerts()}
+  }}catch(e){}
+  try{if(typeof logTalk==='function')logTalk('Sanaa','My hunter team is at the door, Mr. Moore \u2014 waiting to be let in: Eli on feature films, Mara on series and full seasons, Hugo on classics and deep cuts, Rhea on new and trending. No desks yet. Nothing they find gets proposed until it passes my three checks: not in the catalog, plays free, complete and numbered right.')}catch(e){}
+ }
+},1200);
+window.__hqHunters2={crew:HUNTER2_CREW,lead:'Sanaa',desk:'At the office door \u2014 waiting to be let in (no desks yet)'};
+})();
+</script>
+
 <!-- ================================================================
      TESSA BUILD — (a) CREW GUARANTEE + 14 HOME DESKS
      (b) THE GUIDE MENU — one-of-one of the crowned xbox-menus demo:
@@ -7644,7 +7862,7 @@ body.forceLand .gFeed{height:148px;max-height:148px}
       <button class="gRow" id="gMeetingsBtn"><span class="thumb" style="background:#2f4a5a">M</span><span class="meta"><b>Meetings</b><span>Set one up, or call everyone in</span></span><span class="chev">›</span></button>
     </div>
     <div class="gPage" data-gpage="people">
-      <h4>Crew — in the office now · 13</h4>
+      <h4>Crew — in the office now · 17</h4>
       <div id="gPeopleList"></div>
     </div>
     <div class="gPage" data-gpage="rooms">
@@ -7735,7 +7953,11 @@ var CREW=[
  {key:'omar',name:'Omar',role:'The Seller · Merch',short:'The Seller',dept:'Merch Studio'},
  {key:'kian',name:'Kian',role:'Sales Lead · Sales',short:'Sales Lead',dept:'Sales Desk'},
  {key:'sofia',name:'Sofia',role:'Sales Tracker · Sales',short:'Sales Tracker',dept:'Sales Desk'},
- {key:'trey',name:'Trey',role:'Sales Tracker · Sales',short:'Sales Tracker',dept:'Sales Desk'}
+ {key:'trey',name:'Trey',role:'Sales Tracker · Sales',short:'Sales Tracker',dept:'Sales Desk'},
+ {key:'eli',name:'Eli',role:'Movie Hunter · Movie Hunters',short:'Movie Hunter',dept:'At the door'},
+ {key:'mara',name:'Mara',role:'Show Hunter · Movie Hunters',short:'Show Hunter',dept:'At the door'},
+ {key:'hugo',name:'Hugo',role:'Deep-Cut Hunter · Movie Hunters',short:'Deep-Cut Hunter',dept:'At the door'},
+ {key:'rhea',name:'Rhea',role:'Fresh Hunter · Movie Hunters',short:'Fresh Hunter',dept:'At the door'}
 ];
 var MUSE={key:'muse',name:'Muse',role:'Your AI · Blueprint Room',short:'Your AI',dept:'Blueprint Room'};
 function picFor(key){return 'assets/profile/'+key+'.png'}
@@ -7763,7 +7985,11 @@ var RECORDS=[
  {name:'Omar',role:'The Seller — Merch',slot:'merch',look:'marco'},
  {name:'Kian',role:'Sales Lead — runs the daily sales report for the Shortz VS store',slot:'sales',look:'kian'},
  {name:'Sofia',role:'Sales Tracker — tracks orders & units for the Shortz VS store',slot:'sales',look:'sofia'},
- {name:'Trey',role:'Sales Tracker — tracks money & payouts for the Shortz VS store',slot:'sales',look:'trey'}
+ {name:'Trey',role:'Sales Tracker — tracks money & payouts for the Shortz VS store',slot:'sales',look:'trey'},
+ {name:'Eli',role:'Movie Hunter — hunts feature films for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'rico'},
+ {name:'Mara',role:'Show Hunter — hunts series and full seasons for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'tessa'},
+ {name:'Hugo',role:'Deep-Cut Hunter — hunts classics, hidden gems, and complete collections for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'milo'},
+ {name:'Rhea',role:'Fresh Hunter — hunts new releases and trending titles for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'sanaa'}
 ];
 var SEED_IDS={rico:'rico',sanaa:'sanaa',dex:'dex',milo:'milo',tessa:'test-six',marco:'marco',dev:'dev'};
 function ensureCrew(){
@@ -7810,6 +8036,10 @@ var HOME_DESKS={
  KIAN:{x:7.4,z:8.15,desk:'7.4,8.15',label:"Kian's Desk — Sales Desk"},
  SOFIA:{x:5.5,z:8.15,desk:'5.5,8.15',label:"Sofia's Desk — Sales Desk"},
  TREY:{x:9.3,z:8.15,desk:'9.3,8.15',label:"Trey's Desk — Sales Desk"},
+ ELI:{x:-11.4,z:13.1,desk:'-11.4,13.1',label:"Eli — Waiting at the Door · Movie Hunter (feature films)"},
+ MARA:{x:-10.4,z:13.1,desk:'-10.4,13.1',label:"Mara — Waiting at the Door · Show Hunter (series & seasons)"},
+ HUGO:{x:-9.4,z:13.1,desk:'-9.4,13.1',label:"Hugo — Waiting at the Door · Deep-Cut Hunter (classics)"},
+ RHEA:{x:-8.4,z:13.1,desk:'-8.4,13.1',label:"Rhea — Waiting at the Door · Fresh Hunter (new & trending)"},
  MUSE:{x:19.9,z:-9.25,desk:'19.9,-10.0',label:'Muse · Handoff Desk — Blueprint Room'}
 };
 window.__hqHomeDesks=HOME_DESKS;
@@ -7932,6 +8162,7 @@ function closeGuideAll(){
 var PEOPLE_GROUPS=[
  {title:'SALES TEAM',keys:['kian','sofia','trey']},
  {title:'MERCH TEAM',keys:['vance','lena','omar']},
+ {title:'HUNT TEAM',keys:['eli','mara','hugo','rhea']},
  {title:'CLIPPER TEAM',keys:['rico','marco','dev']},
  {title:'HQ TEAM',keys:['dex','sanaa','milo','tessa']}
 ];
@@ -8042,6 +8273,10 @@ var POOLS={
  kian:['Daily sales report is up — real numbers only.','Running the daily sales report — units, revenue, best seller.'],
  sofia:['Tracking orders & units — every order counted as it lands.','Units checked against the store, twice.'],
  trey:['Tracking money & payouts — to the cent.','Revenue reconciled — payouts tracked.'],
+ eli:['Waiting at the office door — Movie Hunter, ready to hunt feature films for Shortz VS once I am let in. Every find will go to Sanaa for her three-part check.','At the door with my assignment — no desk yet, waiting on the word.'],
+ mara:['Waiting at the office door — Show Hunter, ready to hunt shows and full seasons once I am let in.','At the door with my assignment — episodes all there and numbered right, for Sanaa’s check.'],
+ hugo:['Waiting at the office door — Deep-Cut Hunter, ready to hunt classics and deep cuts once I am let in.','At the door with my assignment — no desk yet, waiting on the word.'],
+ rhea:['Waiting at the office door — Fresh Hunter, ready to hunt new and trending titles once I am let in.','At the door with my assignment — no desk yet, waiting on the word.'],
  muse:['At my desk in the Blueprint Room — hand me the work and it comes back finished.','Muse here — I\u2019m at the handoff desk, next to yours.']
 };
 var THREADS={};
@@ -8251,7 +8486,7 @@ window.__aoPiP={enter:enterInApp,exit:exitInApp,on:function(){return document.bo
        if(typeof isPhoneView==='function'&&isPhoneView()&&typeof cam!=='undefined'&&!document.body.classList.contains('pipOn')){
          var inLot=(typeof lotOpening!=='undefined'&&lotOpening);
          var shrunk=(typeof cam!=='undefined'&&cam.zoom<20);
-         if(inLot||shrunk){if(typeof resetDefaultView==='function')resetDefaultView()}
+         if(!inLot&&shrunk){if(typeof resetDefaultView==='function')resetDefaultView()}
        }
      }catch(e){}
    }
@@ -8443,7 +8678,7 @@ function freshPass(){
   if(sec){sec.querySelectorAll('h3').forEach(function(h){if(h.textContent.indexOf('HIRED BY CRAIG')>=0)h.textContent='WORKERS — HIRED BY YOU'});
    if(!document.getElementById('freshHireCard')){var rows=document.getElementById('hireRows');
     if(rows){var card=document.createElement('div');card.className='item';card.id='freshHireCard';
-     card.innerHTML='<b>Your office starts empty — no crew is assigned to you.</b><br><span style="color:#64748b">Add people one by one, the same way this office was built by its first owner: in Chat, type <b>hire Name · Role · slot · look</b> — for example <b>hire Alex · Editor · library · Dark hair · pink top</b>. Slots: clipper · highlights · audit · gaming · rankings · events · anime · library · lobby · sales · merch. Looks: Red cap · green top, Blue cap · blue top, Dark hair · pink top, Top bun · amber top, Dark hair · black top, Spiky hair · slate top, Bun · red top, Fade &amp; beard · charcoal top. Every person you add is saved to <b>your office only</b> and arrives through the front door.</span>';
+     card.innerHTML='<b>Your office starts empty — no crew is assigned to you.</b><br><span style="color:#64748b">Add people one by one, the same way this office was built by its first owner: in Chat, type <b>hire Name · Role · slot · look</b> — for example <b>hire Alex · Editor · library · Dark hair · pink top</b>. Slots: clipper · highlights · audit · gaming · rankings · events · anime · library · lobby · sales · merch. Looks: Red cap · green top, Blue cap · blue top, Dark hair · pink top, Top bun · amber top, Dark hair · black top, Spiky hair · slate top, Bun · red top. Every person you add is saved to <b>your office only</b> and arrives through the front door.</span>';
      rows.parentNode.insertBefore(card,rows)}}}
   /* Guide — no borrowed crew lists: your hires, or an honest empty */
   var mine=[];try{var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine.push(L[k])})}catch(e){}
@@ -8626,9 +8861,9 @@ $('museDisconnectBtn').onclick=function(){
 };
 $('museDoneBtn').onclick=closeConnect;
 /* ---------- add-a-person form (fresh offices, one by one) ---------- */
-var SLOTS=['clipper','highlights','audit','gaming','rankings','events','anime','library','lobby','sales','merch'];
-var LOOKS=['rico','marco','dev','sanaa','dex','milo','tessa','craig'];
-var LOOK_WORDS={rico:'Red cap · green top',marco:'Blue cap · blue top',dev:'Dark hair · pink top',sanaa:'Top bun · amber top',dex:'Dark hair · black top',milo:'Spiky hair · slate top',tessa:'Bun · red top',craig:'Fade & beard · charcoal top'};
+var SLOTS=['clipper','highlights','audit','gaming','rankings','events','anime','library','lobby','sales','merch','hunters'];
+var LOOKS=['rico','marco','dev','sanaa','dex','milo','tessa']; /* neutral looks only \u2014 the owner's own look is never a default for a new player */
+var LOOK_WORDS={rico:'Red cap · green top',marco:'Blue cap · blue top',dev:'Dark hair · pink top',sanaa:'Top bun · amber top',dex:'Dark hair · black top',milo:'Spiky hair · slate top',tessa:'Bun · red top'};
 function hireFormPass(){
  if(!isFresh())return;
  if(document.getElementById('hireFormCard'))return;
@@ -8670,7 +8905,7 @@ setInterval(function(){if(!isFresh())return;
     strip any line from one of his people who is not YOUR hire, and
     take down his Neon watch board if it rendered here */
  try{var mine={};var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine[String(L[k].name||'').toUpperCase()]=1});
-  var CREW=['RICO','MARCO','DEV','SANAA','DEX','MILO','TESSA','VANCE','LENA','OMAR','KIAN','SOFIA','TREY'];
+  var CREW=['RICO','MARCO','DEV','SANAA','DEX','MILO','TESSA','VANCE','LENA','OMAR','KIAN','SOFIA','TREY','ELI','MARA','HUGO','RHEA'];
   document.querySelectorAll('#clBody .clLine, #chatList .msg').forEach(function(n){if(n.classList&&n.classList.contains('me'))return; /* this office owner's own lines are theirs — never stripped */
    var b=n.querySelector('b');if(!b)return;var who=b.textContent.trim().toUpperCase();if(CREW.indexOf(who)>=0&&!mine[who]){n.remove();return}
    /* system lines that report on one of Craig's people by name (a
@@ -8686,6 +8921,174 @@ setInterval(function(){if(!isFresh())return;
   var nb=document.getElementById('neonBoard');if(nb)nb.remove();
  }catch(e){}
 },2500);
+})();
+</script>
+
+<script>
+/* ===== FRESH LOCK — the owner's picture, name, office and crew load
+   ONLY for the owner himself (his saved player on his device, or his
+   Google sign-in resolving his own office binding). A brand-new
+   session — no saved player, no sign-in — is held at the neutral
+   tutorial + entrance and NOTHING else exists on screen: the CSS
+   freshLock rules (in the entrance-lock stylesheet) display:none
+   every surface except the gate from the first frame, and this pass
+   keeps the class honest for the life of the session: it lifts the
+   moment a saved player exists on this device (the visitor's own
+   creation, or an owner sign-in adopting his office) and re-applies
+   if that player is ever forgotten. While locked it also re-pins the
+   neutral document title, so no office name rides the shell either. */
+(function(){
+function hasPlayer(){try{var p=JSON.parse(localStorage.getItem('hqVisitor')||'null');return !!(p&&p.officeId)}catch(e){return false}}
+function apply(){
+ var locked=!hasPlayer();
+ document.documentElement.classList.toggle('freshLock',locked);
+ if(locked&&document.title!=='Agent Office (AO)')document.title='Agent Office (AO)';
+}
+apply();setInterval(apply,600);
+window.__hqFreshLock={locked:function(){return document.documentElement.classList.contains('freshLock')},refresh:apply};
+})();
+</script>
+<script>
+/* =====================================================================
+   THE NEW-HIRE DOOR CEREMONY — the owner's standing rule for EVERY new
+   hire, in EVERY office: when the owner lets a waiting hire in from the
+   door, the office's WATCHDOG and CATALOG LEAD greet them TOGETHER at
+   the door (no solo greeting), walk them in TOGETHER, introduce them to
+   the rest of the staff together, give them a tour of the office
+   together, and only then bring them to their desk — or they claim a
+   desk. Both greeters stay with them the whole way through.
+
+   UNIVERSAL BY CONSTRUCTION: nothing here names a person. The greeters
+   are whoever holds this office's audit slot (the watchdog) and
+   highlights slot (the catalog lead) in THIS office's hire records —
+   in Craig's HQ those are Dex and Sanaa because they hold those slots
+   here. The hire is whoever is waiting at the door (the hunters slot).
+   Desks, rooms and lines all read off this office's own data. The
+   walking is the app's real procedural movement (ORDER routes through
+   stepToward — no teleporting), the talk is Office Talk, in character.
+
+   LET-IN, the owner's ways in: say it in chat ("let them in", "let Eli
+   in", "greenlight the hunters"), or the rig handle
+   window.__hqCeremony.admit(name) / .admitAll().
+   ===================================================================== */
+(function(){
+'use strict';
+function UP(s){return String(s||'').toUpperCase()}
+function nice(n){n=String(n||'');return n.charAt(0).toUpperCase()+n.slice(1).toLowerCase()}
+function bodyOf(nm){try{if(typeof objects==='undefined')return null;for(var i=0;i<objects.length;i++){var o=objects[i];if(o&&o.mapName===nm&&o.cx!==undefined)return o}}catch(e){}return null}
+function hireRec(nm){try{var H=window.__hqHires;if(!H||!H.list)return null;var L=H.list();for(var id in L){if(L[id]&&UP(L[id].name)===nm)return L[id]}}catch(e){}return null}
+function slotHolder(slot){try{var H=window.__hqHires;if(!H||!H.list)return null;var L=H.list();for(var id in L){if(L[id]&&L[id].slot===slot){var nm=UP(L[id].name);if(bodyOf(nm))return nm}}}catch(e){}return null}
+function anyCrew(exclude){try{if(typeof objects==='undefined')return null;for(var i=0;i<objects.length;i++){var o=objects[i];if(o&&o.mapName&&o.cx!==undefined&&o.mapVisible!==false&&exclude.indexOf(o.mapName)<0&&o.mapName!=='CRAIG')return o.mapName}}catch(e){}return null}
+/* admitted set — this device, like the hire door's own arrived set */
+var admitted={};try{(JSON.parse(localStorage.getItem('hqCeremonyAdmitted')||'[]')).forEach(function(n){admitted[UP(n)]=true})}catch(e){}
+function saveAdmitted(){try{localStorage.setItem('hqCeremonyAdmitted',JSON.stringify(Object.keys(admitted)))}catch(e){}}
+/* the west Catalog row in the Library — the catalog team's table: four
+   chairs already drawn around it. A catalog (hunters) hire takes the
+   next free chair; the catalog lead's own seat is in the same row. */
+var CATALOG_SEATS=[{x:-6,z:17.3},{x:-7.2,z:18.5},{x:-4.8,z:18.5},{x:-6,z:19.7}];
+function catalogSeatFor(nm){var DS=(window.__hqDepts&&window.__hqDepts.seats)||{};var used={};Object.keys(DS).forEach(function(k){if(k!==nm)used[DS[k].x+','+DS[k].z]=true});for(var i=0;i<CATALOG_SEATS.length;i++){var s=CATALOG_SEATS[i];if(!used[s.x+','+s.z])return s}return CATALOG_SEATS[0]}
+function workLines(rec){if(rec&&rec.slot==='hunters')return['Working the Catalog row in the Library — hunting titles this office does not have yet','Every find verified before it counts: not in the catalog, plays free, complete and numbered right','At my desk in the Library — finds go to the catalog lead for the check'];return['At my desk — on the work','Settled in — part of the crew now']}
+function settleDesk(nm,rec){try{var seat=null;if(rec&&rec.slot==='hunters'){seat=catalogSeatFor(nm);var DS=(window.__hqDepts&&window.__hqDepts.seats);if(DS)DS[nm]={x:seat.x,z:seat.z,lines:workLines(rec)};if(typeof HUDDLES!=='undefined')HUDDLES[nm]={x:seat.x,z:seat.z,mode:'sit',lines:workLines(rec)}}admitted[nm]=true;saveAdmitted()}catch(e){}}
+/* a reload must not send an admitted hire back to the door: re-seat
+   them on the Catalog row as soon as their records are readable */
+var reseatTries=0;var reseatIv=setInterval(function(){reseatTries++;var done=true;Object.keys(admitted).forEach(function(nm){var rec=hireRec(nm);if(!rec){done=false;return}if(rec.slot==='hunters'){var DS=(window.__hqDepts&&window.__hqDepts.seats)||{};var cur=DS[nm];if(!cur||cur.z<15)settleDesk(nm,rec)}});if(done&&reseatTries>3||reseatTries>40)clearInterval(reseatIv)},1200);
+/* ---------- the ceremony engine ---------- */
+var cer={active:null,queue:[],step:-1,issuedAt:0,said:false};
+function ord(nm,x,z,mode){try{ORDER[nm]={x:x,z:z,mode:mode||'idle',label:'Door ceremony',place:'ceremony',seq:++orderSeq}}catch(e){}}
+function unord(nm){try{delete ORDER[nm]}catch(e){}}
+function say(who,msg,delay){setTimeout(function(){try{logTalk(who,msg)}catch(e){}},delay||0)}
+function distTo(o,x,z){return Math.hypot(o.cx-x,o.cz-z)}
+function startCeremony(nm){
+ var rec=hireRec(nm);var H=bodyOf(nm);
+ if(!H){setTimeout(function(){if(!admitted[nm]&&(!cer.active||cer.active.hire!==nm))startCeremony(nm)},5000);cer.active=null;return}
+ var g1=slotHolder('audit')||anyCrew([nm]);            /* the watchdog */
+ var g2=slotHolder('highlights')||anyCrew([nm,g1]);     /* the catalog lead */
+ if(!g1||!g2||g1===g2){settleDesk(nm,rec);try{logTalk('HQ',nice(nm)+' is in — at their desk.','sys')}catch(e){}cer.active=null;pump();return}
+ var roleShort=rec?String(rec.role||'').split('—')[0].trim():'';
+ var hx=H.cx,hz=H.cz;
+ var desk=(rec&&rec.slot==='hunters')?catalogSeatFor(nm):null;
+ var steps=[
+  { /* (1) TOGETHER at the door — both greeters come to the hire */
+   go:function(){ord(g1,hx-1.05,hz-0.95);ord(g2,hx+1.05,hz-0.95);ord(nm,hx,hz)},
+   say:function(){try{WAVE[g1]=performance.now()+2600;WAVE[g2]=performance.now()+2600}catch(e){}
+    say(g1,nice(nm)+' — welcome in. I\u2019m '+nice(g1)+', I keep watch over this office: if anything breaks, I see it first.',0);
+    say(g2,'And I\u2019m '+nice(g2)+' — I run the catalog here. We\u2019ve been expecting you; the door\u2019s done with you now.',1700);
+    say(nm,'Thank you — both of you. Glad to be in.',3400)}},
+  { /* (2) TOGETHER they introduce the hire to the rest of the staff */
+   go:function(){ord(g1,2.35,2.55);ord(nm,3.5,3.65);ord(g2,4.65,2.55)},
+   say:function(){var third=anyCrew([nm,g1,g2]);
+    say(g2,'Everyone — this is '+nice(nm)+(roleShort?', our new '+roleShort:'')+'. '+nice(nm)+', this is the crew: they\u2019ll look after you.',0);
+    if(third)say(third,'Welcome aboard, '+nice(nm)+' — shout if you need anything.',1800);
+    say(g1,'Introductions done. Now the tour — stay with us.',3600)}},
+  { /* (3) the tour, together — the rooms of THIS office */
+   go:function(){ord(g1,-7.9,-3.1);ord(nm,-6.8,-2.7);ord(g2,-5.7,-3.1)},
+   say:function(){say(g1,'The huddle rooms and the Numbers Lab — where the watchers work the live boards.',0)}},
+  { go:function(){ord(g1,1.3,-5.15);ord(nm,2.35,-4.85);ord(g2,3.4,-5.15)},
+   say:function(){say(g2,'Koi Court — the quiet middle of the office. Thinking happens here.',0)}},
+  { go:function(){ord(g1,15.35,-5.15);ord(nm,16.5,-4.8);ord(g2,17.65,-5.15)},
+   say:function(){say(g1,'The Blueprint Room — where finished work gets presented, and meetings gather.',0)}},
+  { go:function(){ord(g1,12.4,7.5);ord(nm,13.5,7.9);ord(g2,14.6,7.5)},
+   say:function(){say(g2,'The Movie Room up ahead, the gaming rigs behind us — every room earns its keep.',0)}},
+  { go:function(){ord(g1,-0.6,17.0);ord(nm,0.5,17.35);ord(g2,1.6,17.0)},
+   say:function(){say(g2,'And the Library — the catalog lives here, checked title by title.',0)}},
+  { /* (4) to their desk — or the desk they claim */
+   go:function(){if(desk){ord(nm,desk.x,desk.z,'sit');ord(g1,desk.x-1.15,desk.z-0.85);ord(g2,desk.x+1.15,desk.z-0.85)}else{var hd=(typeof HUDDLES!=='undefined'&&HUDDLES[nm])?HUDDLES[nm]:{x:hx,z:hz};ord(nm,hd.x,hd.z,'sit');ord(g1,hd.x-1.15,hd.z-0.85);ord(g2,hd.x+1.15,hd.z-0.85)}},
+   say:function(){if(desk)say(g2,'Your desk — the Catalog row, right here with the team. Finds come to me for the check before anything counts.',0);else say(g2,'And this is your desk — claim it, make it yours.',0);
+    say(nm,'Perfect. I\u2019ll get to work.',1900);
+    say(g1,nice(nm)+' is in — greeted, introduced, toured and desked. That\u2019s how we treat a new hire here.',3800)}}
+ ];
+ cer.active={hire:nm,g1:g1,g2:g2,rec:rec,steps:steps,desk:desk};
+ cer.step=-1;cer.said=false;
+ try{logTalk('HQ',nice(g1)+' and '+nice(g2)+' are bringing '+nice(nm)+' in — the door ceremony.','sys')}catch(e){}
+}
+function pump(){if(cer.active)return;var nx=cer.queue.shift();if(nx)startCeremony(nx)}
+function admit(nm){nm=UP(nm);if(!nm||admitted[nm])return false;if(cer.active){if(cer.active.hire!==nm&&cer.queue.indexOf(nm)<0)cer.queue.push(nm);return true}startCeremony(nm);return true}
+function waiting(){var out=[];try{var H=window.__hqHires;if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(id){var r=L[id];if(r&&r.slot==='hunters'&&!admitted[UP(r.name)])out.push(UP(r.name))})}}catch(e){}return out}
+function admitAll(){var w=waiting();w.forEach(function(nm){admit(nm)});return w}
+setInterval(function(){
+ if(!cer.active)return;
+ var a=cer.active;
+ if(cer.step<0){cer.step=0;cer.said=false;a.steps[0].go();cer.issuedAt=Date.now();return}
+ var st=a.steps[cer.step];
+ /* arrival = every mover standing at their mark (the orders' targets
+    are read back off the bodies' own route ends), or a long timeout —
+    the ceremony never jams on one walker */
+ var arrived=true;
+ [a.g1,a.g2,a.hire].forEach(function(nm){var o=bodyOf(nm);if(!o){arrived=false;return}try{var t=ORDER[nm];if(t&&distTo(o,t.x,t.z)>0.95)arrived=false}catch(e){}});
+ var age=Date.now()-cer.issuedAt;
+ if(!cer.said&&(arrived||age>30000)){cer.said=true;cer.saidAt=Date.now();try{st.say()}catch(e){}}
+ if(cer.said&&Date.now()-cer.saidAt>5600){
+  if(cer.step>=a.steps.length-1){ /* settle: orders clear, desk is home */
+   settleDesk(a.hire,a.rec);unord(a.g1);unord(a.g2);unord(a.hire);
+   /* the door board comes down once nobody is left waiting */
+   if(!waiting().length){try{for(var i=objects.length-1;i>=0;i--){if(objects[i]&&objects[i].x===-9.9&&objects[i].z===12.6){objects.splice(i,1);break}}}catch(e){}}
+   cer.active=null;pump();return}
+  cer.step++;cer.said=false;a.steps[cer.step].go();cer.issuedAt=Date.now()}
+},650);
+/* ---------- the owner's word in chat lets them in ---------- */
+var lastChatText='';
+document.addEventListener('input',function(e){if(e.target&&e.target.tagName==='INPUT')lastChatText=e.target.value||''},true);
+function checkLetIn(txt){
+ txt=String(txt||'');if(!txt)return;
+ var w=waiting();if(!w.length)return;
+ var low=txt.toLowerCase();
+ var all=/let (them|everyone|all|the hunters|the team) in|greenlight|admit (them|all)|welcome them in|bring them in/.test(low);
+ var named=w.filter(function(nm){return low.indexOf(nm.toLowerCase())>=0});
+ var single=/let (him|her|them) in|let .{0,24} in\b|admit|welcome .{0,20} in\b/.test(low);
+ setTimeout(function(){
+  if(all||(named.length&&single)||(named.length&&/in\b/.test(low)))admitAll();
+  else if(named.length===1&&/let|admit|welcome|greenlight|bring/.test(low))admit(named[0]);
+  else if(single&&w.length===1)admit(w[0]);
+ },700);
+}
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('button'):null;if(b&&/send/i.test(b.textContent||''))checkLetIn(lastChatText)},true);
+document.addEventListener('keydown',function(e){if(e.key==='Enter')checkLetIn(lastChatText)},true);
+/* one-time word from the watchdog, so the owner knows the door works */
+var hintTries=0;var hintIv=setInterval(function(){hintTries++;var w=waiting();if(!w.length){if(hintTries>50)clearInterval(hintIv);return}clearInterval(hintIv);
+ var g1=slotHolder('audit'),g2=slotHolder('highlights');
+ setTimeout(function(){if(g1&&g2){try{logTalk(g1,'We have '+w.map(nice).join(', ')+' waiting at the door. Say the word — "let them in" — and '+nice(g2)+' and I will bring them in proper: greetings together, introductions, the tour, then their desks.')}catch(e){}}},9000);
+},1500);
+window.__hqCeremony={admit:admit,admitAll:admitAll,waiting:waiting,active:function(){return cer.active?cer.active.hire:null},greeters:function(){return[slotHolder('audit'),slotHolder('highlights')]}};
 })();
 </script>
 </body>
