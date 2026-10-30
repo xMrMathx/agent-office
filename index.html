@@ -1107,7 +1107,8 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v47";(function(){try{var k="aoFreshV47";if(sessionStorage.getItem(k))return;fetch("version.txt",{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){if(t.trim()&&t.trim()!=="v47"){sessionStorage.setItem(k,"1");location.reload();}}).catch(function(){});}catch(e){}})();</script></head>
+<script>window.AO_BUILD="v48";(function(){try{var k='aoFreshV48';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
+</head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
 
@@ -1130,7 +1131,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
 </div>
 <div class="musicPanel" id="musicPanel" aria-label="Office music">
   <div class="mpHead"><b>Office music</b><button class="profX" id="musicClose" aria-label="Close music panel">✕</button></div>
-  <p class="mpSub">Pick where it plays first, then pick a track. You only hear it while your camera is over a room it's playing in — scroll into one of those rooms and it's there; scroll out and it's silent. Your four tracks play through in order and start over.</p>
+  <p class="mpSub">Pick where it plays first, then pick a track. You only hear it while your camera is over a room it's playing in — scroll into one of those rooms and it's there; scroll out and it's silent. Your five tracks play through in order and start over.</p>
   <div class="mpRow"><span>Volume</span><input type="range" id="musicVol" min="0" max="100" value="60" aria-label="Music volume"><span class="mpVolVal" id="musicVolVal">60%</span></div>
   <button class="mpRoomsBar" id="musicRoomsBar" type="button" aria-expanded="false" aria-controls="musicRoomsDrawer"><span class="mpRoomsBarLbl">Where it plays</span><span class="mpRoomsSummary" id="musicRoomsSummary">All rooms</span><span class="mpRoomsChev" aria-hidden="true">▾</span></button>
   <div class="mpRoomsDrawer" id="musicRoomsDrawer">
@@ -1143,6 +1144,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
     <button class="mpMood" data-track="1"><span class="tkCheck">✓</span>This and That<span class="tkDur">2:12</span></button>
     <button class="mpMood" data-track="2"><span class="tkCheck">✓</span>Almost There<span class="tkDur">2:27</span></button>
     <button class="mpMood" data-track="3"><span class="tkCheck">✓</span>AO<span class="tkDur">2:28</span></button>
+    <button class="mpMood" data-track="4"><span class="tkCheck">✓</span>8bit Office<span class="tkDur">3:03</span></button>
   </div>
   <button class="mpStop" id="musicStop">Stop the music</button>
   <div class="mpState" id="musicState">Music is off.</div>
@@ -4244,7 +4246,7 @@ function renderBgGrid(){const dis=FX.tier==='none',faceOnly=FX.tier==='face';
 document.getElementById('bgFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);const img=new Image();img.onload=()=>{FX.photo=img;FX.photoURL=url;setFxMode('photo')};img.src=url});
 camBtn.onclick=async()=>{await toggleCam();applySelfView();if(camOn&&FX.mode!=='none')startFX();if(!camOn)stopFX()};
 /* ===== OFFICE MUSIC — the boss's own tracks, on the office loop ===== */
-const TRACKS=[{name:'Dusty Vinyl',dur:'2:42',src:'assets/music-dusty-vinyl.mp3'},{name:'This and That',dur:'2:12',src:'assets/music-this-and-that.mp3'},{name:'Almost There',dur:'2:27',src:'assets/music-almost-there.mp3'},{name:'AO',dur:'2:28',src:'assets/music-ao.mp3'}];
+const TRACKS=[{name:'Dusty Vinyl',dur:'2:42',src:'assets/music-dusty-vinyl.mp3'},{name:'This and That',dur:'2:12',src:'assets/music-this-and-that.mp3'},{name:'Almost There',dur:'2:27',src:'assets/music-almost-there.mp3'},{name:'AO',dur:'2:28',src:'assets/music-ao.mp3'},{name:'8bit Office',dur:'3:03',src:'assets/music-8bit-office.mp3'}];
 /* EVERY room in the office, in the drawer — pulled from the office's
    own places: the ROOMS registry, the ZONES, and the desk islands
    (Merch Studio, Sales Desk, Anime Corner, Parking Lot). The cubicle
@@ -7190,7 +7192,8 @@ try{if(typeof objects!=='undefined'){
 }}catch(e){}
 })();
 </script>
-<script>window.addEventListener('load',function(){if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}});</script></body>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+</body>
 
 
 
