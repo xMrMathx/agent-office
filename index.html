@@ -306,7 +306,7 @@ body.pipOn #railLip{display:none}
 .chatLog .clHead{font-size:8.5px;font-weight:800;letter-spacing:.13em;color:#93a5bd;display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .chatLog .clHead i{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.16);animation:pulse 1.8s infinite}
 .chatLog .clGrow{margin-left:auto;letter-spacing:.06em;color:#7186a0;font-weight:700}
-.clBody{height:78px;overflow-y:auto;overflow-x:hidden;display:block;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+.clBody{height:78px;overflow-y:auto;overflow-x:hidden;display:block;scroll-behavior:auto;scrollbar-width:none;overscroll-behavior:none;-webkit-overflow-scrolling:touch}
 .clBody::-webkit-scrollbar{display:none}
 .clLine{display:block;flex:none;font-size:11.5px;line-height:1.5;color:#d7e0ec;padding:4px 2px 5px;border-bottom:1px solid rgba(255,255,255,.07);overflow-wrap:break-word;word-break:break-word;animation:clIn .3s ease}
 .clLine:last-child{border-bottom:0}
@@ -1130,7 +1130,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v49";(function(){try{var k='aoFreshV49';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
+<script>window.AO_BUILD="v50";(function(){try{var k='aoFreshV50';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
@@ -1571,11 +1571,30 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
      window listeners up, so no stopPropagation anywhere can shield a
      move from the guard. */
   let lastX=null,lastY=null,gestureOn=false,gestureScroller=null,pinning=false;
+  /* FLUID SCROLL — hand-scrolled panels used to take one raw scrollTop
+     write per touchmove (jitter at the event rate, layout thrash on
+     every write) and stopped dead the instant the finger lifted: no
+     momentum at all. Now moves accumulate and are applied ONCE per
+     animation frame, a smoothed flick velocity is tracked while the
+     finger is down, and on release the panel keeps gliding with a
+     decaying fling until it settles or reaches an edge — the native
+     flick feel, inside the guard's own hand-rolled scrolling. Every
+     panel the guard scrolls shares this: the Guide HQ Chat feed, the
+     Office Talk log, the folder chat, all of them. */
+  const rafScrolls=new Set();
+  function applyScroll(sc){if(sc.__pdx){sc.scrollLeft-=sc.__pdx;sc.__pdx=0} if(sc.__pdy){sc.scrollTop-=sc.__pdy;sc.__pdy=0}}
+  function pumpScroll(){rafScrolls.forEach(function(sc){applyScroll(sc)});rafScrolls.clear()}
+  function queueScroll(sc){if(!rafScrolls.has(sc)){rafScrolls.add(sc);requestAnimationFrame(pumpScroll)}}
+  function stopFling(sc){if(!sc)return;sc.__flingTok=(sc.__flingTok||0)+1;sc.__sv=0;sc.__lt=0}
+  function startFling(sc){var v=sc.__sv||0;sc.__sv=0;if(Math.abs(v)<2.5)return;var tok=(sc.__flingTok=(sc.__flingTok||0)+1);
+   const step=function(){if(sc.__flingTok!==tok)return;const before=sc.scrollTop;sc.scrollTop-=v;v*=0.95;
+    if(sc.scrollTop===before||Math.abs(v)<0.4)return;requestAnimationFrame(step)};
+   requestAnimationFrame(step)}
   function scrollableOf(t){while(t&&t!==document.body){if(t.classList&&(t.classList.contains('fbody')||t.classList.contains('dGrid')||t.classList.contains('dCats')||t.classList.contains('clBody')||t.classList.contains('chatScroll')||t.classList.contains('camMenu')||t.classList.contains('bgCard')||t.classList.contains('musicPanel')||t.classList.contains('payCard')||t.classList.contains('roomCard')||t.classList.contains('profileCard')||t.classList.contains('invite')||t.classList.contains('presentCard')||t.classList.contains('convoScroll')||t.classList.contains('wGuide')||t.classList.contains('wireScroll')||t.classList.contains('gBody')||t.classList.contains('gLayer')||t.classList.contains('gThreadBody')||t.classList.contains('gFeed')||t.classList.contains('dexCard')||t.classList.contains('wireCard')||t.classList.contains('wireCardIn')||t.classList.contains('crewCard')||t.id==='mgGrid'||t.id==='pipHome'))return t;try{var cs=t.nodeType===1?getComputedStyle(t):null;if(cs&&(cs.overflowY==='auto'||cs.overflowY==='scroll')&&t.scrollHeight>t.clientHeight+2)return t}catch(e){} t=t.parentElement}return null}
   function pinScroll(){if(pinning)return;if(window.scrollY!==1){pinning=true;try{window.scrollTo(0,1)}catch(e){}pinning=false}}
   function onTouchStart(e){
     pinScroll();
-    if(e.touches&&e.touches.length===1){gestureOn=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;gestureScroller=scrollableOf(e.target)}
+    if(e.touches&&e.touches.length===1){gestureOn=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;gestureScroller=scrollableOf(e.target);if(gestureScroller)stopFling(gestureScroller)}
     else{gestureOn=false;lastX=null;lastY=null;gestureScroller=null}
   }
   function onTouchMove(e){
@@ -1590,16 +1609,27 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
     if(document.body.classList.contains('forceLand')){const tdx=dy,tdy=-dx;dx=tdx;dy=tdy}
     const sc=gestureScroller||scrollableOf(e.target);
     if(!sc)return;
-    /* Scroll the panel by hand, per move, clamped at both edges: the
-       panel moves exactly with the finger and stops dead at its ends —
-       and the moves past the end are still consumed above. */
-    if((sc.classList.contains('dCats')||sc.classList.contains('wGuide'))&&Math.abs(dx)>Math.abs(dy)){sc.scrollLeft-=dx;if(sc.classList.contains('wGuide'))sc.__vx=(sc.__vx||0)*.6+dx*.4}
-    else{sc.scrollTop-=dy}
+    /* Scroll the panel by hand: the move's delta is BANKED, not written
+       — the frame pump applies the whole bank once per frame, so the
+       panel tracks the finger at the display's own rate with no
+       per-event jitter, clamped at both edges as always — and the
+       moves past the end are still consumed above. The same bank feeds
+       the flick velocity, so a fast finger throws the panel into its
+       momentum glide on release. */
+    if((sc.classList.contains('dCats')||sc.classList.contains('wGuide'))&&Math.abs(dx)>Math.abs(dy)){sc.__pdx=(sc.__pdx||0)+dx;queueScroll(sc);if(sc.classList.contains('wGuide'))sc.__vx=(sc.__vx||0)*.6+dx*.4}
+    else{sc.__pdy=(sc.__pdy||0)+dy;queueScroll(sc);
+     const now=performance.now(),dt=now-(sc.__lt||now);sc.__lt=now;
+     if(dt>0&&dt<120){const inst=dy/(dt/16.7);sc.__sv=(sc.__sv||0)*0.6+inst*0.4}}
   }
   function onTouchEnd(e){if(!e.touches||e.touches.length===0){const sc2=gestureScroller;gestureOn=false;lastX=null;lastY=null;gestureScroller=null;
+    if(sc2)applyScroll(sc2); /* land whatever the finger banked before the glide starts */
     /* channel rail fling — the swipe keeps gliding inside the rail and
        settles, exactly like a native rail; nothing behind it moves */
-    if(sc2&&sc2.classList.contains('wGuide')&&Math.abs(sc2.__vx||0)>2.2){let vx=sc2.__vx;sc2.__vx=0;const fling=()=>{vx*=.93;sc2.scrollLeft-=vx;if(Math.abs(vx)>.45)requestAnimationFrame(fling)};requestAnimationFrame(fling)}}}
+    if(sc2&&sc2.classList.contains('wGuide')&&Math.abs(sc2.__vx||0)>2.2){let vx=sc2.__vx;sc2.__vx=0;const fling=()=>{vx*=.93;sc2.scrollLeft-=vx;if(Math.abs(vx)>.45)requestAnimationFrame(fling)};requestAnimationFrame(fling)}
+    /* vertical momentum — every other hand-scrolled panel (the chat
+       surfaces first among them) glides on with the flick's velocity
+       and settles smooth, instead of stopping dead at the lift */
+    else if(sc2)startFling(sc2)}}
   window.addEventListener('touchstart',onTouchStart,{passive:true,capture:true});
   document.addEventListener('touchstart',onTouchStart,{passive:true,capture:true});
   window.addEventListener('touchmove',onTouchMove,{passive:false,capture:true});
@@ -3364,7 +3394,7 @@ function logTalk(who,txt,cls){if(HQ_REMOVED_TALK.indexOf(String(who).toUpperCase
     log. Craig's own office is untouched. */
  if(/^craig$/i.test(String(who).trim())){try{if(window.__hqOfficeNeutral&&__hqOfficeNeutral()){var __vp=null;try{__vp=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
   var __fn=__vp&&__vp.name?String(__vp.name).trim().split(/\s+/)[0]:'';if(__fn&&!/^craig$/i.test(__fn))who=__fn}}catch(e){}}
- const body=document.getElementById('clBody');if(!body)return;const d=document.createElement('div');d.className='clLine '+(cls||'');const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);d.appendChild(document.createTextNode(txt));body.appendChild(d);while(body.children.length>36)body.removeChild(body.firstChild);body.scrollTop=body.scrollHeight;
+ const body=document.getElementById('clBody');if(!body)return;const __stick=body.scrollTop+body.clientHeight>=body.scrollHeight-48;const d=document.createElement('div');d.className='clLine '+(cls||'');const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);d.appendChild(document.createTextNode(txt));body.appendChild(d);while(body.children.length>36)body.removeChild(body.firstChild);if(__stick)body.scrollTop=body.scrollHeight;
  /* DEX TALKS OUT LOUD — Office Talk is his talk-back channel: every line
     he puts here plays its recording in his real voice, "Satiny Moon"
     (the Dex module owns the audio; no recording = text only, never a
@@ -3376,6 +3406,46 @@ function appendMsg(who,txt,me){if(typeof HQ_REMOVED_TALK!=='undefined'&&HQ_REMOV
    in their huddle area, on-shift, not away on an order or a break. */
 const talkState={i:0,lineIdx:{}};
 setInterval(()=>{if(document.hidden)return;const present=[];Object.keys(HUDDLES).forEach(nm=>{if(ORDER[nm])return;if(typeof assignmentForName==='function'&&assignmentForName(nm))return; /* on assignment, their talk comes from the assignment ticker instead */const k=NAME_KEYS[nm];if(k){const a=agentByKey(k);if(!a||shiftState(a)!=='on')return;if(WORK.active&&WORK.job&&WORK.job.who.indexOf(k)>=0)return}present.push(nm)});if(!present.length)return;talkState.i=(talkState.i+1)%present.length;const nm=present[talkState.i];const hd=HUDDLES[nm];const li=(talkState.lineIdx[nm]=(talkState.lineIdx[nm]||0)+1)%hd.lines.length;logTalk(nm,hd.lines[li]);if(typeof recordHuddleLine==='function')recordHuddleLine(nm,hd.lines[li])},8000);
+/* ===== HQ CHAT LIVENESS — the ORIGINAL room, restored =====
+   The first HQ Chat was alive: the crew talked in the room all the
+   time — work talk, reactions, back-and-forth — each in their own
+   voice. That went quiet because the only ambient ticker left posts
+   to the floor log alone, and only from whoever happens to be free
+   at that second. This engine puts the room back: every few seconds
+   somebody present speaks IN THE CHAT (appendMsg — so the line lands
+   in the folder chat, the Guide HQ Chat feed AND the Office Talk log
+   together), rotating across the whole crew, and every third beat a
+   second person answers the first, so it reads as people talking to
+   each other, not announcements. Lines are each person's own
+   HUDDLES lines — the same in-character desk/huddle talk the floor
+   already uses, rotated per person so nobody repeats themselves.
+   ORDERING HOLDS: ambient lines only ever APPEND at the end of the
+   stream — nothing is inserted above anything, nothing is reordered,
+   proposals stay exactly where the Activity ordering keeps them,
+   and the room goes quiet around the owner: for a while after he
+   speaks (and while the door ceremony is performing), ambient talk
+   holds so a direct answer to him is never buried under chatter. */
+const ambState={i:0,beat:0,lastOwnerAt:0};
+document.addEventListener('input',function(e){if(e.target&&(e.target.id==='chatInput'||e.target.id==='gHqInput'))ambState.lastOwnerAt=Date.now()},true);
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('button'):null;if(b&&/send/i.test(b.textContent||''))ambState.lastOwnerAt=Date.now()},true);
+function ambPresent(){const present=[];Object.keys(HUDDLES).forEach(nm=>{if(ORDER[nm])return;if(typeof assignmentForName==='function'&&assignmentForName(nm))return;const k=NAME_KEYS[nm];if(k){const a=agentByKey(k);if(!a||shiftState(a)!=='on')return;if(WORK.active&&WORK.job&&WORK.job.who.indexOf(k)>=0)return}const hd=HUDDLES[nm];if(hd&&hd.lines&&hd.lines.length)present.push(nm)});return present}
+function ambLine(nm){const hd=HUDDLES[nm];if(!hd||!hd.lines||!hd.lines.length)return null;const li=(talkState.lineIdx[nm]=(talkState.lineIdx[nm]||0)+1)%hd.lines.length;return hd.lines[li]}
+function ambTrim(){const l=document.getElementById('chatList');if(!l)return;while(l.children.length>90)l.removeChild(l.firstChild)}
+setInterval(()=>{
+ if(document.hidden)return;
+ if(Date.now()-ambState.lastOwnerAt<15000)return; /* the owner's word owns the room — chatter holds around it */
+ try{if(window.__hqCeremony&&__hqCeremony.active&&__hqCeremony.active())return}catch(e){}
+ const p=ambPresent();if(p.length<2)return;
+ ambState.beat++;
+ ambState.i=(ambState.i+1)%p.length;
+ const nm=p[ambState.i];const line=ambLine(nm);if(!line)return;
+ try{appendMsg(nm,line)}catch(e){return}
+ ambTrim();
+ if(typeof recordHuddleLine==='function')recordHuddleLine(nm,line);
+ /* back-and-forth — every third beat, someone else answers */
+ if(ambState.beat%3===0){const others=p.filter(x=>x!==nm);if(!others.length)return;const nm2=others[Math.floor(Math.random()*others.length)];const line2=ambLine(nm2);if(!line2)return;
+  setTimeout(()=>{if(document.hidden)return;if(Date.now()-ambState.lastOwnerAt<9000)return;try{appendMsg(nm2,line2);ambTrim();if(typeof recordHuddleLine==='function')recordHuddleLine(nm2,line2)}catch(e){}},2100)}
+},6000);
 /* ===== LIVE CHAT — agents really talk back, each in their own voice =====
    Replies read what Craig actually said: praise gets a warm, specific answer,
    questions get real answers about the office (roster, shifts, rooms, work),
@@ -5989,13 +6059,17 @@ function renderWireUI(){var myRec=Store.offices[myHomeId()];var cur=Store.office
    return '<div class="wireOffRow"><div style="min-width:0"><b>'+esc(o.business||o.name||o.id)+'</b><span>'+esc(o.ownerName||'')+(typeof o.plot==='number'?' · Plot '+(o.plot+1):'')+(o.locked?' · locked':'')+(isCur?' · you are here':linked?' · connected':' · not connected yet')+'</span></div>'+(isCur?'<button class="alt" disabled style="opacity:.55">Here</button>':linked?'<button class="gold" data-enter="'+id+'">Walk in</button>':'<span class="wireNote" style="white-space:nowrap;align-self:center">Join with their code</span>')+'</div>'}).join('')||'<div class="wireNote">No offices yet.</div>';
   ol.querySelectorAll('[data-enter]').forEach(function(b){b.onclick=function(){var id=b.dataset.enter;$('wireCard').classList.remove('show');enterOffice(id,{teleport:true});logTalk('Doorway','You walked through — welcome to '+(Store.offices[id]?Store.offices[id].business:id)+'.','sys')}});
   ol.querySelectorAll('[data-link]').forEach(function(b){b.onclick=function(){linkOffices(myHomeId(),b.dataset.link);cardMsg('Connected — the doorway in the Lobby now links both offices, both ways.',true)}})}
- var mc=$('wireMyCode');if(mc)mc.textContent=myRec?myRec.code:'······';
+ var mc=$('wireMyCode');if(mc){var __code='';try{__code=myOfficeCode()}catch(e){} mc.textContent=__code||'······'}
  var dn=$('wireDoorNote');if(dn)dn.innerHTML=BACK.mode==='live'?'The live wire is ON: presence, movement and Office Talk sync between phones in real time through Firebase Realtime Database.':'<b>The one door step:</b> everything is built and running in local preview on this device (offices, doorway, chat and presence sync across this device\u2019s tabs). To go live between two phones takes ONE sign-in by the owner: create a free Firebase project, turn on Realtime Database, and paste its web config into the WIRE_FIREBASE_CONFIG line at the top of the wire script in index.html. Nothing else changes — the same code goes live.';
  var ivn=$('wireInvNote');if(ivn)ivn.textContent=BACK.mode==='live'?'Offices are connected live — swap office codes here, then walk through the Lobby doorway.':'Local preview is on. Open Offices & connections for your office code and the one sign-in step that takes it live between phones.';
  var rs=$('wireResetBtn');if(rs)rs.style.display=profile?'':'none'}
 $('wireDockBtn').onclick=function(){if(welcomeBack&&profile){welcomeBack=false;sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){} reskin();enterOffice(profile.officeId,{teleport:true});return} openWireCard()};
 $('wireCardX').onclick=function(){$('wireCard').classList.remove('show')};
-$('wireCopyCode').onclick=function(){var myRec=Store.offices[myHomeId()];if(!myRec)return;var done=function(){cardMsg('Code copied — send it to the person whose office you are connecting.',true)};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(myRec.code).then(done,done);else done()};
+$('wireCopyCode').onclick=function(){var code='';try{code=myOfficeCode()}catch(e){}
+ if(!code){cardMsg('Your office code is not ready yet — give it a moment, then tap Copy again.');return}
+ var done=function(){cardMsg('Code copied: '+code+' — send it to the person whose office you are connecting.',true)};
+ var fallback=function(){var ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0;left:0;top:0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){} ta.remove();if(ok)done();else cardMsg('Your office code is '+code+' — type it to them if the copy did not take.')};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,fallback);else fallback()};
 $('wireConnectBtn').onclick=function(){var code=$('wireCodeInput').value.trim().toUpperCase();if(!code){cardMsg('Enter the other office\u2019s code first.');return}
  var found=null;Object.keys(Store.offices).forEach(function(id){if(Store.offices[id].code===code)found=Store.offices[id]});
  if(!found){cardMsg(BACK.mode==='live'?'No office with that code is on the wire yet — check the code and try again.':'No office with that code exists on this device yet. In local preview, offices live on this device — the one sign-in step in the note below is what puts them on every phone.');return}
@@ -6086,6 +6160,29 @@ function readBinding(email,cb){var k=emailKey(email);
  if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).once('value',function(s){cb(s.val()||null)});return}catch(e){}}
  cb(acctLocal()[k]||null)}
 function myOfficeRec(){return Store.offices[myHomeId()]||null}
+/* ---------- MY OFFICE CODE — one resolver, every surface ----------
+   The Offices panel showed "······" and Copy copied nothing whenever
+   the owner's home-office record was missing from the local store or
+   reached the wire without its code on it (a record carrying only
+   door subtrees — hires, levels — has no code field until identity
+   lands). Every surface that needs the owner's code or record now
+   goes through here, and the resolver HEALS from the owner's own
+   data, the same way for every owner:
+   (1) the record exists but has no code → the code is put on it (the
+       home office's canonical code for the owner's office; a fresh
+       unused code for any other) and written back through the backend;
+   (2) no record exists under the owner's home id, but this device
+       holds the owner's own profile for that id → the office IS
+       theirs, so the record is laid down from that profile — their
+       name, their business, their look, a real code — and written
+       back. A fresh owner gets a working code the moment his office
+       exists; two owners can actually swap codes and connect. */
+function freshOfficeCode(){var c='';do{c=rnd(6).toUpperCase()}while(Object.keys(Store.offices).some(function(k){return Store.offices[k]&&Store.offices[k].code===c}));return c}
+function myOfficeRecord(){var id=myHomeId();if(!validOfficeId(id))return null;var rec=Store.offices[id]||null;
+ if(rec){if(!rec.code){rec.code=(id===OWNER_OFFICE)?'VIBEZ1':freshOfficeCode();try{BACK.putOffice(rec)}catch(e){}}return rec}
+ if(profile&&profile.officeId===id){rec={id:id,ownerName:profile.name||'Owner',business:profile.business||'Your office',look:profile.look||'craig',code:(id===OWNER_OFFICE)?'VIBEZ1':freshOfficeCode(),createdAt:Date.now()};if(authUser&&authUser.email)rec.ownerEmail=authUser.email;Store.offices[id]=rec;try{BACK.putOffice(rec)}catch(e){}return rec}
+ return null}
+function myOfficeCode(){var rec=myOfficeRecord();return rec&&rec.code?String(rec.code):''}
 function ensureLinkKey(oid,regen){var rec=Store.offices[oid];if(!rec)return linkKeyFor(oid);
  if(rec.linkKey&&!regen){try{localStorage.setItem('hqLinkKey_'+oid,rec.linkKey)}catch(e){} return rec.linkKey}
  var key='AO-'+rnd(4).toUpperCase()+'-'+rnd(4).toUpperCase()+'-'+rnd(4).toUpperCase();
@@ -6281,7 +6378,7 @@ function dInjectCard(){var card=$('wireCard');if(!card||$('districtBtn'))return;
  var lockRow=document.createElement('div');lockRow.id='districtLockRow';
  anchor.parentNode.insertBefore(lockSec,anchor.nextSibling);anchor.parentNode.insertBefore(lockRow,anchor.nextSibling.nextSibling);
  dRenderLock()}
-function dRenderLock(){var row=$('districtLockRow');if(!row)return;var mine=Store.offices[myHomeId()];
+function dRenderLock(){var row=$('districtLockRow');if(!row)return;var mine=null;try{mine=myOfficeRecord()}catch(e){} if(!mine)mine=Store.offices[myHomeId()];
  if(!mine){row.innerHTML='<p class="wireNote" style="margin:0">Your office record is still forming.</p>';return}
  var locked=!!mine.locked;
  row.innerHTML='<p class="wireNote" style="margin:0 0 7px">'+(locked?'Your office is <b>locked</b> — it shows on the district, but nobody can walk in.':'Your office is <b>open</b> — connected owners can walk in from the district.')+'</p><button class="alt" id="districtLockBtn" style="width:100%;padding:10px 0">'+(locked?'Unlock my office':'Lock my office')+'</button>';
@@ -7766,7 +7863,7 @@ body.railOpen #railLip{left:0!important}
 .gHqHead{display:flex;align-items:center;gap:8px;margin:2px 6px 2px}
 .gHqHead h4{margin:0}
 .gHqSub{font-size:12px;color:#BCA3A3;margin:0 6px 10px}
-.gFeed{display:grid;gap:12px;padding:10px 8px;height:204px;max-height:204px;overflow-y:auto;overflow-x:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:12px;margin:0 6px;scroll-behavior:smooth;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;align-content:start}
+.gFeed{display:grid;gap:12px;padding:10px 8px;height:204px;max-height:204px;overflow-y:auto;overflow-x:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:12px;margin:0 6px;scroll-behavior:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;align-content:start}
 .gFeed::-webkit-scrollbar{width:5px}.gFeed::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:3px}
 .gMsg{display:flex;gap:9px}
 .gMsg .mPic{width:30px;height:30px;border-radius:50%;flex:0 0 auto;overflow:hidden;background:#171111;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;margin-top:2px}
@@ -7821,7 +7918,7 @@ body.forceLand .gLayer{left:10px;top:6px;bottom:6px;width:min(356px,52vh)}
 .gThreadHead .mPic img{width:100%;height:100%;object-fit:cover;object-position:50% 0%;display:block}
 .gThreadHead b{font-size:15.5px;display:block;line-height:1.2}
 .gThreadHead span{font-size:11.5px;color:#BCA3A3}
-.gThreadBody{flex:1;min-height:0;overflow-y:auto;padding:12px 2px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;scrollbar-width:thin}
+.gThreadBody{flex:1;min-height:0;overflow-y:auto;padding:12px 2px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-behavior:auto;scrollbar-width:thin}
 .gBubble{max-width:84%;padding:8px 11px;border-radius:12px;font-size:13.5px;line-height:1.45;background:rgba(255,255,255,.08);align-self:flex-start;border-bottom-left-radius:4px;overflow-wrap:break-word}
 .gBubble.me{background:rgba(216,35,42,.30);align-self:flex-end;border-bottom-left-radius:12px;border-bottom-right-radius:4px}
 .gTyping{font-size:11.5px;color:#BCA3A3;font-style:italic;padding:2px 4px}
@@ -8230,6 +8327,11 @@ $('gModePriv').onclick=function(){setChatMode('private')};
 
 function renderHqFeed(){
  var feed=$('gHqFeed');if(!feed)return;
+ /* reading-back guard: if the owner has flicked up into the history,
+    a new line re-renders the feed but must NOT yank him back to the
+    bottom — his scroll position survives the render; only a reader
+    already at the bottom rides new lines down. */
+ var __stick=feed.scrollTop+feed.clientHeight>=feed.scrollHeight-60,__prevTop=feed.scrollTop;
  var list=$('chatList');var out=[];
  if(list){
   var msgs=list.querySelectorAll('.msg');
@@ -8245,7 +8347,7 @@ function renderHqFeed(){
   }
  }
  if(!out.length)out.push('<p class="gNote">The floor is quiet — say the first word and the crew answers here.</p>');
- feed.innerHTML=out.join('');feed.scrollTop=feed.scrollHeight;
+ feed.innerHTML=out.join('');if(__stick)feed.scrollTop=feed.scrollHeight;else feed.scrollTop=Math.min(__prevTop,Math.max(0,feed.scrollHeight-feed.clientHeight));
 }
 (function watchHq(){
  var list=$('chatList');if(!list)return;
@@ -9007,31 +9109,41 @@ function startCeremony(nm){
  var roleShort=rec?String(rec.role||'').split('—')[0].trim():'';
  var hx=H.cx,hz=H.cz;
  var desk=(rec&&rec.slot==='hunters')?catalogSeatFor(nm):null;
+ /* one tour stop: the whole group walks there together (real ORDER
+    routes, no teleporting), the named greeter names the room, and the
+    stop dwells just long enough for the owner to SEE the room before
+    the group walks on to the next one */
+ function tour(x,z,who,line,label){return{label:label,dwell:3000,timeout:16000,
+  go:function(){ord(g1,x-1.05,z-0.85);ord(nm,x,z);ord(g2,x+1.05,z-0.85)},
+  say:function(){say(who,line,0)}}}
  var steps=[
-  { /* (1) TOGETHER at the door — both greeters come to the hire */
+  {label:'Greeting at the door',dwell:5600,timeout:20000, /* (1) TOGETHER at the door — both greeters come to the hire */
    go:function(){ord(g1,hx-1.05,hz-0.95);ord(g2,hx+1.05,hz-0.95);ord(nm,hx,hz)},
    say:function(){try{WAVE[g1]=performance.now()+2600;WAVE[g2]=performance.now()+2600}catch(e){}
     say(g1,nice(nm)+' — welcome in. I\u2019m '+nice(g1)+', I keep watch over this office: if anything breaks, I see it first.',0);
     say(g2,'And I\u2019m '+nice(g2)+' — I run the catalog here. We\u2019ve been expecting you; the door\u2019s done with you now.',1700);
     say(nm,'Thank you — both of you. Glad to be in.',3400)}},
-  { /* (2) TOGETHER they introduce the hire to the rest of the staff */
+  {label:'Introductions — meet the crew',dwell:5600,timeout:20000, /* (2) TOGETHER they introduce the hire to the rest of the staff */
    go:function(){ord(g1,2.35,2.55);ord(nm,3.5,3.65);ord(g2,4.65,2.55)},
    say:function(){var third=anyCrew([nm,g1,g2]);
     say(g2,'Everyone — this is '+nice(nm)+(roleShort?', our new '+roleShort:'')+'. '+nice(nm)+', this is the crew: they\u2019ll look after you.',0);
     if(third)say(third,'Welcome aboard, '+nice(nm)+' — shout if you need anything.',1800);
-    say(g1,'Introductions done. Now the tour — stay with us.',3600)}},
-  { /* (3) the tour, together — the rooms of THIS office */
-   go:function(){ord(g1,-7.9,-3.1);ord(nm,-6.8,-2.7);ord(g2,-5.7,-3.1)},
-   say:function(){say(g1,'The huddle rooms and the Numbers Lab — where the watchers work the live boards.',0)}},
-  { go:function(){ord(g1,1.3,-5.15);ord(nm,2.35,-4.85);ord(g2,3.4,-5.15)},
-   say:function(){say(g2,'Koi Court — the quiet middle of the office. Thinking happens here.',0)}},
-  { go:function(){ord(g1,15.35,-5.15);ord(nm,16.5,-4.8);ord(g2,17.65,-5.15)},
-   say:function(){say(g1,'The Blueprint Room — where finished work gets presented, and meetings gather.',0)}},
-  { go:function(){ord(g1,12.4,7.5);ord(nm,13.5,7.9);ord(g2,14.6,7.5)},
-   say:function(){say(g2,'The Movie Room up ahead, the gaming rigs behind us — every room earns its keep.',0)}},
-  { go:function(){ord(g1,-0.6,17.0);ord(nm,0.5,17.35);ord(g2,1.6,17.0)},
-   say:function(){say(g2,'And the Library — the catalog lives here, checked title by title.',0)}},
-  { /* (4) to their desk — or the desk they claim */
+    say(g1,'Introductions done. Now the tour — every room, stay with us.',3600)}},
+  /* (3) the tour, together — EVERY room of THIS office, in walking order */
+  tour(-8.5,9.6,g2,'The Lobby and the Welcome Lounge — the front door, the welcome desk, and where guests land first.','Tour — the Lobby & Welcome Lounge'),
+  tour(-10.2,-7.85,g1,'The Brew Lab — coffee, the round table, quick huddles over a fresh brew.','Tour — Brew Lab'),
+  tour(-6.8,-7.85,g2,'The Deep Work Den — books on the table, clock on the wall, quiet on purpose. Heads-down work lives here.','Tour — Deep Work Den'),
+  tour(-6.8,-4.45,g1,'The Numbers Lab — screens on the wall and the numbers up big. Rankings, picks and stats live here.','Tour — Numbers Lab'),
+  tour(-8.5,1.5,g2,'Tea & Talk — the tea set in the middle, soft chairs, slow talks and good ideas.','Tour — Tea & Talk'),
+  tour(3.5,-3.1,g1,'The Main Floor — desk rows, the heart of the office. Everybody\u2019s cube stands off this floor.','Tour — Main Floor'),
+  tour(2.35,-4.85,g2,'Koi Court — the quiet middle of the office. Thinking happens here, by the pond.','Tour — Koi Court'),
+  tour(16.5,-5.9,g1,'The Blueprint Room — the big one: where finished work gets presented, and meetings gather.','Tour — the Blueprint Room'),
+  tour(16.5,1.7,g2,'The Gaming Room — three playable rigs along the wall. Breaks get serious in here.','Tour — Gaming Room'),
+  tour(16.5,4.3,g1,'The Game Room — foosball, table tennis and the chess table, each with a scoreboard.','Tour — Game Room'),
+  tour(13.5,9.7,g2,'The Movie Room — the Shortz VS screen plays here, with theater chairs for the whole crew.','Tour — Movie Room'),
+  tour(0.5,11.1,g1,'Lounge & Focus — couch corner, focus pods, the kitchenette and the fish tank.','Tour — Lounge & Focus'),
+  tour(0.5,17.35,g2,'And the Library — the catalog lives here, checked title by title, shelves wall to wall.','Tour — the Library'),
+  {label:'To their desk',dwell:5600,timeout:20000, /* (4) to their desk — or the desk they claim */
    go:function(){if(desk){ord(nm,desk.x,desk.z,'sit');ord(g1,desk.x-1.15,desk.z-0.85);ord(g2,desk.x+1.15,desk.z-0.85)}else{var hd=(typeof HUDDLES!=='undefined'&&HUDDLES[nm])?HUDDLES[nm]:{x:hx,z:hz};ord(nm,hd.x,hd.z,'sit');ord(g1,hd.x-1.15,hd.z-0.85);ord(g2,hd.x+1.15,hd.z-0.85)}},
    say:function(){if(desk)say(g2,'Your desk — the Catalog row, right here with the team. Finds come to me for the check before anything counts.',0);else say(g2,'And this is your desk — claim it, make it yours.',0);
     say(nm,'Perfect. I\u2019ll get to work.',1900);
@@ -9039,10 +9151,11 @@ function startCeremony(nm){
  ];
  cer.active={hire:nm,g1:g1,g2:g2,rec:rec,steps:steps,desk:desk};
  cer.step=-1;cer.said=false;
+ cerPillShow('Door ceremony — '+nice(g1)+' and '+nice(g2)+' are bringing '+nice(nm)+' in.');
  try{logTalk('HQ',nice(g1)+' and '+nice(g2)+' are bringing '+nice(nm)+' in — the door ceremony.','sys')}catch(e){}
 }
 function pump(){if(cer.active)return;var nx=cer.queue.shift();if(nx)startCeremony(nx)}
-function admit(nm){nm=UP(nm);if(!nm||admitted[nm])return false;if(cer.active){if(cer.active.hire!==nm&&cer.queue.indexOf(nm)<0)cer.queue.push(nm);return true}startCeremony(nm);return true}
+function admit(nm){nm=UP(nm);if(!nm||admitted[nm])return false;if(cer.active){if(cer.active.hire!==nm&&cer.queue.indexOf(nm)<0)cer.queue.push(nm);return true}cerCamHold=false;startCeremony(nm);return true}
 function waiting(){var out=[];try{var H=window.__hqHires;if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(id){var r=L[id];if(r&&r.slot==='hunters'&&!admitted[UP(r.name)])out.push(UP(r.name))})}}catch(e){}return out}
 function admitAll(){var w=waiting();w.forEach(function(nm){admit(nm)});return w}
 setInterval(function(){
@@ -9056,15 +9169,129 @@ setInterval(function(){
  var arrived=true;
  [a.g1,a.g2,a.hire].forEach(function(nm){var o=bodyOf(nm);if(!o){arrived=false;return}try{var t=ORDER[nm];if(t&&distTo(o,t.x,t.z)>0.95)arrived=false}catch(e){}});
  var age=Date.now()-cer.issuedAt;
- if(!cer.said&&(arrived||age>30000)){cer.said=true;cer.saidAt=Date.now();try{st.say()}catch(e){}}
- if(cer.said&&Date.now()-cer.saidAt>5600){
+ if(!cer.said&&(arrived||age>(st.timeout||15000))){cer.said=true;cer.saidAt=Date.now();try{st.say()}catch(e){}
+  cerPillShow('Door ceremony — '+nice(a.hire)+': '+(st.label||'on the move')+(cer.queue.length?' · '+cer.queue.length+' more after this one':' · last one in'))}
+ if(cer.said&&Date.now()-cer.saidAt>(st.dwell||5600)){
   if(cer.step>=a.steps.length-1){ /* settle: orders clear, desk is home */
    settleDesk(a.hire,a.rec);unord(a.g1);unord(a.g2);unord(a.hire);
-   /* the door board comes down once nobody is left waiting */
-   if(!waiting().length){try{for(var i=objects.length-1;i>=0;i--){if(objects[i]&&objects[i].x===-9.9&&objects[i].z===12.6){objects.splice(i,1);break}}}catch(e){}}
-   cer.active=null;pump();return}
+   var doneHire=a.hire;cer.active=null;
+   /* the door board + bench come down once nobody is left waiting */
+   if(!waiting().length&&!cer.queue.length){try{for(var i=objects.length-1;i>=0;i--){if(objects[i]&&objects[i].x===-9.9&&(objects[i].z===12.6||objects[i].z===13.35)){objects.splice(i,1)}}}catch(e){}
+    cerPillShow(nice(doneHire)+' is desked — everybody is in. The ceremony is done.',true)}
+   pump();return}
   cer.step++;cer.said=false;a.steps[cer.step].go();cer.issuedAt=Date.now()}
 },650);
+/* ---------- THE DOOR BOARD TAP + START CEREMONY PANEL ----------
+   The owner's way in, on screen: tap the WAITING AT THE DOOR board
+   (or the bench, or any waiting hire standing by it) and a panel
+   opens listing who is waiting, with one big gold START CEREMONY
+   button. Tapping it runs admitAll() — the full visible ceremony
+   above, one hire at a time in queue — while the camera follows the
+   group and a status pill names each stage, so the owner SEES the
+   greeting, the introductions, every room of the tour and the desk
+   landing from wherever he is standing. Role-driven like the rest
+   of the ceremony: the greeters named on the panel are this office's
+   own watchdog + catalog lead, whoever holds those slots here. */
+var cerCamHold=false,cerCamStep=-2,cerPillTimer=null;
+var cerStyle=document.createElement('style');
+cerStyle.textContent='#cerPanel{position:fixed;top:112px;left:50%;transform:translateX(-50%);z-index:66;width:min(380px,calc(100vw - 32px));max-height:calc(100dvh - 210px);overflow-y:auto;overscroll-behavior:none;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 55px rgba(15,23,42,.30);padding:16px;display:none;color:var(--ink)}'
++'#cerPanel.show{display:block;animation:finUp .22s ease}'
++'#cerPanel h2{margin:0;font-size:19px;font-weight:750;line-height:1.2}'
++'#cerPanel .cerSub{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:3px}'
++'#cerPanel .cerRow{display:flex;gap:9px;align-items:baseline;padding:8px 0;border-top:1px solid #eef2f7}'
++'#cerPanel .cerRow b{font-size:14.5px;flex:0 0 auto}'
++'#cerPanel .cerRow span{font-size:12px;color:var(--muted);line-height:1.4}'
++'#cerStart{width:100%;margin-top:13px;background:var(--gold);color:#fff;font-size:16.5px;font-weight:800;letter-spacing:.02em;padding:15px 14px;border-radius:11px;box-shadow:0 8px 20px rgba(185,151,91,.4)}'
++'#cerStart:disabled{background:#cbd5e1;color:#64748b;box-shadow:none;cursor:default}'
++'#cerPanel .cerX{margin-left:auto;background:var(--soft);color:var(--ink);width:32px;height:32px;border-radius:9px;padding:0;flex:0 0 auto;font-size:13px}'
++'#cerPill{position:fixed;top:106px;left:50%;transform:translateX(-50%);z-index:34;background:rgba(30,41,59,.94);color:#fff;font-size:12px;font-weight:650;letter-spacing:.02em;padding:7px 13px;border-radius:999px;display:none;white-space:nowrap;max-width:calc(100vw - 118px);overflow:hidden;text-overflow:ellipsis;pointer-events:none;box-shadow:0 8px 22px rgba(15,23,42,.3)}'
++'#cerPill.show{display:block}#cerPill b{color:#e9c979}'
++'#cerFollowChip{position:fixed;top:140px;left:50%;transform:translateX(-50%);z-index:35;background:var(--gold);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.05em;padding:10px 17px;border-radius:999px;display:none;box-shadow:0 10px 24px rgba(185,151,91,.5);cursor:pointer;white-space:nowrap}'
++'#cerFollowChip.show{display:block;animation:finUp .22s ease}'
++'@media(max-width:860px){#cerPanel{top:96px}#cerPill{top:100px}#cerFollowChip{top:136px}}'
++'@media(orientation:landscape) and (max-height:540px){#cerPanel{top:76px;max-height:calc(100dvh - 130px)}#cerPill{top:64px}#cerFollowChip{top:98px}}';
+document.head.appendChild(cerStyle);
+var cerPillEl=document.createElement('div');cerPillEl.id='cerPill';document.body.appendChild(cerPillEl);
+/* FOLLOW chip — shows ONLY while a ceremony is running and the owner
+   has taken the camera himself; one tap hands the camera back to the
+   ceremony group. Hidden the moment following resumes or the
+   ceremony ends. */
+var cerFollowChip=document.createElement('button');cerFollowChip.id='cerFollowChip';cerFollowChip.textContent='◎ FOLLOW CEREMONY';cerFollowChip.setAttribute('aria-label','Follow the ceremony group with the camera');document.body.appendChild(cerFollowChip);
+cerFollowChip.addEventListener('click',function(){cerCamHold=false});
+function cerPillShow(txt,final){try{cerPillEl.innerHTML='<b>DOOR CEREMONY</b> · '+txt;cerPillEl.classList.add('show');clearTimeout(cerPillTimer);if(final)cerPillTimer=setTimeout(function(){cerPillEl.classList.remove('show')},8000)}catch(e){}}
+var cerPanelEl=document.createElement('section');
+cerPanelEl.id='cerPanel';cerPanelEl.setAttribute('aria-label','Waiting at the door — start the new-hire ceremony');
+document.body.appendChild(cerPanelEl);
+/* tapping the ceremony panel hands the camera back to the group */
+cerPanelEl.addEventListener('pointerdown',function(){if(cer.active)cerCamHold=false});
+var ASSIGN_SHORT={ELI:'Movie Hunter — feature films',MARA:'Show Hunter — series & full seasons',HUGO:'Deep-Cut Hunter — classics & deep cuts',RHEA:'Fresh Hunter — new & trending'};
+function renderCerPanel(){
+ var w=waiting(),g1=slotHolder('audit'),g2=slotHolder('highlights');
+ var rows;
+ if(cer.active){rows='<div class="cerRow"><b>'+nice(cer.active.hire)+'</b><span>Being brought in right now — greetings, introductions, the full tour, then their desk. '+(cer.queue.length?cer.queue.length+' more waiting after this one.':'')+'</span></div>'
+  +w.filter(function(nm){return nm!==cer.active.hire&&cer.queue.indexOf(nm)<0}).map(function(nm){return '<div class="cerRow"><b>'+nice(nm)+'</b><span>'+(ASSIGN_SHORT[nm]||'Waiting at the door')+' — still at the door</span></div>'}).join('')}
+ else if(w.length){rows=w.map(function(nm){var r=hireRec(nm);var rs=r?String(r.role||'').split('—')[0].trim():'';return '<div class="cerRow"><b>'+nice(nm)+'</b><span>'+(ASSIGN_SHORT[nm]||rs||'New hire')+' — waiting at the door</span></div>'}).join('')}
+ else{rows='<div class="cerRow"><span>Nobody is waiting at the door right now — everyone who arrived has been brought in and desked.</span></div>'}
+ var btn;
+ if(cer.active)btn='<button id="cerStart" disabled>CEREMONY RUNNING — '+nice(cer.active.hire).toUpperCase()+' IS BEING BROUGHT IN…</button>';
+ else if(w.length)btn='<button id="cerStart">START CEREMONY</button>';
+ else btn='<button id="cerStart" disabled>EVERYONE IS IN</button>';
+ cerPanelEl.innerHTML='<div style="display:flex;align-items:flex-start;gap:10px"><div><h2>Waiting at the door</h2><div class="cerSub">'
+  +(g1&&g2?nice(g1)+' and '+nice(g2)+' greet each hire <b>together</b> at the door, introduce them to the rest of the staff, tour them through <b>every room</b>, then walk them to their desk — watch it happen on the floor. One at a time, in order.':'The office greeters bring each hire in: greetings together at the door, introductions, a tour of every room, then their desk.')
+  +'</div></div><button class="cerX" id="cerClose" aria-label="Close">✕</button></div>'
+  +'<div style="margin-top:8px">'+rows+'</div>'+btn
+  +'<div class="cerSub" style="margin-top:9px">The camera follows the group the whole way. Drag the floor and the camera is yours — following stops and a gold FOLLOW CEREMONY chip appears; tap it, or tap this panel or the door board again, to follow the group again.</div>';
+ var cb=document.getElementById('cerClose');if(cb)cb.onclick=function(){cerPanelEl.classList.remove('show')};
+ var sb=document.getElementById('cerStart');
+ if(sb)sb.onclick=function(){if(cer.active||!waiting().length)return;admitAll();cerPanelEl.classList.remove('show');try{logTalk('HQ','The door ceremony is starting — watch the floor.','sys')}catch(e){}};
+}
+function openCerPanel(){if(cer.active)cerCamHold=false;renderCerPanel();try{hideRoomCard()}catch(e){}cerPanelEl.classList.add('show')}
+/* keep an open panel honest while a ceremony runs */
+var cerPanelKey='';setInterval(function(){if(!cerPanelEl.classList.contains('show'))return;var k=(cer.active?cer.active.hire+'/'+cer.step:'idle')+'|'+waiting().join(',');if(k!==cerPanelKey){cerPanelKey=k;renderCerPanel()}},800);
+/* CAMERA FOLLOW — while a ceremony runs, the camera rides with the
+   group: it pans to the three walkers' centre and, if the owner is
+   zoomed out at the map / lot view, eases in until the people are
+   readable. Following is ON by default at ceremony start. The MOMENT
+   the owner swipes/drags the view (or wheel-zooms) himself, following
+   stops instantly and stays off — he has full control — and the gold
+   FOLLOW CEREMONY chip shows. Following resumes ONLY when he taps
+   that chip, taps the door board again, or taps the ceremony panel.
+   This governs the ceremony camera only; with no ceremony running,
+   the office camera behaves exactly as it always has. */
+var cerDragPt=null;
+try{
+ cv.addEventListener('pointerdown',function(e){try{var p=evLocal(e);cerDragPt={x:p.x,y:p.y}}catch(err){cerDragPt=null}},true);
+ cv.addEventListener('pointermove',function(e){if(!cerDragPt||!cer.active||cerCamHold)return;try{var p=evLocal(e);if(Math.hypot(p.x-cerDragPt.x,p.y-cerDragPt.y)>6)cerCamHold=true}catch(err){}},true);
+ cv.addEventListener('pointerup',function(){cerDragPt=null},true);
+ cv.addEventListener('pointercancel',function(){cerDragPt=null},true);
+ cv.addEventListener('wheel',function(){if(cer.active)cerCamHold=true},{passive:true,capture:true});
+}catch(e){}
+setInterval(function(){
+ if(!cer.active){cerFollowChip.classList.remove('show');return}
+ cerFollowChip.classList.toggle('show',!!cerCamHold);
+ if(cerCamHold)return;
+ var a=cer.active,pts=[];
+ [a.g1,a.g2,a.hire].forEach(function(nm){var o=bodyOf(nm);if(o)pts.push(o)});
+ if(!pts.length)return;
+ var cx=0,cz=0;pts.forEach(function(o){cx+=o.cx;cz+=o.cz});cx/=pts.length;cz/=pts.length;
+ try{camTween=null;cam.tx+=(cx-cam.tx)*0.16;cam.tz+=(cz-cam.tz)*0.16;clampPan();
+  if(cam.zoom<26)cam.zoom+=(Math.min(fitZoom(),46)-cam.zoom)*0.10}catch(e){}
+},120);
+/* THE BOARD TAP — intercept taps on the door board / bench / waiting
+   hires BEFORE the room card can claim them (the board stands in the
+   Welcome Lounge, whose card used to swallow the tap and do nothing
+   for the door). Every other tap falls through untouched. */
+try{
+ var _cerPrevTap=handleTap;
+ handleTap=function(sx,sy){
+  try{
+   var w=screenToWorld(sx,sy),wx=w[0],wz=w[1];
+   var wl=waiting();
+   if((wl.length||cer.active)&&Math.abs(wx+9.9)<2.3&&Math.abs(wz-12.95)<1.75){openCerPanel();return}
+   for(var i=0;i<wl.length;i++){var b=bodyOf(wl[i]);if(b&&Math.hypot(wx-b.cx,wz-b.cz)<0.95){openCerPanel();return}}
+  }catch(e){}
+  _cerPrevTap(sx,sy)};
+}catch(e){}
 /* ---------- the owner's word in chat lets them in ---------- */
 var lastChatText='';
 document.addEventListener('input',function(e){if(e.target&&e.target.tagName==='INPUT')lastChatText=e.target.value||''},true);
@@ -9086,9 +9313,9 @@ document.addEventListener('keydown',function(e){if(e.key==='Enter')checkLetIn(la
 /* one-time word from the watchdog, so the owner knows the door works */
 var hintTries=0;var hintIv=setInterval(function(){hintTries++;var w=waiting();if(!w.length){if(hintTries>50)clearInterval(hintIv);return}clearInterval(hintIv);
  var g1=slotHolder('audit'),g2=slotHolder('highlights');
- setTimeout(function(){if(g1&&g2){try{logTalk(g1,'We have '+w.map(nice).join(', ')+' waiting at the door. Say the word — "let them in" — and '+nice(g2)+' and I will bring them in proper: greetings together, introductions, the tour, then their desks.')}catch(e){}}},9000);
+ setTimeout(function(){if(g1&&g2){try{logTalk(g1,'We have '+w.map(nice).join(', ')+' waiting at the door. Tap the WAITING AT THE DOOR board and hit START CEREMONY — or say "let them in" — and '+nice(g2)+' and I will bring them in proper: greetings together, introductions, the tour, then their desks.')}catch(e){}}},9000);
 },1500);
-window.__hqCeremony={admit:admit,admitAll:admitAll,waiting:waiting,active:function(){return cer.active?cer.active.hire:null},greeters:function(){return[slotHolder('audit'),slotHolder('highlights')]}};
+window.__hqCeremony={admit:admit,admitAll:admitAll,waiting:waiting,active:function(){return cer.active?cer.active.hire:null},greeters:function(){return[slotHolder('audit'),slotHolder('highlights')]},openPanel:openCerPanel,startAll:function(){var w=admitAll();cerPanelEl.classList.remove('show');return w},step:function(){return cer.active?{hire:cer.active.hire,step:cer.step,label:(cer.active.steps[cer.step]?cer.active.steps[cer.step].label||'':'')}:null}};
 })();
 </script>
 </body>
