@@ -14,6 +14,21 @@
 <link rel="icon" href="data:,">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Agent Office (AO) — Cre8tor VibeZ HQ</title>
+<script>
+/* RETURNING-PLAYER CHECK — runs in the head, before a single element
+   of the page is parsed or painted. A device with a saved player is
+   marked hqReturning and the entrance gate is CSS-barred from ever
+   appearing on it — not as a flash, not as a first frame; the wire's
+   boot reads the same saved player and lands them straight inside
+   their own office. A device with NO saved player is marked hqNew
+   and gets the solid front-door lock from the first frame, instead
+   of a flash of somebody else's office. The entrance is for
+   strangers only. */
+window.__hqSavedPlayerEarly=null;
+try{var __sp=null;try{__sp=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+ if(__sp&&__sp.officeId){window.__hqSavedPlayerEarly=__sp;document.documentElement.classList.add('hqReturning')}
+ else{document.documentElement.classList.add('hqNew')}}catch(e){document.documentElement.classList.add('hqNew')}
+</script>
 <style>
 :root{--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--gold:#b9975b;--gold2:#d4af6a;--char:#1e293b;--soft:#f1f5f9}
 *{box-sizing:border-box;touch-action:none!important}html,body{height:100%;overscroll-behavior:none;overscroll-behavior-y:none;touch-action:none}
@@ -626,10 +641,42 @@ button.active{background:#334155!important;color:#fff!important;border-color:#33
 .mpMood.sel{background:#b9975b;color:#fff}
 .mpStop{width:100%;margin-top:10px;background:transparent;border:1px solid #3b475e;color:#fca5a5;padding:9px;border-radius:9px;font-weight:700;font-size:13px}
 .mpState{font-size:11.5px;color:#94a3b8;margin-top:10px;line-height:1.45}
+
 .tkCheck{visibility:hidden;margin-right:7px}
 .mpMood.sel .tkCheck{visibility:visible}
 .tkDur{float:right;color:#94a3b8;font-weight:600;font-size:12px}
 .mpMood.sel .tkDur{color:#ffe9b8}
+/* Where it plays — collapsible room picker inside the music panel.
+   Tap the bar, the drawer drops down with every room; tap rooms to
+   pick one, a few, or all; tap the bar again and the drawer tucks up. */
+.mpRoomsBar{width:100%;margin-top:12px;display:flex;align-items:center;gap:8px;background:#232b3a;border:1px solid #2b3648;color:#fff;padding:11px 12px;border-radius:10px;text-align:left}
+.mpRoomsBar:active{background:#2b3648}
+.mpRoomsBarLbl{font-size:13px;font-weight:750;flex:0 0 auto}
+.mpRoomsSummary{flex:1;min-width:0;font-size:12px;font-weight:650;color:#e9c979;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.mpRoomsChev{flex:0 0 auto;font-size:15px;line-height:1;color:#e9c979;transition:transform .22s ease}
+.mpRoomsBar.open .mpRoomsChev{transform:rotate(180deg)}
+.mpRoomsDrawer{display:none;margin-top:8px;background:#101623;border:1px solid #2b3648;border-radius:11px;padding:10px}
+.mpRoomsDrawer.open{display:block;animation:pvIn .2s ease}
+.mpRoomAll{width:100%;background:#232b3a;border:1.5px solid #3b475e;color:#e2e8f0;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:750;text-align:left;display:flex;align-items:center;gap:7px}
+.mpRoomAll .rkCheck{visibility:hidden;color:#fff}
+.mpRoomAll.sel{background:#b9975b;border-color:#b9975b;color:#fff}
+.mpRoomAll.sel .rkCheck{visibility:visible}
+.mpRoomsGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}
+.mpRoom{background:#232b3a;border:1.5px solid #2b3648;color:#cbd5e1;padding:9px 9px;border-radius:9px;font-size:12.5px;font-weight:650;text-align:left;display:flex;align-items:center;gap:6px;line-height:1.25;min-width:0}
+.mpRoom .rkCheck{visibility:hidden;color:#fff;flex:0 0 auto;font-size:12px}
+.mpRoom .rkName{min-width:0;overflow-wrap:break-word}
+.mpRoom.sel{background:#b9975b;border-color:#b9975b;color:#fff}
+.mpRoom.sel .rkCheck{visibility:visible}
+.mpRoomsHint{font-size:11.5px;color:#94a3b8;line-height:1.45;margin:9px 2px 1px}
+.mpRoomsHint b{color:#e9c979;font-weight:700}
+/* Music-here pill — while a track plays, says whether you can hear it
+   where your camera is: on here, or playing elsewhere and silent here. */
+.musicBtn.away{background:#232b3a;color:#94a3b8;border-style:dashed}
+#musicHerePill{position:fixed;top:58px;right:12px;z-index:33;display:none;max-width:min(330px,calc(100vw - 90px));background:rgba(23,29,41,.95);color:#e9c979;border:1px solid #2b3648;border-radius:999px;padding:7px 12px;font-size:11.5px;font-weight:700;line-height:1.35;box-shadow:0 8px 22px rgba(15,23,42,.28);pointer-events:none}
+#musicHerePill.show{display:block}
+#musicHerePill.silent{color:#cbd5e1}
+#musicHerePill.silent b{color:#fca5a5}
+#musicHerePill b{font-weight:800}
 /* Decorator panel */
 .decorPanel{position:fixed;left:40px;top:64px;bottom:88px;width:min(340px,78vw);z-index:46;background:#fff;border-radius:16px;border:1px solid var(--line);box-shadow:0 24px 55px rgba(15,23,42,.28);display:none;flex-direction:column;overflow:hidden}
 .decorPanel.open{display:flex;animation:cardIn .22s ease}
@@ -831,6 +878,14 @@ body.forceLand .folder,body.forceLand .decorPanel{top:42px;bottom:52px}
    never present the owner's office, name or crew. */
 body.noPlayer .wireGate{display:flex;background:#141010}
 body.noPlayer .topbar,body.noPlayer .bottomBar,body.noPlayer .chatLog,body.noPlayer .minimap,body.noPlayer .rrail,body.noPlayer #railLip,body.noPlayer .wireDock,body.noPlayer #thumbBar,body.noPlayer .modePill,body.noPlayer .toast,body.noPlayer #guidePanel,body.noPlayer #guideScrim{display:none!important}
+/* head-check classes (see the returning-player check in the head):
+   a saved player NEVER sees the entrance — the only way the gate may
+   open on their screen is the deliberate preview (hqPreviewOK); a
+   first-time device is locked to the gate from the first frame */
+html.hqReturning .wireGate{display:none!important}
+html.hqReturning .wireGate.hqPreviewOK{display:flex!important}
+html.hqNew .wireGate{display:flex;background:#141010}
+html.hqNew .topbar,html.hqNew .bottomBar,html.hqNew .chatLog,html.hqNew .minimap,html.hqNew .rrail,html.hqNew #railLip,html.hqNew .wireDock,html.hqNew #thumbBar,html.hqNew .modePill,html.hqNew .toast,html.hqNew #guidePanel,html.hqNew #guideScrim{display:none!important}
 /* CONNECT YOUR AI — the stepped hook-up card behind every engine button */
 .museLayer{position:fixed;left:0;top:0;right:0;bottom:0;z-index:96;background:rgba(8,10,18,.62);display:none;align-items:center;justify-content:center;padding:14px;touch-action:none;overscroll-behavior:none}
 .museLayer.show{display:flex;animation:finUp .22s ease}
@@ -1075,8 +1130,14 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
 </div>
 <div class="musicPanel" id="musicPanel" aria-label="Office music">
   <div class="mpHead"><b>Office music</b><button class="profX" id="musicClose" aria-label="Close music panel">✕</button></div>
-  <p class="mpSub">Your four tracks, on the office loop — they play through in order and start over. For now it plays in your session; with the live wire, one person's pick plays for the whole office.</p>
+  <p class="mpSub">Pick where it plays first, then pick a track. You only hear it while your camera is over a room it's playing in — scroll into one of those rooms and it's there; scroll out and it's silent. Your four tracks play through in order and start over.</p>
   <div class="mpRow"><span>Volume</span><input type="range" id="musicVol" min="0" max="100" value="60" aria-label="Music volume"><span class="mpVolVal" id="musicVolVal">60%</span></div>
+  <button class="mpRoomsBar" id="musicRoomsBar" type="button" aria-expanded="false" aria-controls="musicRoomsDrawer"><span class="mpRoomsBarLbl">Where it plays</span><span class="mpRoomsSummary" id="musicRoomsSummary">All rooms</span><span class="mpRoomsChev" aria-hidden="true">▾</span></button>
+  <div class="mpRoomsDrawer" id="musicRoomsDrawer">
+    <button class="mpRoomAll sel" id="musicRoomAll" type="button" aria-pressed="true"><span class="rkCheck">✓</span>All rooms</button>
+    <div class="mpRoomsGrid" id="musicRoomsGrid"></div>
+    <p class="mpRoomsHint" id="musicRoomsHint">Playing in <b>all rooms</b>. Tap a room to play in just that room, then tap more to add them.</p>
+  </div>
   <div class="mpMoods">
     <button class="mpMood" data-track="0"><span class="tkCheck">✓</span>Dusty Vinyl<span class="tkDur">2:42</span></button>
     <button class="mpMood" data-track="1"><span class="tkCheck">✓</span>This and That<span class="tkDur">2:12</span></button>
@@ -1086,9 +1147,10 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
   <button class="mpStop" id="musicStop">Stop the music</button>
   <div class="mpState" id="musicState">Music is off.</div>
 </div>
+<div id="musicHerePill" aria-live="polite"></div>
 <div class="modePill" id="modePill"><b>SCROLL</b> · Main Floor — drag to scroll across the office</div>
 <div class="intercomPill" id="intercomPill" aria-live="polite"><span class="icDot"></span><span id="intercomTxt">INTERCOM LIVE — the office is listening. Say an order out loud.</span></div>
-<div class="destPill" id="destPill" aria-live="polite"><div class="dKicker">Heading to</div><div class="dName" id="destName">Main Floor</div><div class="dSub" id="destSub">Craig is walking there</div></div>
+<div class="destPill" id="destPill" aria-live="polite"><div class="dKicker">Heading to</div><div class="dName" id="destName">Main Floor</div><div class="dSub" id="destSub">Walking there</div></div>
 <div class="tileBar" id="tileBar"><div class="tile meTile"><video id="tileVideo" autoplay playsinline muted></video><span class="tTag">YOU · LIVE</span></div><div class="tile otTile" id="tileOther"><img class="otFace" id="otFace" alt=""><div class="otInner"><span class="otInit" id="otInit">G</span><span class="otName" id="otName">Guest</span><span class="otStatus" id="otStatus">In the room</span><span class="eq"><i></i><i></i><i></i><i></i></span></div><span class="faceTag" id="faceTag"></span><span class="tTag">IN THE ROOM</span></div><div class="tile otTile" id="tileOther2" style="display:none"><img class="otFace" id="otFace2" alt=""><div class="otInner"><span class="otInit" id="otInit2">J</span><span class="otName" id="otName2"></span><span class="otStatus" id="otStatus2">In the room</span><span class="eq"><i></i><i></i><i></i><i></i></span></div><span class="faceTag" id="faceTag2"></span><span class="tTag">IN THE ROOM</span></div></div>
 <div class="tvRemote" id="tvRemote" aria-label="Movie Room channel remote"><span class="trLbl">TV REMOTE</span><button id="trUp" aria-label="Channel up">▲</button><span class="trCh" id="trCh">CH 1</span><button id="trDown" aria-label="Channel down">▼</button></div>
 <div class="joinCard" id="joinCard"><span class="jIco">▭</span><div style="min-width:0"><b>Meeting called</b><span id="joinSub">The Blueprint Room — the crew is heading over.</span></div><button class="jBtn" id="joinBtn">Join</button><button class="jX" id="joinX" aria-label="Dismiss join card">✕</button></div>
@@ -1349,13 +1411,13 @@ Come in, claim a desk on the Main Floor, decorate your spot, meet us in the Blue
     <div id="wireStep1">
       <label for="wireName">Your name — it rides over your character</label>
       <input id="wireName" type="text" maxlength="18" placeholder="e.g. Alex" autocomplete="off">
-      <label>Pick your look — the office's own people style</label>
+      <label>Pick your look</label>
       <div class="wireLooks" id="wireLooks"></div>
       <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:11px"><label>Already have an office? Your Google account knows it</label><button class="gold" id="gateGoogleBtn" type="button" style="width:100%;padding:11px 0">Connect Google account — take me to my office</button><p class="wireNote" id="gateGoogleMsg" style="margin:7px 0 0">Sign in with the Google account your office is bound to and you land in YOUR office — crew, profile and all. New here? Just create your character above — your office is made fresh, and it is yours.</p></div>
     </div>
     <div id="wireStep2" style="display:none">
       <label for="wireBiz">Name your business — it goes on your office door</label>
-      <input id="wireBiz" type="text" maxlength="34" placeholder="e.g. Moore Media" autocomplete="off">
+      <input id="wireBiz" type="text" maxlength="34" placeholder="e.g. My Business" autocomplete="off">
       <p class="wireNote">Your office is this same building, with your business on the door and the sign. Connect it to the office that invited you and a doorway opens in the Lobby — walk through it to visit, walk back the same way.</p>
     </div>
     <div id="wireStep3" style="display:none">
@@ -1953,7 +2015,18 @@ function drawCubeFrame(x,z,big,name,key,gold){
  cubePanel(x-w/2+stubW/2,zF,stubW,'x',H,capCol);
  cubePanel(x+w/2-stubW/2,zF,stubW,'x',H,capCol);
  if(tier>=3){const q=proj(x,H+.16,zB);text('★',q[0],q[1],Math.min(13,cam.zoom*.3),'#b9975b','center',800)}
- if(name)floorText(name,x,zF-.24,gold?'rgba(146,110,52,.65)':'rgba(71,85,105,.55)')}
+ if(name){const plate=cubePlateText(name,key);if(plate)floorText(plate,x,zF-.24,gold?'rgba(146,110,52,.65)':'rgba(71,85,105,.55)')}}
+/* CUBICLE SIGNS — the painted plates carry the founding crew's names,
+   and in Craig's own office they stay exactly like that. In any other
+   office the same cubes belong to THAT office's people: a cube shows
+   the name of this office's own hire working that slot, and a cube
+   nobody there holds stays blank — never a borrowed name. */
+function cubePlateText(name,key){try{
+ if(!(window.__hqOfficeNeutral&&__hqOfficeNeutral()))return name;
+ if(typeof hires==='undefined'||!key)return null;
+ const slotFor={dex:'audit',sanaa:'highlights',rico:'clipper',milo:'gaming',tessa:'rankings'};const want=slotFor[key];if(!want)return null;
+ for(const id in hires){const r=hires[id]&&hires[id].rec;if(r&&r.slot===want)return String(r.name||'').toUpperCase()}
+ return null}catch(e){return name}}
 function cubicle(x,z,big,name,key,gold){return{x:x,z:z,draw(){drawCubeFrame(x,z,big,name,key,gold)}}}
 const BODY_R=.34;
 /* ===== NO-STUCK LAW — nobody ever jams, ever =====
@@ -3145,13 +3218,65 @@ tapBind(document.getElementById('panelCallMeeting'),toggleMeeting);
 /* ===== CHAT LOG (beside the minimap) — every line of office talk lands here:
    chat replies, order confirmations, huddle idea talk, job arrivals. ===== */
 const HQ_REMOVED_TALK=[];
-function logTalk(who,txt,cls){if(HQ_REMOVED_TALK.indexOf(String(who).toUpperCase())>=0)return;const body=document.getElementById('clBody');if(!body)return;const d=document.createElement('div');d.className='clLine '+(cls||'');const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);d.appendChild(document.createTextNode(txt));body.appendChild(d);while(body.children.length>36)body.removeChild(body.firstChild);body.scrollTop=body.scrollHeight;
+/* CENTRAL MOVEMENT-LINE FILTER — every "Moving now:" line and every
+   summon / Dex-movement line that reaches Office Talk or HQ Chat,
+   from ANY emitter, passes through here. In any office that is not
+   Craig's (__hqOfficeNeutral), such a line may name only that
+   office's own people: the owner (the CRAIG slot's local name) and
+   this office's hires. Craig and his crew are dropped from the
+   mover list; a line with nobody of this office left in it does
+   not print at all. Craig's own office: this returns the line
+   byte-identical, always. */
+function __hqMoveFilter(who,txt){
+ try{
+  if(typeof txt!=='string')return txt;
+  if(!(window.__hqOfficeNeutral&&__hqOfficeNeutral()))return txt;
+  var isMove=txt.indexOf('Moving now:')>=0;
+  var isSummon=txt.indexOf('On my way')===0||txt.indexOf('watchdog pass reroutes')>=0||txt.indexOf('Clipper desk \u2014 on my way')>=0;
+  if(!isMove&&!isSummon)return txt;
+  var own='';try{var W=window.__hqWire;var st=W&&W.state?W.state():null;var rec=st&&st.offices&&st.currentOffice?st.offices[st.currentOffice]:null;if(rec&&rec.ownerName)own=String(rec.ownerName).trim().split(/\s+/)[0]}catch(e){}
+  if(!own){try{var vp=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(vp&&vp.name)own=String(vp.name).trim().split(/\s+/)[0]}catch(e){}}
+  if(/^craig$/i.test(own))own='';
+  var hireSet={};try{var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){if(L[k]&&L[k].name)hireSet[String(L[k].name).trim().toUpperCase()]=String(L[k].name).trim().split(/\s+/)[0]})}catch(e){}
+  if(isSummon){
+   var wu=String(who||'').trim().toUpperCase();
+   if(wu==='HQ')return txt;
+   if(wu==='CRAIG')return own?txt:null;
+   if(own&&wu===own.toUpperCase())return txt;
+   return hireSet[wu]?txt:null;
+  }
+  var pre='Moving now:';var idx=txt.indexOf(pre);var rest=txt.slice(idx+pre.length);
+  var ai=rest.indexOf('\u2192');if(ai<0)return txt;
+  var namesPart=rest.slice(0,ai).trim();var destPart=rest.slice(ai+1).trim();
+  var names=namesPart.split(',').map(function(s){return s.trim()}).filter(Boolean);
+  var kept=[],allOwn=names.length>0;
+  names.forEach(function(n){if(/^craig$/i.test(n)){allOwn=false;if(own)kept.push(own)}
+   else if(own&&n.toUpperCase()===own.toUpperCase())kept.push(n);
+   else if(hireSet[n.toUpperCase()])kept.push(n);
+   else allOwn=false});
+  kept=kept.filter(function(v,i){return kept.indexOf(v)===i});
+  if(!kept.length)return null;
+  if(allOwn)return txt;
+  var destClean=destPart.split(' (')[0];
+  return 'Moving now: '+kept.join(', ')+' \u2192 '+destClean;
+ }catch(e){return txt}}
+function logTalk(who,txt,cls){if(HQ_REMOVED_TALK.indexOf(String(who).toUpperCase())>=0)return;
+ var __mf=__hqMoveFilter(who,txt);if(__mf===null)return;txt=__mf;
+ /* NON-OWNER OFFICE — the local player body rides in the "Craig" slot
+    of the shared engine, and its own action lines are labeled with
+    that name at several call sites. In any office that is not
+    Craig's, those lines speak under THIS office owner's own name —
+    the owner of Craig's office is never named in another office's
+    log. Craig's own office is untouched. */
+ if(/^craig$/i.test(String(who).trim())){try{if(window.__hqOfficeNeutral&&__hqOfficeNeutral()){var __vp=null;try{__vp=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+  var __fn=__vp&&__vp.name?String(__vp.name).trim().split(/\s+/)[0]:'';if(__fn&&!/^craig$/i.test(__fn))who=__fn}}catch(e){}}
+ const body=document.getElementById('clBody');if(!body)return;const d=document.createElement('div');d.className='clLine '+(cls||'');const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);d.appendChild(document.createTextNode(txt));body.appendChild(d);while(body.children.length>36)body.removeChild(body.firstChild);body.scrollTop=body.scrollHeight;
  /* DEX TALKS OUT LOUD — Office Talk is his talk-back channel: every line
     he puts here plays its recording in his real voice, "Satiny Moon"
     (the Dex module owns the audio; no recording = text only, never a
     device-voice substitute). Guarded: the module loads later. */
  if(cls!=='sys'&&String(who).trim().toUpperCase()==='DEX'&&typeof dexHeardLine==='function')dexHeardLine(txt)}
-function appendMsg(who,txt,me){if(typeof HQ_REMOVED_TALK!=='undefined'&&HQ_REMOVED_TALK.indexOf(String(who).toUpperCase())>=0)return;const d=document.createElement('div');d.className='msg'+(me?' me':'');const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);d.appendChild(document.createTextNode(txt));const l=document.getElementById('chatList');l.appendChild(d);l.scrollTop=l.scrollHeight;logTalk(who,txt,me?'me':'')}
+function appendMsg(who,txt,me){if(typeof HQ_REMOVED_TALK!=='undefined'&&HQ_REMOVED_TALK.indexOf(String(who).toUpperCase())>=0)return;var __mf2=__hqMoveFilter(who,txt);if(__mf2===null)return;txt=__mf2;const d=document.createElement('div');d.className='msg'+(me?' me':'');const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);d.appendChild(document.createTextNode(txt));const l=document.getElementById('chatList');l.appendChild(d);l.scrollTop=l.scrollHeight;logTalk(who,txt,me?'me':'')}
 /* Huddle talk ticker — the idea conversation, read in the log (not over heads).
    Rotates through whoever is actually in a huddle right now: department-mates
    in their huddle area, on-shift, not away on an order or a break. */
@@ -3164,7 +3289,7 @@ setInterval(()=>{if(document.hidden)return;const present=[];Object.keys(HUDDLES)
    canned line twice in a row — and a second agent can chime in. */
 const chatMem={pool:{}};
 function pickLine(pool,key){let i=Math.floor(Math.random()*pool.length);if(pool.length>1&&chatMem.pool[key]===i)i=(i+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;chatMem.pool[key]=i;return pool[i]}
-function typingThen(who,text,delay){if(typeof HQ_REMOVED_TALK!=='undefined'&&HQ_REMOVED_TALK.indexOf(String(who).toUpperCase())>=0)return;const l=document.getElementById('chatList');const d=document.createElement('div');d.className='msg';const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);const s=document.createElement('span');s.style.color='#94a3b8';s.textContent='typing…';d.appendChild(s);l.appendChild(d);l.scrollTop=l.scrollHeight;setTimeout(()=>{d.remove();appendMsg(who,text)},delay||750+Math.random()*550)}
+function typingThen(who,text,delay){if(typeof HQ_REMOVED_TALK!=='undefined'&&HQ_REMOVED_TALK.indexOf(String(who).toUpperCase())>=0)return;var __mf3=__hqMoveFilter(who,text);if(__mf3===null)return;text=__mf3;const l=document.getElementById('chatList');const d=document.createElement('div');d.className='msg';const b=document.createElement('b');b.textContent=who.toUpperCase();d.appendChild(b);const s=document.createElement('span');s.style.color='#94a3b8';s.textContent='typing…';d.appendChild(s);l.appendChild(d);l.scrollTop=l.scrollHeight;setTimeout(()=>{d.remove();appendMsg(who,text)},delay||750+Math.random()*550)}
 function onShiftAgents(){return AGENTS.filter(a=>shiftState(a)==='on')}
 /* ===== CHAT IS A COMMAND CHANNEL — Craig's word moves bodies =====
    Typed or spoken, an order is parsed the same way: WHO (everybody / a crew /
@@ -3304,7 +3429,28 @@ function executeCommand(cmd){
  const label=placeNames[cmd.place]||cmd.place;
  const movers=cmd.who.filter(nm=>{const k=NAME_KEYS[nm];if(!k)return true;const a=agentByKey(k);return a&&shiftState(a)==='on'});
  const offShift=cmd.who.filter(nm=>movers.indexOf(nm)<0&&NAME_KEYS[nm]);
+ /* NEUTRAL OFFICE SCRUB (computed up front, used by every movement
+    line below) — same law as the destination banner: in ANY office
+    that is not Craig's, movement lines (chat + Office Talk) name
+    only that office's own people. The CRAIG slot is the local
+    player body: here it is announced under THIS office's owner's
+    name. This office's hires keep their names. Everybody else —
+    Craig and his crew — is dropped from the line, and if nobody
+    of this office is moving, no movement line prints at all.
+    Craig's own office: the lines run exactly as they always have. */
+ const niceMV=n=>n.charAt(0)+n.slice(1).toLowerCase();
+ let neutralOffice=false;try{neutralOffice=!!(window.__hqOfficeNeutral&&__hqOfficeNeutral())}catch(e){}
+ let dispMovers=movers.map(niceMV),dispOff=offShift.map(niceMV);
+ if(neutralOffice){
+  let ownName='';try{const W=window.__hqWire;const st=W&&W.state?W.state():null;const rec=st&&st.offices&&st.currentOffice?st.offices[st.currentOffice]:null;if(rec&&rec.ownerName)ownName=String(rec.ownerName).trim().split(/\s+/)[0]}catch(e){}
+  if(!ownName){try{const vp=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(vp&&vp.name)ownName=String(vp.name).trim().split(/\s+/)[0]}catch(e){}}
+  if(/^craig$/i.test(ownName))ownName='';
+  const hireSet={};try{const L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(k=>{if(L[k]&&L[k].name)hireSet[String(L[k].name).trim().toUpperCase()]=true})}catch(e){}
+  const disp=nm=>nm==='CRAIG'?(ownName||null):(hireSet[nm]?niceMV(nm):null);
+  dispMovers=movers.map(disp).filter(Boolean);dispOff=offShift.map(disp).filter(Boolean);
+ }
  if(cmd.place==='desks'){cmd.who.forEach(nm=>{delete ORDER[nm]});if(meetingOn||(typeof gathering!=='undefined'&&gathering)){meetingOn=false;if(typeof clearGatheringState==='function')clearGatheringState();if(typeof syncGatherUI==='function')syncGatherUI()}else if(typeof updateModeUI==='function')updateModeUI();
+  if(neutralOffice&&!dispMovers.length)return;
   typingThen('HQ',pickLine(['You heard him \u2014 back to your desks, everybody. Desks are for the running work.','Copy \u2014 orders cleared, crews back to their sections and desks.'],'cmdDesks'));return}
  /* DISTINCT SLOTS LAW — every attendee gets their OWN verified spot:
     never inside furniture, never in a doorway, never the same tile as
@@ -3330,12 +3476,13 @@ function executeCommand(cmd){
  if(movers.length>=2){startGathering(cmd.place,label,movers.slice());if(gathering){gathering.t0=performance.now();if((cmd.caller||'CRAIG')==='CRAIG')gathering.craigLed=true}}
  if(cmd.place==='breakroom'&&typeof startRoomTV==='function')startRoomTV();
  if(typeof updateModeUI==='function')updateModeUI();
- const nice=n=>n.charAt(0)+n.slice(1).toLowerCase();
- const listStr=movers.map(nice).join(', ');
- if(movers.length===1&&NAME_KEYS[movers[0]]){const nm=movers[0];const SUMMON_LINES={DEX:'On my way to '+label+' — now. Watchdog moving: you called, I come.',SANAA:'On my way to '+label+' — now. Catalog can wait — you called, I\u2019m coming.',RICO:'On my way to '+label+' — now. Captain\u2019s moving — the clips hold till I\u2019m back.',MARCO:'On my way to '+label+' — now. Spike watch can spare me — coming.',DEV:'On my way to '+label+' — now. Timestamps hold — I\u2019m coming.',MILO:'On my way to '+label+' — now. Rig\u2019s paused — coming, Mr. Moore.',TESSA:'On my way to '+label+' — now. Rankings can wait a minute — coming.'};const sLine=SUMMON_LINES[nm]||('On my way to '+label+' — now. Your word, I move.');typingThen(nice(nm),sLine);try{logTalk(nice(nm),sLine)}catch(e){}return}
- if(movers.length>=8){typingThen('HQ','You heard him \u2014 everybody to '+label+', now. Watch the floor move.');if(movers.indexOf('DEX')>=0)typingThen('Dex','Moving \u2014 watchdog pass reroutes through '+label+'.',1750);return}
- if(movers.length&&movers.every(nm=>['RICO'].indexOf(nm)>=0)){typingThen('Rico','Clipper desk — on my way to '+label+', now.');return}
- const mvLine='Moving now: '+listStr+' \u2192 '+label+'.'+(offShift.length?' ('+offShift.map(nice).join(', ')+' on a later shift \u2014 they will get the word.)':'');typingThen('HQ',mvLine);try{logTalk('HQ',mvLine)}catch(e){}}
+ const nice=niceMV;
+ const listStr=dispMovers.join(', ');
+ if(movers.length===1&&NAME_KEYS[movers[0]]){const nm=movers[0];if(neutralOffice){if(dispMovers.length){const gLine='On my way to '+label+' — now. Your word, I move.';typingThen(dispMovers[0],gLine);try{logTalk(dispMovers[0],gLine)}catch(e){}}return}const SUMMON_LINES={DEX:'On my way to '+label+' — now. Watchdog moving: you called, I come.',SANAA:'On my way to '+label+' — now. Catalog can wait — you called, I\u2019m coming.',RICO:'On my way to '+label+' — now. Captain\u2019s moving — the clips hold till I\u2019m back.',MARCO:'On my way to '+label+' — now. Spike watch can spare me — coming.',DEV:'On my way to '+label+' — now. Timestamps hold — I\u2019m coming.',MILO:'On my way to '+label+' — now. Rig\u2019s paused — coming, Mr. Moore.',TESSA:'On my way to '+label+' — now. Rankings can wait a minute — coming.'};const sLine=SUMMON_LINES[nm]||('On my way to '+label+' — now. Your word, I move.');typingThen(nice(nm),sLine);try{logTalk(nice(nm),sLine)}catch(e){}return}
+ if(movers.length>=8&&!neutralOffice){typingThen('HQ','You heard him \u2014 everybody to '+label+', now. Watch the floor move.');if(movers.indexOf('DEX')>=0)typingThen('Dex','Moving \u2014 watchdog pass reroutes through '+label+'.',1750);return}
+ if(movers.length&&movers.every(nm=>['RICO'].indexOf(nm)>=0)&&!neutralOffice){typingThen('Rico','Clipper desk — on my way to '+label+', now.');return}
+ if(neutralOffice&&!dispMovers.length)return;
+ const mvLine='Moving now: '+listStr+' \u2192 '+label+'.'+(dispOff.length?' ('+dispOff.join(', ')+' on a later shift \u2014 they will get the word.)':'');typingThen('HQ',mvLine);try{logTalk('HQ',mvLine)}catch(e){}}
 function agentReply(v){
  /* END THE GATHERING — "meeting is over" / "meeting's over" / "end the
     meeting" and friends release ANY gathering Craig called, any room,
@@ -4098,23 +4245,79 @@ document.getElementById('bgFile').addEventListener('change',e=>{const f=e.target
 camBtn.onclick=async()=>{await toggleCam();applySelfView();if(camOn&&FX.mode!=='none')startFX();if(!camOn)stopFX()};
 /* ===== OFFICE MUSIC — the boss's own tracks, on the office loop ===== */
 const TRACKS=[{name:'Dusty Vinyl',dur:'2:42',src:'assets/music-dusty-vinyl.mp3'},{name:'This and That',dur:'2:12',src:'assets/music-this-and-that.mp3'},{name:'Almost There',dur:'2:27',src:'assets/music-almost-there.mp3'},{name:'AO',dur:'2:28',src:'assets/music-ao.mp3'}];
-const MUS={audio:null,idx:-1,vol:.6};
-function musAudio(){if(!MUS.audio){const a=new Audio();a.preload='auto';a.volume=MUS.vol;a.addEventListener('ended',()=>{if(MUS.idx>=0)musPlay((MUS.idx+1)%TRACKS.length)});a.addEventListener('play',()=>musState());a.addEventListener('pause',()=>musState());MUS.audio=a}return MUS.audio}
+/* EVERY room in the office, in the drawer — pulled from the office's
+   own places: the ROOMS registry, the ZONES, and the desk islands
+   (Merch Studio, Sales Desk, Anime Corner, Parking Lot). The cubicle
+   floor is ONE entry — Main Floor, the whole Desk Row, listed once.
+   ALL ROOMS sits on top of the drawer (its own button in the markup). */
+const MUSIC_ROOMS=[{id:'main',name:'Main Floor — The Cubicles'},{id:'planning',name:'Blueprint Room'},{id:'numbers',name:'Numbers Lab'},{id:'movie',name:'Movie Room'},{id:'lobby',name:'The Lobby'},{id:'couches',name:'Welcome Lounge'},{id:'meeting',name:'Meeting Room'},{id:'huddles',name:'Huddle Rooms'},{id:'merch',name:'Merch Studio'},{id:'sales',name:'Sales Desk'},{id:'library',name:'The Library'},{id:'brew',name:'Brew Lab'},{id:'tea',name:'Tea & Talk'},{id:'deep',name:'Deep Work Den'},{id:'lounge',name:'Lounge & Focus'},{id:'garden',name:'Koi Court'},{id:'anime',name:'Anime Corner'},{id:'game',name:'Game Room'},{id:'gaming',name:'Gaming Room'},{id:'parking',name:'Parking Lot'}];
+const MUS={audio:null,idx:-1,vol:.6,all:true,rooms:new Set(MUSIC_ROOMS.map(r=>r.id)),here:true,viewKey:''};
+/* The music map is saved PER OFFICE, in the app's own per-office
+   on-device store (same pattern as the hires door: the owner's office
+   uses the plain key, every other office gets its own suffixed key). */
+function musStoreKey(){try{var p=JSON.parse(localStorage.getItem('hqVisitor')||'null');var oid=p&&p.officeId;return(!oid||oid==='craig-hq')?'hqMusicRooms':'hqMusicRooms__'+oid}catch(e){return'hqMusicRooms'}}
+let musKey=musStoreKey();
+function musSave(){try{localStorage.setItem(musStoreKey(),JSON.stringify({all:!!MUS.all,rooms:Array.from(MUS.rooms)}))}catch(e){}}
+function musLoad(){musKey=musStoreKey();try{var s=JSON.parse(localStorage.getItem(musKey)||'null');if(s&&Array.isArray(s.rooms)){MUS.rooms=new Set(s.rooms.filter(id=>MUSIC_ROOMS.some(r=>r.id===id)));MUS.all=!!s.all||MUS.rooms.size===MUSIC_ROOMS.length;if(MUS.all)MUS.rooms=new Set(MUSIC_ROOMS.map(r=>r.id))}}catch(e){}}
+/* CAMERA-SCOPED AUDIBILITY — where is the camera looking right now?
+   Resolves the camera centre (cam.tx / cam.tz) to the set of music
+   rooms it is over: smallest tapped ROOM first, then its ZONE, then
+   the desk-island rects that live inside bigger zones. A room can
+   belong to a group too: Brew / Deep / Numbers / Tea / Blueprint are
+   also the Meeting Room + Huddle Rooms family. */
+function musViewIds(){const ids=new Set();try{
+ if(typeof lotOpening!=='undefined'&&lotOpening){ids.add('parking');return ids}
+ if(typeof currentZone!=='undefined'&&currentZone==='overview'){MUSIC_ROOMS.forEach(r=>ids.add(r.id));return ids}
+ const x=cam.tx,z=cam.tz;
+ let room=null,roomAr=1e18;ROOMS.forEach(r=>{if(x>=r.x1&&x<=r.x2&&z>=r.z1&&z<=r.z2){const ar=(r.x2-r.x1)*(r.z2-r.z1);if(ar<roomAr){roomAr=ar;room=r}}});
+ if(room){ids.add(room.id);if(room.id==='brew'||room.id==='deep'||room.id==='numbers'){ids.add('huddles');ids.add('meeting')}else if(room.id==='tea'||room.id==='planning'){ids.add('meeting')}else if(room.id==='couches'){ids.add('lobby')}}
+ const zn=zoneOfPoint(x,z);
+ if(zn&&zn!=='grounds'){ids.add(zn);if(zn==='huddles'||zn==='planning'||zn==='tea')ids.add('meeting')}
+ if(x>=-11.2&&x<=-5.4&&z>=5.2&&z<=8.8)ids.add('merch');
+ if(x>=4.2&&x<=11&&z>=7.4&&z<=9.6)ids.add('sales');
+ if(x>=6.8&&x<=10.2&&z>=-2&&z<=1.2)ids.add('anime');
+ if(x<-13.5||x<-13||x>22||z<-12||z>22)ids.add('parking');
+ }catch(e){} return ids}
+function musViewLabel(){try{if(typeof lotOpening!=='undefined'&&lotOpening)return'Parking Lot';if(typeof currentZone!=='undefined'&&currentZone==='overview')return'Overview — the whole office'}catch(e){} const ids=musViewIds();const order=['planning','numbers','brew','deep','tea','merch','sales','anime','movie','game','gaming','garden','library','lounge','couches','lobby','huddles','main','meeting','parking'];for(const id of order){if(ids.has(id)){const r=MUSIC_ROOMS.find(r2=>r2.id===id);if(r)return r.name}}return ids.size?'the corridor':'the corridor'}
+function musHere(){if(MUS.all||MUS.rooms.size===MUSIC_ROOMS.length)return true;const v=musViewIds();for(const id of v){if(MUS.rooms.has(id))return true}return false}
+/* Applies the scope to the LIVE audio element on the spot — volume
+   only, never a pause, restart or seek, so live room toggles and
+   camera moves bring the music in / stop it mid-track. */
+function musApplyAudibility(force){const here=musHere();const key=Array.from(musViewIds()).sort().join(',');const changed=here!==MUS.here||key!==MUS.viewKey;MUS.here=here;MUS.viewKey=key;if(MUS.audio&&musPlaying())MUS.audio.volume=here?MUS.vol:0;else if(MUS.audio&&MUS.idx>=0)MUS.audio.volume=here?MUS.vol:0;if(changed||force)musState();return here}
+function musAudio(){if(!MUS.audio){const a=new Audio();a.preload='auto';a.volume=MUS.vol;a.addEventListener('ended',()=>{if(MUS.idx>=0)musPlay((MUS.idx+1)%TRACKS.length)});a.addEventListener('play',()=>{musApplyAudibility(true)});a.addEventListener('pause',()=>musState());MUS.audio=a}return MUS.audio}
 function musPlaying(){return !!(MUS.audio&&!MUS.audio.paused&&MUS.idx>=0)}
-function musState(msg){const el=document.getElementById('musicState');const playing=musPlaying();
- if(el)el.textContent=msg||(playing?('Now playing: '+TRACKS[MUS.idx].name+' \u00b7 track '+(MUS.idx+1)+' of '+TRACKS.length+' \u00b7 volume '+Math.round(MUS.vol*100)+'%'):'Music is off.');
+function musRoomNames(){return MUSIC_ROOMS.filter(r=>MUS.rooms.has(r.id)).map(r=>r.name)}
+function musRoomsLabel(){if(MUS.all||MUS.rooms.size===MUSIC_ROOMS.length)return'All rooms';if(MUS.rooms.size===0)return'No rooms picked';if(MUS.rooms.size===1)return musRoomNames()[0];return MUS.rooms.size+' rooms'}
+function musRoomsDetail(){if(MUS.all||MUS.rooms.size===MUSIC_ROOMS.length)return'all rooms';if(MUS.rooms.size===0)return'no rooms — pick a room above';const n=musRoomNames();if(n.length<=3)return n.join(', ');return n.slice(0,3).join(', ')+' + '+(n.length-3)+' more'}
+function renderMusRooms(){const grid=document.getElementById('musicRoomsGrid');if(grid&&!grid.children.length){grid.innerHTML=MUSIC_ROOMS.map(r=>'<button class="mpRoom" type="button" data-room="'+r.id+'" aria-pressed="false"><span class="rkCheck">\u2713</span><span class="rkName">'+r.name+'</span></button>').join('');grid.querySelectorAll('.mpRoom').forEach(b=>b.onclick=()=>musToggleRoom(b.dataset.room))}
+ if(grid)grid.querySelectorAll('.mpRoom').forEach(b=>{const on=MUS.rooms.has(b.dataset.room);b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on)});
+ const allBtn=document.getElementById('musicRoomAll');if(allBtn){const allOn=MUS.all||MUS.rooms.size===MUSIC_ROOMS.length;allBtn.classList.toggle('sel',allOn);allBtn.setAttribute('aria-pressed',allOn)}
+ const sum=document.getElementById('musicRoomsSummary');if(sum)sum.textContent=musRoomsLabel();
+ const hint=document.getElementById('musicRoomsHint');if(hint){if(MUS.all||MUS.rooms.size===MUSIC_ROOMS.length)hint.innerHTML='Playing in <b>all rooms</b> — you hear it everywhere. Tap a room to play in just that room, then tap more to add them.';else if(MUS.rooms.size===0)hint.innerHTML='No rooms picked — the track plays but is <b>silent everywhere</b>. Tap a room and it comes in there, live.';else hint.innerHTML='Playing in <b>'+musRoomsDetail()+'</b> ('+MUS.rooms.size+' of '+MUSIC_ROOMS.length+'). You hear it only while your camera is over one of these rooms. Taps apply live, mid-track.'}}
+function musToggleRoom(id){if(MUS.all){MUS.all=false;MUS.rooms=new Set([id])}else if(MUS.rooms.has(id)){MUS.rooms.delete(id)}else{MUS.rooms.add(id);if(MUS.rooms.size===MUSIC_ROOMS.length)MUS.all=true}musSave();renderMusRooms();musApplyAudibility(true)}
+function musAllRooms(){MUS.all=true;MUS.rooms=new Set(MUSIC_ROOMS.map(r=>r.id));musSave();renderMusRooms();musApplyAudibility(true)}
+function musState(msg){const el=document.getElementById('musicState');const playing=musPlaying();const here=MUS.here;
+ if(el)el.textContent=msg||(playing?(here?('Now playing: '+TRACKS[MUS.idx].name+' \u00b7 track '+(MUS.idx+1)+' of '+TRACKS.length+' \u00b7 in '+musRoomsDetail()+' \u00b7 you are in '+musViewLabel()+' — music is ON here \u00b7 volume '+Math.round(MUS.vol*100)+'%'):('Playing: '+TRACKS[MUS.idx].name+' \u00b7 in '+musRoomsDetail()+' \u2014 but you are in '+musViewLabel()+', so it is SILENT here. Scroll into a lit room to hear it.')):('Music is off \u00b7 set to play in '+musRoomsDetail()+'.'));
  document.querySelectorAll('.mpMood[data-track]').forEach(b=>b.classList.toggle('sel',playing&&+b.dataset.track===MUS.idx));
- const mb=document.getElementById('musicBtn');if(mb)mb.classList.toggle('on',playing)}
-function musPlay(i){const a=musAudio();MUS.idx=i;a.src=TRACKS[i].src;a.volume=MUS.vol;const p=a.play();if(p&&p.catch)p.catch(()=>musState('That track could not start in this browser \u2014 music stays off here.'));musState()}
+ const mb=document.getElementById('musicBtn');if(mb){mb.classList.toggle('on',playing&&here);mb.classList.toggle('away',playing&&!here);mb.title=playing?(here?('Music on here — playing in '+musRoomsLabel()):('Playing in '+musRoomsLabel()+' — silent here ('+musViewLabel()+')')):'Office music'}
+ const pill=document.getElementById('musicHerePill');if(pill){if(playing){pill.classList.add('show');pill.classList.toggle('silent',!here);pill.innerHTML=here?('\u266a <b>'+TRACKS[MUS.idx].name+'</b> — music is ON here \u00b7 '+musViewLabel()):('\u266a <b>'+TRACKS[MUS.idx].name+'</b> — playing in '+musRoomsLabel()+' \u00b7 <b>silent here</b> ('+musViewLabel()+')')}else{pill.classList.remove('show');pill.innerHTML=''}}}
+function musPlay(i){const a=musAudio();MUS.idx=i;a.src=TRACKS[i].src;a.volume=MUS.vol;const p=a.play();if(p&&p.catch)p.catch(()=>musState('That track could not start in this browser \u2014 music stays off here.'));musApplyAudibility(true);musState()}
 function musStop(){if(MUS.audio)MUS.audio.pause();musState()}
 (function(){const btn=document.getElementById('musicBtn'),panel=document.getElementById('musicPanel');
- if(btn&&panel)btn.onclick=()=>{panel.classList.toggle('show');musState()};
+ if(btn&&panel)btn.onclick=()=>{if(musStoreKey()!==musKey){musLoad();renderMusRooms()}panel.classList.toggle('show');musApplyAudibility(true)};
  const cx=document.getElementById('musicClose');if(cx)cx.onclick=()=>panel.classList.remove('show');
  document.querySelectorAll('.mpMood[data-track]').forEach(b=>b.onclick=()=>musPlay(+b.dataset.track));
  const st=document.getElementById('musicStop');if(st)st.onclick=()=>musStop();
- const vol=document.getElementById('musicVol');if(vol)vol.addEventListener('input',()=>{MUS.vol=vol.value/100;const vv=document.getElementById('musicVolVal');if(vv)vv.textContent=vol.value+'%';if(MUS.audio)MUS.audio.volume=MUS.vol;if(musPlaying())musState()});
+ const vol=document.getElementById('musicVol');if(vol)vol.addEventListener('input',()=>{MUS.vol=vol.value/100;const vv=document.getElementById('musicVolVal');if(vv)vv.textContent=vol.value+'%';musApplyAudibility(true)});
+ const rBar=document.getElementById('musicRoomsBar'),rDrawer=document.getElementById('musicRoomsDrawer');
+ if(rBar&&rDrawer)rBar.onclick=()=>{const open=rDrawer.classList.toggle('open');rBar.classList.toggle('open',open);rBar.setAttribute('aria-expanded',open)};
+ const allBtn=document.getElementById('musicRoomAll');if(allBtn)allBtn.onclick=()=>musAllRooms();
+ musLoad();renderMusRooms();musState();
+ /* The scope check — runs for the life of the page, so panning,
+    zone travel and camera tweens move the sound with the camera. */
+ setInterval(()=>{if(MUS.idx>=0)musApplyAudibility(false)},200);
 })();
-window.__hqMusic={state:()=>({track:MUS.idx>=0?TRACKS[MUS.idx].name:null,index:MUS.idx,playing:musPlaying(),vol:MUS.vol,at:MUS.audio?Math.round(MUS.audio.currentTime):0}),play:musPlay,stop:musStop};
+window.__hqMusic={state:()=>({track:MUS.idx>=0?TRACKS[MUS.idx].name:null,index:MUS.idx,playing:musPlaying(),vol:MUS.vol,effectiveVol:MUS.audio?Math.round(MUS.audio.volume*100)/100:0,audibleHere:musPlaying()?MUS.here:null,here:MUS.here,viewLabel:musViewLabel(),viewRooms:Array.from(musViewIds()),at:MUS.audio?Math.round(MUS.audio.currentTime):0,rooms:musRoomNames(),allRooms:!!(MUS.all||MUS.rooms.size===MUSIC_ROOMS.length),roomsLabel:musRoomsLabel()}),play:musPlay,stop:musStop,rooms:()=>MUSIC_ROOMS.map(r=>({id:r.id,name:r.name,on:MUS.rooms.has(r.id)})),toggleRoom:(id)=>musToggleRoom(id),allRooms:musAllRooms,setRooms:(ids)=>{MUS.rooms=new Set((ids||[]).filter(id=>MUSIC_ROOMS.some(r=>r.id===id)));MUS.all=MUS.rooms.size===MUSIC_ROOMS.length;musSave();renderMusRooms();musApplyAudibility(true)},view:()=>({ids:Array.from(musViewIds()),label:musViewLabel(),here:musHere()})};
 window.__hqCam={fx:FX,setFxMode:setFxMode,displayStream:displayStream};
 /* ===== Activity toast — small white card: icon, bold title, one detail line, X. Nothing more. ===== */
 const toastEl=document.getElementById('toast'),toastIco=document.getElementById('toastIco'),toastTitle=document.getElementById('toastTitle'),toastDetail=document.getElementById('toastDetail');
@@ -4128,11 +4331,15 @@ function hideToast(){toastEl.classList.remove('show');document.body.classList.re
 document.getElementById('toastX').onclick=hideToast;
 /* Ambient office events — finished tasks only, spaced far apart, never back-to-back. */
 const AMBIENT=[['done','Highlight finished','Rico turned in a new cut at the Lab table.'],['done','Clips delivered','Rico finished a batch.'],['ok','Rankings updated','Tessa refreshed the rankings in the Numbers Lab.']];
+/* NEUTRAL AMBIENT — in any office that is not Craig's, the ambient
+   banners name only that office's own activity, never Craig or his
+   crew. Craig's office keeps the set above, word for word. */
+const AMBIENT_GENERIC=[['done','Highlight finished','A new cut was turned in at the Lab table.'],['done','Clips delivered','A finished batch was delivered.'],['ok','Rankings updated','The rankings board was refreshed in the Numbers Lab.']];
 let nextAmbientAt=performance.now()+60000;
-setInterval(()=>{const now=performance.now();if(toastEl.classList.contains('show')){if(now>=toastHideAt){toastEl.classList.remove('show');document.body.classList.remove('toastOn')}return}if(now<actBusyUntil||now<nextAmbientAt)return;const a=AMBIENT[actIdx++%AMBIENT.length];nextAmbientAt=now+90000;showActivity(a[0],a[1],a[2],4200)},1000);
+setInterval(()=>{const now=performance.now();if(toastEl.classList.contains('show')){if(now>=toastHideAt){toastEl.classList.remove('show');document.body.classList.remove('toastOn')}return}if(now<actBusyUntil||now<nextAmbientAt)return;const neutral=!!(window.__hqOfficeNeutral&&__hqOfficeNeutral());const list=neutral?AMBIENT_GENERIC:AMBIENT;const a=list[actIdx++%list.length];nextAmbientAt=now+90000;showActivity(a[0],a[1],a[2],4200)},1000);
 /* Follow Craig (right-rail, like the follow arrow in his shot) */
 let followCam=false;const followBtn=document.getElementById('followBtn');
-followBtn.onclick=()=>{followCam=!followCam;followBtn.classList.toggle('on',followCam);followBtn.setAttribute('aria-pressed',followCam);if(followCam&&craigObj){camTween=null;barNote('Following Craig — drag anywhere to take the camera back.',true)}};
+followBtn.onclick=()=>{followCam=!followCam;followBtn.classList.toggle('on',followCam);followBtn.setAttribute('aria-pressed',followCam);if(followCam&&craigObj){camTween=null;barNote('Following '+((typeof PEOPLE!=='undefined'&&PEOPLE.craig&&PEOPLE.craig.full)||'Craig')+' — drag anywhere to take the camera back.',true)}};
 cv.addEventListener('pointerdown',()=>{if(followCam){followCam=false;followBtn.classList.remove('on');followBtn.setAttribute('aria-pressed','false')} },true);
 /* ===== FULL-SCREEN MAP — far zoom-out simplifies the office into a floor plan =====
    Same data as the minimap (zones, rooms, live positions), drawn big: plain labeled
@@ -4900,8 +5107,16 @@ var hires={},arriveSeq=0,salesSpaceSeq=0;
 var arrivedSet={};try{(JSON.parse(localStorage.getItem('hqHiresArrived')||'[]')).forEach(function(id){arrivedSet[id]=true})}catch(e){}
 function saveArrived(){try{localStorage.setItem('hqHiresArrived',JSON.stringify(Object.keys(arrivedSet)))}catch(e){}}
 function slug(nm){var s=String(nm||'hire').toLowerCase().replace(/[^a-z0-9]+/g,'');return s||'hire'}
+/* NEUTRAL LOOK WORDS → LOOK KEYS — hire cards and the chat hire line
+   name looks by their neutral descriptions (the words the entrance
+   picker and the connection-card template use), never by a person's
+   name. This resolves those descriptions back to the internal look
+   keys the sprites key off; a card that still carries a plain look
+   key resolves to itself. */
+var NEUTRAL_LOOKS={redcapgreentop:'rico',bluecapbluetop:'marco',darkhairpinktop:'dev',topbunambertop:'sanaa',darkhairblacktop:'dex',spikyhairslatetop:'milo',bunredtop:'tessa',fadebeardcharcoaltop:'craig'};
+function resolveLook(l){var raw=String(l||'').toLowerCase().trim();if(LOOK_OUTFIT[raw])return raw;var s=slug(raw);if(LOOK_OUTFIT[s])return s;return NEUTRAL_LOOKS[s]||raw}
 function linesFor(rec){if(LINES[rec.slot])return LINES[rec.slot];var r=(' '+(rec.role||'').toLowerCase()+' ');if(/clip/.test(r))return LINES.clipper;if(/catalog|show|movie|title/.test(r))return LINES.highlights;if(/watch|health|check/.test(r))return LINES.audit;if(/game|test|joust|bug/.test(r))return LINES.gaming;return LINES.generic}
-function cfgFor(id,rec){var look=(rec.look||'dev').toLowerCase();if(!LOOK_OUTFIT[look])look='dev';var NAME=String(rec.name||'Hire').toUpperCase();
+function cfgFor(id,rec){var look=resolveLook(rec.look||'dev');if(!LOOK_OUTFIT[look])look='dev';var NAME=String(rec.name||'Hire').toUpperCase();
  var nmk=slug(rec.name);if(look!==id||nmk!==id){var tries=0;var al=setInterval(function(){tries++;['stand','back','head','front'].forEach(function(k){var src=SPRITES[look+'-'+k];if(!src)return;if(!SPRITES[id+'-'+k])SPRITES[id+'-'+k]=src;if(nmk&&nmk!==id&&!SPRITES[nmk+'-'+k])SPRITES[nmk+'-'+k]=src});if(SPRITES[id+'-stand']||tries>24)clearInterval(al)},400)}
  return{name:NAME,outfit:LOOK_OUTFIT[look]||'#334155',pants:'#1e293b',skin:'#c68642',label:LOOK_LABEL[look]||'#334155',ph:0.6+(id.length%7)*0.8,bubble:linesFor(rec)[0]}}
 function peopleCount(){var h=document.querySelector('.fsec[data-sec="people"] h3');if(h)h.textContent='PEOPLE · '+(1+Object.keys(hires).length)+' IN HQ'}
@@ -5042,7 +5257,7 @@ function acceptHireCard(v,echo){
  var want='';try{want=(window.__hqLinkKey&&__hqLinkKey.get)?__hqLinkKey.get(officeId()):''}catch(e){}
  if(!nm){logTalk('HQ','That hire card has no Name on it \u2014 nobody was added. A hire card needs a Name, a Role, a Look, a Voice and this office\u2019s link key.','sys');return true}
  if(!want||!key||key!==want){logTalk('HQ','Hire card rejected \u2014 its link key does not match this office, so nobody was added. A card only lands in the one office whose key it carries.','sys');return true}
- var rec={name:nm,role:role||'New hire',slot:slotFromRole(role),look:slug(look||'dev'),voice:voice||''};
+ var rec={name:nm,role:role||'New hire',slot:slotFromRole(role),look:resolveLook(look||'dev'),voice:voice||''};
  doorWrite(slug(nm),rec);
  try{if(window.__hqLinkKey&&__hqLinkKey.markConnected)__hqLinkKey.markConnected(officeId(),'hire-card')}catch(e){}
  logTalk('HQ','Hire card accepted \u2014 '+nm+' is on this office\u2019s list'+(voice?(', voice: '+voice):'')+'. Watch the lot.','sys');
@@ -5061,7 +5276,7 @@ sendChat=function(){
  if(acceptHireCard(v,true)){if(inp)inp.value='';return}
  var hm=v.match(/^hire\s+(.+)$/i),fm=v.match(/^(?:unhire|remove hire)\s+(.+)$/i);
  if(hm){var parts=hm[1].split(/\s*[·|]\s*|\s*,\s*/);var nm=(parts[0]||'').trim();
-  if(nm){var rec={name:nm,role:(parts[1]||'New hire').trim()||'New hire',slot:slug(parts[2]||'library'),look:slug(parts[3]||'dev')};
+  if(nm){var rec={name:nm,role:(parts[1]||'New hire').trim()||'New hire',slot:slug(parts[2]||'library'),look:resolveLook(parts.length>4?parts.slice(3).join(' · '):(parts[3]||'dev'))};
    doorWrite(slug(nm),rec);if(inp)inp.value='';appendMsg('Craig',v,true);
    logTalk('HQ','Hiring '+nm+' — the record is on the office list. Watch the lot.','sys');return}}
  if(fm){var id2=slug(fm[1].trim());if(hires[id2]){doorRemove(id2);if(inp)inp.value='';appendMsg('Craig',v,true);return}}
@@ -5489,7 +5704,13 @@ var currentOffice=OWNER_OFFICE, pendingVisit=null, welcomeBack=false;
 var LOOK_KEYS=['rico','milo','craig','dex','sanaa','marco','dev'];
 var LOOK_EXTRA={rico:{name:'RICO',hair:'capRed',outfit:'#059669',pants:'#064e3b',skin:'#e8b88a',label:'#065f46',ph:.7},milo:{name:'MILO',hair:'spiky',outfit:'#475569',pants:'#1e293b',skin:'#f0c8a0',label:'#334155',ph:4.9}};
 function lookCfg(k){if(PEOPLE[k])return PEOPLE[k];if(LOOK_EXTRA[k])return LOOK_EXTRA[k];var a=agentByKey(k);return a?a.cfg:null}
-function lookLabel(k){var c=lookCfg(k);return c?c.name.charAt(0)+c.name.slice(1).toLowerCase():k}
+/* NEUTRAL LOOK LABELS — the entrance picker names the LOOK, never a
+   person: the same eight styles, described by what they look like.
+   The internal look keys stay exactly as they are (sprites, saved
+   profiles and hire records all key off them); only the words a
+   visitor reads are neutral. */
+var LOOK_LABELS={rico:'Red cap · green top',milo:'Spiky hair · slate top',craig:'Fade & beard · charcoal top',dex:'Dark hair · black top',sanaa:'Top bun · amber top',marco:'Blue cap · blue top',dev:'Dark hair · pink top',tessa:'Bun · red top'};
+function lookLabel(k){return LOOK_LABELS[k]||'Classic look'}
 /* ---------- office registry + links (local store; live store mirrors it) ---------- */
 var Store={offices:{},links:{}};
 function saveLocal(){try{localStorage.setItem('hqWireOffices',JSON.stringify(Store.offices));localStorage.setItem('hqWireLinks',JSON.stringify(Store.links))}catch(e){}}
@@ -5600,9 +5821,10 @@ function gateShowStep(){[1,2,3].forEach(function(i){var el=$('wireStep'+i);if(el
  $('wireBack').style.display=gateStep>1?'':'none';
  $('wireGateTitle').textContent=gateStep===1?'Create your character':gateStep===2?'Name your business':'Your office is ready';
  $('wireNext').textContent=gateStep===1?'Next — name your business':gateStep===2?'Next — review':'Create my office'}
-function openGate(preview){gatePreview=!!preview;gateStep=1;gateLook=null;buildLooks();var w=$('wireLooks');if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.remove('sel')});
- $('wireGateX').style.display=gatePreview?'':'none';gateMsg('');gateShowStep();$('wireGate').classList.add('show')}
-function closeGate(){$('wireGate').classList.remove('show')}
+function openGate(preview){if(!preview&&window.__hqSavedPlayerEarly){closeGate();return} /* the entrance is for strangers only — a device with a saved player is never gated, whoever asks */
+ gatePreview=!!preview;gateStep=1;gateLook=null;buildLooks();var w=$('wireLooks');if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.remove('sel')});
+ $('wireGateX').style.display=gatePreview?'':'none';gateMsg('');gateShowStep();var g=$('wireGate');g.classList.add('show');g.classList.toggle('hqPreviewOK',!!preview)}
+function closeGate(){var g=$('wireGate');g.classList.remove('show');g.classList.remove('hqPreviewOK')}
 function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value.trim();
  var oid='ofc-'+rnd(6);profile={id:'u-'+rnd(8),name:name,business:biz,look:gateLook,officeId:oid,createdAt:Date.now()};uid=profile.id;
  try{localStorage.setItem('hqVisitor',JSON.stringify(profile))}catch(e){}
@@ -5612,6 +5834,7 @@ function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value
  sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
  reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
  document.body.classList.remove('noPlayer'); /* entrance lock lifts — this device now has its OWN player and its OWN office */
+ try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning')}catch(e){}
  closeGate();
  var target=pendingVisit||oid;if(pendingVisit&&pendingVisit!==oid)linkOffices(oid,pendingVisit);
  pendingVisit=null;enterOffice(target,{teleport:true});
@@ -5619,7 +5842,7 @@ function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value
  barNote('Your office is open: '+biz+'. The doorway in your Lobby connects it to the office that invited you.',true);renderWireUI()}
 function linkOffices(a,b){if(!a||!b||a===b)return;BACK.putLink(a,b);renderWireUI()}
 $('wireNext').onclick=function(){
- if(gateStep===1){var nm=$('wireName').value.trim();if(nm.length<2){gateMsg('Give your character a name first — two letters or more.');return} if(!gateLook){gateMsg('Pick a look — tap one of the people above.');return} gateMsg('');gateStep=2;gateShowStep();var bz=$('wireBiz');if(bz)setTimeout(function(){bz.focus()},60);return}
+ if(gateStep===1){var nm=$('wireName').value.trim();if(nm.length<2){gateMsg('Give your character a name first — two letters or more.');return} if(!gateLook){gateMsg('Pick a look — tap one of the looks above.');return} gateMsg('');gateStep=2;gateShowStep();var bz=$('wireBiz');if(bz)setTimeout(function(){bz.focus()},60);return}
  if(gateStep===2){var b2=$('wireBiz').value.trim();if(b2.length<2){gateMsg('Name your business — that name goes on your office door.');return} gateMsg('');
   $('wireReview').innerHTML='You are <b>'+esc($('wireName').value.trim())+'</b> · your look: <b>'+esc(lookLabel(gateLook))+'</b><br>Your business: <b>'+esc(b2)+'</b><br>Your office: this same building, <b>'+esc(b2)+'</b> on the door — connected by invite, doorway in the Lobby.';
   gateStep=3;gateShowStep();return}
@@ -5754,7 +5977,7 @@ function markAiConnected(oid,via){var rec=Store.offices[oid];if(!rec)return;
 window.__hqLinkKey={get:function(oid){return linkKeyFor(oid)},markConnected:function(oid,via){markAiConnected(oid,via||'hire-card')}};
 function connectionCard(){var rec=myOfficeRec();var oid=myHomeId();var key=ensureLinkKey(oid,false);
  var biz=rec?(rec.business||rec.name||oid):oid;var owner=rec?(rec.ownerName||''):((profile&&profile.name)||'');
- return 'You are connecting to my office in Agent Office (AO).\n\nOffice: '+biz+'\nOwner: '+owner+'\nOffice link: '+OFFICE_URL+'\nOffice Link Key: '+key+'\n\nWhen I ask you to add a person to my office, answer with exactly one hire card in this format, and nothing else around it:\n\nHIRE CARD\nOffice: '+biz+'\nName: <the person\u2019s name>\nRole: <their job in the office>\nLook: <one of: rico, marco, dev, sanaa, dex, milo, tessa, craig>\nVoice: <a voice name or a short voice description>\nLink key: '+key+'\n\nI paste that card into my office and the person is added to THIS office only. The link key is private \u2014 it proves the card belongs to my office. A card carrying any other key is rejected. Never share this key with anyone else.'}
+ return 'You are connecting to my office in Agent Office (AO).\n\nOffice: '+biz+'\nOwner: '+owner+'\nOffice link: '+OFFICE_URL+'\nOffice Link Key: '+key+'\n\nWhen I ask you to add a person to my office, answer with exactly one hire card in this format, and nothing else around it:\n\nHIRE CARD\nOffice: '+biz+'\nName: <the person\u2019s name>\nRole: <their job in the office>\nLook: <one of: Red cap · green top, Blue cap · blue top, Dark hair · pink top, Top bun · amber top, Dark hair · black top, Spiky hair · slate top, Bun · red top, Fade & beard · charcoal top>\nVoice: <a voice name or a short voice description>\nLink key: '+key+'\n\nI paste that card into my office and the person is added to THIS office only. The link key is private \u2014 it proves the card belongs to my office. A card carrying any other key is rejected. Never share this key with anyone else.'}
 function renderConnectUI(){
  var gs=$('googleState');if(gs)gs.innerHTML=authUser?('Google account: <b>'+esc(authUser.email)+'</b> \u2014 connected. Any device signed in with this account opens the office bound to it.'):('Google account: <b>Not connected</b>');
  var gb=$('googleBtn');if(gb)gb.style.display=authUser?'none':'';
@@ -5771,6 +5994,7 @@ function adoptOffice(oid,user,tries){var rec=Store.offices[oid];
  rec=rec||{id:oid,business:'Your office',ownerName:(user&&user.displayName)||'Owner',look:'craig'};
  profile={id:uid,name:rec.ownerName||(user&&user.displayName)||'Owner',business:rec.business||'',look:rec.look||'craig',officeId:oid,createdAt:Date.now(),email:user?user.email:''};
  try{localStorage.setItem('hqVisitor',JSON.stringify(profile))}catch(e){}
+ try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning')}catch(e){} /* this device has its player now — the entrance never opens on it again */
  sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
  reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
  try{closeGate()}catch(e){}
@@ -5785,22 +6009,51 @@ function resolveAccount(user){if(!user||!user.email)return;
    try{logTalk('HQ','Google connected \u2014 '+user.email+' is now bound to your office ('+(Store.offices[profile.officeId]?Store.offices[profile.officeId].business:profile.officeId)+'). Sign in with it on any device and this office opens.','sys')}catch(e){}
    return}
   openGate(false);var m=$('gateGoogleMsg');if(m)m.textContent='Signed in as '+user.email+' \u2014 now create your character and your office below; this account will own it.'})}
+/* Plain-words sign-in reporting: whatever Google/Firebase answers —
+   success, refusal or silence — is said HERE, on the entrance screen
+   (and in Settings), in plain words. The person is never stranded on
+   a dead error page. The note is kept in sessionStorage so it
+   survives the redirect round-trip and is still on the entrance when
+   they land back. */
+function authSay(t){var g=$('gateGoogleMsg');if(g)g.textContent=t;var m=$('googleMsg');if(m)m.textContent=t;try{if(t)sessionStorage.setItem('hqAuthNote',t);else sessionStorage.removeItem('hqAuthNote')}catch(e){}}
+function authFail(err){var code=err&&err.code?String(err.code):'';var raw=err&&err.message?String(err.message):'';
+ if(code.indexOf('unauthorized-domain')>=0)authSay('Google refused the sign-in: this app\u2019s web address is not on the approved list for Google sign-in yet \u2014 Firebase calls that an unauthorized domain. Your account is fine, and nothing here is broken: once this address is added to the authorized domains in the Firebase console, this same button takes you straight to your office.');
+ else if(code.indexOf('operation-not-allowed')>=0)authSay('Google sign-in is not switched on for this app yet \u2014 the Google provider still needs enabling in the Firebase console. Once it is on, this same button takes you straight to your office.');
+ else if(code.indexOf('network-request-failed')>=0)authSay('Google sign-in could not get through \u2014 the network dropped it. Check your connection and tap Connect again.');
+ else if(code.indexOf('invalid-api-key')>=0||code.indexOf('api-key-not-valid')>=0)authSay('Google sign-in could not start: the app\u2019s Firebase key was rejected ('+(raw||code)+').');
+ else authSay('Google sign-in did not finish: '+(raw||code||'something interrupted it')+' \u2014 you are still right here on the entrance; tap Connect to try again.')}
 function authBoot(){if(authTried)return;authTried=true;
  var start=function(){try{if(typeof firebase==='undefined'||!firebase.auth)return;
    var app=null;try{app=firebase.app('authDoor')}catch(e){try{app=firebase.initializeApp(WIRE_FIREBASE_CONFIG,'authDoor')}catch(e2){}}
    if(!app)return;authInst=app.auth?app.auth():null;if(!authInst)return;
-   try{var rr=authInst.getRedirectResult();if(rr&&rr.catch)rr.catch(function(){})}catch(e){}
-   authInst.onAuthStateChanged(function(u){authUser=u||null;renderConnectUI();if(u)resolveAccount(u)});
+   /* a note left from before the redirect (or a failed attempt) goes
+      straight back onto the entrance the moment we are home */
+   try{var n0=sessionStorage.getItem('hqAuthNote');if(n0){var g0=$('gateGoogleMsg');if(g0)g0.textContent=n0;var m0=$('googleMsg');if(m0)m0.textContent=n0}}catch(e){}
+   /* THE REDIRECT RETURN — sign-in is a full trip to Google and back;
+      its result, or its refusal, is read here and spoken here */
+   try{var rr=authInst.getRedirectResult();
+    if(rr&&rr.then)rr.then(function(res){var tried=false;try{tried=sessionStorage.getItem('hqAuthTry')==='1';sessionStorage.removeItem('hqAuthTry')}catch(e){}
+     if(res&&res.user){var g1=$('gateGoogleMsg');if(g1)g1.textContent='Signed in as '+res.user.email+' \u2014 taking you to your office\u2026';var m1=$('googleMsg');if(m1)m1.textContent='Signed in as '+res.user.email+' \u2014 taking you to your office\u2026'}
+     else if(tried){authSay('Google sign-in came back without an account \u2014 nothing was connected. Tap Connect and pick the Google account your office is bound to.')}
+    }).catch(function(err){try{sessionStorage.removeItem('hqAuthTry')}catch(e){} authFail(err)})}catch(e){}
+   authInst.onAuthStateChanged(function(u){authUser=u||null;if(u){try{sessionStorage.removeItem('hqAuthNote')}catch(e){}} renderConnectUI();if(u)resolveAccount(u)});
   }catch(e){}};
  if(typeof firebase!=='undefined'&&firebase.auth){start();return}
  loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js').then(function(){return loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js')}).then(start).catch(function(){})}
-function googleSignIn(){var msg=function(t){var m=$('googleMsg');if(m)m.textContent=t;var g=$('gateGoogleMsg');if(g)g.textContent=t};
+function googleSignIn(){var msg=function(t){authSay(t)};
  var go=function(){if(!authInst){msg('Google sign-in could not start here \u2014 it needs the live connection. Check the network and try again.');return}
   try{var prov=new firebase.auth.GoogleAuthProvider();
-   authInst.signInWithPopup(prov).catch(function(err){var code=err&&err.code?String(err.code):'';
-    if(code.indexOf('popup-blocked')>=0||code.indexOf('popup-closed')>=0||code.indexOf('cancelled-popup')>=0){msg('The sign-in popup was blocked \u2014 taking you to Google sign-in instead\u2026');try{authInst.signInWithRedirect(prov)}catch(e){msg('Google sign-in did not start: '+(err&&err.message?err.message:code))}}
-    else msg('Google sign-in did not finish: '+(err&&err.message?err.message:code))});
-  }catch(e){msg('Google sign-in did not start on this device.')}};
+   /* THE REDIRECT FLOW — the popup flow is what stranded people on
+      Firebase's dead "The requested action is invalid" page inside
+      phone webviews. The redirect takes the whole page to the real
+      Google sign-in and brings it back here, where authBoot reads
+      the result: success lands the person in THEIR office, and any
+      refusal is spoken in plain words on this screen. */
+   try{sessionStorage.setItem('hqAuthTry','1')}catch(e){}
+   msg('Taking you to Google sign-in\u2026');
+   var rp=authInst.signInWithRedirect(prov);
+   if(rp&&rp.catch)rp.catch(function(err){try{sessionStorage.removeItem('hqAuthTry')}catch(e){} authFail(err)});
+  }catch(e){try{sessionStorage.removeItem('hqAuthTry')}catch(e){} authFail(e)}};
  if(authInst){go();return}
  authBoot();var n=0;var iv=setInterval(function(){n++;if(authInst){clearInterval(iv);go()}else if(n>16){clearInterval(iv);msg('Google sign-in needs the live wire \u2014 it turns on with the same Firebase connection as the rest of the office, and it is not reachable from here right now.')}},500)}
 (function wireConnectUI(){
@@ -8142,16 +8395,32 @@ function freshOffice(){try{var prof=null;try{prof=JSON.parse(localStorage.getIte
  if(nm==='craig'||nm==='craig moore'||nm==='mr. moore'||nm==='mr moore'||bz.indexOf('vibez')>=0)return false;
  return true}catch(e){return false}}
 window.__hqFreshOffice=freshOffice;
+/* NEUTRAL OFFICE — the office on screen right now is NOT Craig's:
+   either this device's saved player owns a different office, or the
+   viewer is standing in a connected office that isn't his. Shared
+   surfaces (ambient banners, painted cubicle signs) key off this:
+   neutral there, untouched in Craig's own office. */
+window.__hqOfficeNeutral=function(){try{var W=window.__hqWire;if(W&&W.state){var st=W.state();if(st&&st.currentOffice)return st.currentOffice!=='craig-hq'}return freshOffice()}catch(e){return false}};
 function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function freshPass(){
+ /* Destination banner scrub runs in ANY office that is not Craig's —
+    a fresh owner's office OR a connected office being visited: its
+    resting line must never name Craig (or any other owner). The
+    walker line is set live by showDestLabel from this office's own
+    player; the resting text stays neutral. */
+ try{var neutralOffice=false;try{neutralOffice=!!(window.__hqOfficeNeutral&&__hqOfficeNeutral())}catch(e){}
+  if(neutralOffice||freshOffice()){var ds0=document.getElementById('destSub');if(ds0&&/craig/i.test(ds0.textContent))ds0.textContent='Walking there'}}catch(e){}
  if(!freshOffice())return;
  try{
+  /* Destination pill — its resting line names the walker, and here
+     the walker is this office's owner, never Craig */
+  var ds=document.getElementById('destSub');if(ds&&ds.textContent==='Craig is walking there')ds.textContent='Walking there';
   /* People panel — the workers here are hired by YOU, and the way in is visible */
   var sec=document.querySelector('.fsec[data-sec="people"]');
   if(sec){sec.querySelectorAll('h3').forEach(function(h){if(h.textContent.indexOf('HIRED BY CRAIG')>=0)h.textContent='WORKERS — HIRED BY YOU'});
    if(!document.getElementById('freshHireCard')){var rows=document.getElementById('hireRows');
     if(rows){var card=document.createElement('div');card.className='item';card.id='freshHireCard';
-     card.innerHTML='<b>Your office starts empty — no crew is assigned to you.</b><br><span style="color:#64748b">Add people one by one, the same way this office was built by its first owner: in Chat, type <b>hire Name · Role · slot · look</b> — for example <b>hire Alex · Editor · library · dev</b>. Slots: clipper · highlights · audit · gaming · rankings · events · anime · library · lobby · sales · merch. Looks: rico · marco · dev · sanaa · dex · milo · tessa · craig. Every person you add is saved to <b>your office only</b> and arrives through the front door.</span>';
+     card.innerHTML='<b>Your office starts empty — no crew is assigned to you.</b><br><span style="color:#64748b">Add people one by one, the same way this office was built by its first owner: in Chat, type <b>hire Name · Role · slot · look</b> — for example <b>hire Alex · Editor · library · Dark hair · pink top</b>. Slots: clipper · highlights · audit · gaming · rankings · events · anime · library · lobby · sales · merch. Looks: Red cap · green top, Blue cap · blue top, Dark hair · pink top, Top bun · amber top, Dark hair · black top, Spiky hair · slate top, Bun · red top, Fade &amp; beard · charcoal top. Every person you add is saved to <b>your office only</b> and arrives through the front door.</span>';
      rows.parentNode.insertBefore(card,rows)}}}
   /* Guide — no borrowed crew lists: your hires, or an honest empty */
   var mine=[];try{var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine.push(L[k])})}catch(e){}
@@ -8170,7 +8439,7 @@ function personalize(){
  try{
   var W=window.__hqWire;if(!W||!W.state)return;
   var st=W.state();if(!st.profile||!st.sessionActive)return;
-  document.body.classList.remove('noPlayer'); /* a saved player in their own session is never entrance-locked */
+  document.body.classList.remove('noPlayer');try{document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning')}catch(e){} /* a saved player in their own session is never entrance-locked */
   var prof=st.profile;
   var ownerId=null;var offs=st.offices||{};Object.keys(offs).forEach(function(id){if(offs[id]&&offs[id].code==='VIBEZ1')ownerId=id});
   if(ownerId&&prof.officeId===ownerId)return; /* the owner's own office — his Guide is his */
@@ -8282,7 +8551,7 @@ function buildMsg(){var f=officeFacts();
  var base='';try{if(window.__hqConnect&&__hqConnect.card)base=__hqConnect.card()}catch(e){}
  if(base&&base.indexOf('Office Link Key')>=0){
   return base.replace('\n\nWhen I ask','\nOffice code: '+f.code+'\nEngine: '+curEng+'\n\nWhen I ask')}
- return 'OFFICE CONNECTION CARD\nOffice: '+f.biz+'\nOffice code: '+f.code+'\nOwner: '+(f.name||'Owner')+'\nEngine: '+curEng+'\n\nYou are the AI engine for MY office — when I talk to you about my office, this is the office I mean.\n\nWhen I ask you to add a person to my office, answer with exactly one hire card:\n\nHIRE CARD\nOffice: '+f.biz+'\nName: <the person\u2019s name>\nRole: <their job in the office>\nLook: <one of: rico, marco, dev, sanaa, dex, milo, tessa, craig>\n\nI paste that card into my office and the person is added to THIS office only. One person at a time — I add my crew myself, nobody is pre-assigned.'}
+ return 'OFFICE CONNECTION CARD\nOffice: '+f.biz+'\nOffice code: '+f.code+'\nOwner: '+(f.name||'Owner')+'\nEngine: '+curEng+'\n\nYou are the AI engine for MY office — when I talk to you about my office, this is the office I mean.\n\nWhen I ask you to add a person to my office, answer with exactly one hire card:\n\nHIRE CARD\nOffice: '+f.biz+'\nName: <the person\u2019s name>\nRole: <their job in the office>\nLook: <one of: Red cap · green top, Blue cap · blue top, Dark hair · pink top, Top bun · amber top, Dark hair · black top, Spiky hair · slate top, Bun · red top, Fade & beard · charcoal top>\n\nI paste that card into my office and the person is added to THIS office only. One person at a time — I add my crew myself, nobody is pre-assigned.'}
 function showStep(n){curStep=n;
  document.querySelectorAll('.museStep').forEach(function(s){s.classList.toggle('on',String(n)===s.dataset.mstep||(n==='done'&&s.dataset.mstep==='done'))});
  var bar=$('museSteps');if(bar){var idx=n==='done'?3:n;[].forEach.call(bar.children,function(d,i){d.className=i<idx?'on':''})}}
@@ -8336,6 +8605,7 @@ $('museDoneBtn').onclick=closeConnect;
 /* ---------- add-a-person form (fresh offices, one by one) ---------- */
 var SLOTS=['clipper','highlights','audit','gaming','rankings','events','anime','library','lobby','sales','merch'];
 var LOOKS=['rico','marco','dev','sanaa','dex','milo','tessa','craig'];
+var LOOK_WORDS={rico:'Red cap · green top',marco:'Blue cap · blue top',dev:'Dark hair · pink top',sanaa:'Top bun · amber top',dex:'Dark hair · black top',milo:'Spiky hair · slate top',tessa:'Bun · red top',craig:'Fade & beard · charcoal top'};
 function hireFormPass(){
  if(!isFresh())return;
  if(document.getElementById('hireFormCard'))return;
@@ -8345,7 +8615,7 @@ function hireFormPass(){
  +'<label for="hfName">Name</label><input id="hfName" type="text" maxlength="18" placeholder="e.g. Alex" autocomplete="off">'
  +'<label for="hfRole">Role — what they do</label><input id="hfRole" type="text" maxlength="60" placeholder="e.g. Clipper — watches live streams and cuts clips" autocomplete="off">'
  +'<label for="hfSlot">Slot — where they work</label><select id="hfSlot">'+SLOTS.map(function(s){return '<option value="'+s+'">'+s+'</option>'}).join('')+'</select>'
- +'<label for="hfLook">Look</label><select id="hfLook">'+LOOKS.map(function(s){return '<option value="'+s+'">'+s+'</option>'}).join('')+'</select>'
+ +'<label for="hfLook">Look</label><select id="hfLook">'+LOOKS.map(function(s){return '<option value="'+s+'">'+(LOOK_WORDS[s]||s)+'</option>'}).join('')+'</select>'
  +'<button class="gold full" id="hfAdd" style="margin-top:11px">Add this person to my office</button><p class="okmsg" id="hfMsg"></p>';
  rows.parentNode.insertBefore(card,rows);
  $('hfAdd').onclick=function(){
@@ -8378,11 +8648,18 @@ setInterval(function(){if(!isFresh())return;
     take down his Neon watch board if it rendered here */
  try{var mine={};var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine[String(L[k].name||'').toUpperCase()]=1});
   var CREW=['RICO','MARCO','DEV','SANAA','DEX','MILO','TESSA','VANCE','LENA','OMAR','KIAN','SOFIA','TREY'];
-  document.querySelectorAll('#clBody .clLine, #chatList .msg').forEach(function(n){var b=n.querySelector('b');if(!b)return;var who=b.textContent.trim().toUpperCase();if(CREW.indexOf(who)>=0&&!mine[who]){n.remove();return}
+  document.querySelectorAll('#clBody .clLine, #chatList .msg').forEach(function(n){if(n.classList&&n.classList.contains('me'))return; /* this office owner's own lines are theirs — never stripped */
+   var b=n.querySelector('b');if(!b)return;var who=b.textContent.trim().toUpperCase();if(CREW.indexOf(who)>=0&&!mine[who]){n.remove();return}
    /* system lines that report on one of Craig's people by name (a
       meeting of his crew wrapping up, a watch staging) are his
       office's business too — they do not run in a fresh office */
-   var tx=n.textContent||'';for(var ci=0;ci<CREW.length;ci++){var cn=CREW[ci];if(mine[cn])continue;var cap=cn.charAt(0)+cn.slice(1).toLowerCase();if(tx.indexOf(cap)>=0||tx.indexOf(cn)>=0){n.remove();break}}});
+   var tx=n.textContent||'';
+   /* the OWNER's name rides in system lines too — "Moving now:
+      Craig → Welcome Lounge" is an HQ line, and it belongs to
+      Craig's office only; in a fresh office it never prints. (A
+      person this office hired who shares the name keeps theirs.) */
+   if(!mine['CRAIG']&&(tx.indexOf('Craig')>=0||tx.indexOf('CRAIG')>=0||tx.indexOf('Mr. Moore')>=0||tx.indexOf('Mr Moore')>=0)){n.remove();return}
+   for(var ci=0;ci<CREW.length;ci++){var cn=CREW[ci];if(mine[cn])continue;var cap=cn.charAt(0)+cn.slice(1).toLowerCase();if(tx.indexOf(cap)>=0||tx.indexOf(cn)>=0){n.remove();break}}});
   var nb=document.getElementById('neonBoard');if(nb)nb.remove();
  }catch(e){}
 },2500);
