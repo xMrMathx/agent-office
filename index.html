@@ -1130,7 +1130,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v50";(function(){try{var k='aoFreshV50';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
+<script>window.AO_BUILD="v51";(function(){try{var k='aoFreshV51';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
@@ -4136,7 +4136,7 @@ window.__hqApps={link(app,line){if(!APP_STATE[app])return;APP_STATE[app]={linked
    OVER the panel: the panel is never closed or re-scrolled by this, so
    closing the card lands back on the same list at the same spot. ===== */
 const PROF_FIGURES={craig:{img:'assets/profile/craig.png',role:'Owner'},dex:{img:'assets/profile/dex.png',role:'The Watchdog · Audit'},rico:{img:'assets/profile/rico.png',role:'Clipper Captain · Clipper Crew'},marco:{img:'assets/profile/marco.png',role:'Clipper · Clipper Crew'},dev:{img:'assets/profile/dev.png',role:'Clipper · Clipper Crew'},sanaa:{img:'assets/profile/sanaa.png',role:'The Catalog Hunter · Highlights'},milo:{img:'assets/profile/milo.png',role:'The Game Tester · Gaming'},tessa:{img:'assets/profile/tessa.png',role:'Rankings Watch · Rankings'}};
-function syncProfFigure(){const w=document.getElementById('profFigure');if(!w)return;let look='craig';try{look=(typeof myLook==='function')?myLook():'craig'}catch(e){}const f=PROF_FIGURES[String(look).toLowerCase()];if(f){w.style.display='';const im=document.getElementById('profFigureImg');if(im&&im.getAttribute('src')!==f.img)im.src=f.img}else w.style.display='none'}
+function syncProfFigure(){const w=document.getElementById('profFigure');if(!w)return;let look=null;try{const p=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(p&&p.look)look=p.look}catch(e){}if(!look){try{const W=window.__hqWire;if(W&&W.state){const st=W.state();if(st&&st.profile&&st.profile.look)look=st.profile.look}}catch(e){}}if(!look){try{look=(typeof myLook==='function')?myLook():null}catch(e){}}if(!look)look='craig';const f=PROF_FIGURES[String(look).toLowerCase()];if(f){w.style.display='';const im=document.getElementById('profFigureImg');if(im){if(im.getAttribute('src')!==f.img)im.src=f.img;im.alt=(String(look).toLowerCase()==='craig')?'Craig Moore — full-body profile figure':'Full-body profile figure'}}else w.style.display='none'}
 syncProfFigure();setInterval(()=>{try{syncProfFigure()}catch(e){}},3000);
 const personCard=document.getElementById('personCard');
 let pcKey=null,peopleScrollPos=null;
@@ -4556,7 +4556,7 @@ function frame(ts){requestAnimationFrame(frame);const t=ts/1000;if(typeof regMov
  if(mapA<1){
  drawFloor();
  if(!topDownView){drawBackWall(-9,-1,-7,2);drawBackWall(-1,7,-9,3);drawBackWall(11.4,19.4,-9.6,3);drawBackWall(11.4,19.4,-0.4,2)}
- const sorted=[...objects].sort((a,b)=>(proj(a.x,0,a.z)[2]+(a.mapName?.35:0))-(proj(b.x,0,b.z)[2]+(b.mapName?.35:0)));sorted.forEach(o=>{try{o.draw(t)}catch(e){}});
+ const sorted=[...objects].sort((a,b)=>(proj(a.x,0,a.z)[2]+(a.mapName?.35:0)+(a.floor?-1000:0))-(proj(b.x,0,b.z)[2]+(b.mapName?.35:0)+(b.floor?-1000:0)));sorted.forEach(o=>{try{o.draw(t)}catch(e){}});
  if(typeof drawWalkMarker==='function')drawWalkMarker(t);
  drawGongFX(t);
  /* nameplates: one deduped pass over the finished floor, detailed view
@@ -5292,7 +5292,7 @@ var NEUTRAL_LOOKS={redcapgreentop:'rico',bluecapbluetop:'marco',darkhairpinktop:
 function resolveLook(l){var raw=String(l||'').toLowerCase().trim();if(LOOK_OUTFIT[raw])return raw;var s=slug(raw);if(LOOK_OUTFIT[s])return s;return NEUTRAL_LOOKS[s]||raw}
 function linesFor(rec){if(LINES[rec.slot])return LINES[rec.slot];var r=(' '+(rec.role||'').toLowerCase()+' ');if(/clip/.test(r))return LINES.clipper;if(/catalog|show|movie|title/.test(r))return LINES.highlights;if(/watch|health|check/.test(r))return LINES.audit;if(/game|test|joust|bug/.test(r))return LINES.gaming;return LINES.generic}
 function cfgFor(id,rec){var look=resolveLook(rec.look||'dev');if(!LOOK_OUTFIT[look])look='dev';var NAME=String(rec.name||'Hire').toUpperCase();
- var nmk=slug(rec.name);if(look!==id||nmk!==id){var tries=0;var al=setInterval(function(){tries++;['stand','back','head','front'].forEach(function(k){var src=SPRITES[look+'-'+k];if(!src)return;if(!SPRITES[id+'-'+k])SPRITES[id+'-'+k]=src;if(nmk&&nmk!==id&&!SPRITES[nmk+'-'+k])SPRITES[nmk+'-'+k]=src});if(SPRITES[id+'-stand']||tries>24)clearInterval(al)},400)}
+ var nmk=slug(rec.name);if(look!==id||nmk!==id){var tries=0;var al=setInterval(function(){tries++;['stand','back','head','front'].forEach(function(k){var src=SPRITES[look+'-'+k];if(!src)return;if(!SPRITES[id+'-'+k])SPRITES[id+'-'+k]=src;if(nmk&&nmk!==id&&!SPRITES[nmk+'-'+k])SPRITES[nmk+'-'+k]=src});if(SPRITES[id+'-stand']||tries>120)clearInterval(al)},400)}
  return{name:NAME,outfit:LOOK_OUTFIT[look]||'#334155',pants:'#1e293b',skin:'#c68642',label:LOOK_LABEL[look]||'#334155',ph:0.6+(id.length%7)*0.8,bubble:linesFor(rec)[0]}}
 function peopleCount(){var h=document.querySelector('.fsec[data-sec="people"] h3');if(h)h.textContent='PEOPLE · '+(1+Object.keys(hires).length)+' IN HQ'}
 /* PEOPLE LIST — GROUPED BY TEAM (Craig's word): a team title, then that
@@ -5452,7 +5452,7 @@ sendChat=function(){
  var hm=v.match(/^hire\s+(.+)$/i),fm=v.match(/^(?:unhire|remove hire)\s+(.+)$/i);
  if(hm){var parts=hm[1].split(/\s*[·|]\s*|\s*,\s*/);var nm=(parts[0]||'').trim();
   if(nm){var rec={name:nm,role:(parts[1]||'New hire').trim()||'New hire',slot:slug(parts[2]||'library'),look:resolveLook(parts.length>4?parts.slice(3).join(' · '):(parts[3]||'dev'))};
-   doorWrite(slug(nm),rec);if(inp)inp.value='';appendMsg('Craig',v,true);
+   doorWrite(slug(nm),rec);if(inp)inp.value='';appendMsg(ownerName(),v,true);
    logTalk('HQ','Hiring '+nm+' — the record is on the office list. Watch the lot.','sys');return}}
  if(fm){var id2=slug(fm[1].trim());if(hires[id2]){doorRemove(id2);if(inp)inp.value='';appendMsg('Craig',v,true);return}}
  _origSendChat()};
@@ -5511,7 +5511,7 @@ window.__hqHires={mode:function(){return doorMode},path:function(){return doorPa
      Sanaa (Catalog Hunter) → content-find: a show or movie Shortz VS
        does not have. The library is vast (75,769 titles), so she
        hunts what is NOT in it, and a find carries her two checks on
-       the record: (a) verified not in the Shortz VS catalog,
+       the record: (a) verified not in the '+bizName()+' catalog,
        (b) a playable source verified. Her wording: "I found X —
        I checked, we don't have it. Is this a good show or movie
        to add?"
@@ -5545,7 +5545,7 @@ window.__hqHires={mode:function(){return doorMode},path:function(){return doorPa
 
    GREENLIGHT = EXECUTION where the type has one: a greenlit content
    find flips to "greenlit — add it" and the add executes through the
-   standing Shortz VS ingest gates (free-only · dedupe · playability);
+   standing '+bizName()+' ingest gates (free-only · dedupe · playability);
    a greenlit clip is cut and posted. The result is written back onto
    the record and shows in Activity (added + the new catalog count,
    or the failure reason — never a silent death). The owner does
@@ -5562,7 +5562,14 @@ window.__hqHires={mode:function(){return doorMode},path:function(){return doorPa
    Rig handle: window.__hqProposals {mode, path, ledgerPath, office,
    add, verdict, present, complete, list, ledger}. */
 (function(){
-function officeId(){try{if(typeof OWNER_OFFICE!=='undefined'&&OWNER_OFFICE)return OWNER_OFFICE}catch(e){}return 'craig-hq'}
+function officeId(){ /* PER-OFFICE, RESOLVED FROM THE PLAYER ON THIS DEVICE \u2014 the same law as the hires door: a genuine visitor's saved player keys this door to THEIR office; the owner keys to craig-hq. The old body returned 'craig-hq' for everyone (OWNER_OFFICE lives inside the wire script's scope and is invisible here), so every office read and wrote CRAIG's proposals \u2014 his pending work, naming him and Shortz VS, was presented in the Blueprint Room of offices that were never his. */
+ try{var prof=null;try{prof=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+ if(prof&&prof.officeId&&prof.officeId!=='craig-hq'){var nm=String(prof.name||'').trim().toLowerCase();var bz=String(prof.business||'').trim().toLowerCase();if(!(nm==='craig'||nm==='craig moore'||nm==='mr. moore'||nm==='mr moore'||bz.indexOf('vibez')>=0))return prof.officeId}}catch(e){}
+ return 'craig-hq'}
+function ownerName(){try{var p=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(p&&p.officeId&&p.officeId!=='craig-hq'&&p.name)return String(p.name)}catch(e){}return 'Craig'}
+function bizName(){try{var p=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(p&&p.officeId&&p.officeId!=='craig-hq'&&p.business)return String(p.business)}catch(e){}return 'Shortz VS'}
+function pLocalKey(){return officeId()==='craig-hq'?'hqProposalsDoor':'hqProposalsDoor__'+officeId()}
+function lLocalKey(){return officeId()==='craig-hq'?'hqProposalLedger':'hqProposalLedger__'+officeId()}
 function propPath(){return 'wire/offices/'+officeId()+'/proposals'}
 function ledgerPath(){return 'wire/offices/'+officeId()+'/proposalLedger'}
 function normTitle(t){return String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
@@ -5640,17 +5647,17 @@ function execLine(r){if(r.status==='greenlit'&&r.exec&&r.exec.state==='queued'){
  if(r.type==='content-find')return 'EXECUTION — queued: the add runs through the Shortz VS ingest gates (free-only · dedupe · playability). The result lands on this record.';
  if(r.type==='clip')return 'EXECUTION — queued: the clip gets cut and posted; the result lands on this record.'}return''}
 function checksHTML(r){if(r.type!=='content-find'||!r.checks)return'';
- return '<span class="asgMeta">✓ Verified not in the Shortz VS catalog — checked against all 75,769 titles<br>✓ Playable source verified'+(r.checks.by?' · checks by '+esc(r.checks.by):'')+'</span>'}
+ return '<span class="asgMeta">✓ Verified not in the '+bizName()+' catalog — checked against all 75,769 titles<br>✓ Playable source verified'+(r.checks.by?' · checks by '+esc(r.checks.by):'')+'</span>'}
 function renderProps(){if(!ensureBoard())return;var wrap=document.getElementById('propList');if(!wrap)return;
  var ids=Object.keys(props).filter(function(id){return props[id].rec.status!=='blocked'});
  var rank=function(r){return r.status==='pending'?(r.queue==='held'?1:0):2};
  var recency=function(r){return Math.max(r.verdictAt||0,(r.result&&r.result.at)||0,(r.exec&&r.exec.at)||0,r.at||0)};
  ids.sort(function(a,b){var ra=rank(props[a].rec),rb=rank(props[b].rec);if(ra!==rb)return ra-rb;return recency(props[b].rec)-recency(props[a].rec)});
  var doneCount=ids.filter(function(id){return rank(props[id].rec)===2}).length;renderProps._g=-1;wrap.innerHTML=ids.length?ids.map(function(id){var r=props[id].rec;var rk=rank(r);var head='';if(rk!==renderProps._g){renderProps._g=rk;head=rk===2?'<button type="button" class="doneBar" data-donebar="1" aria-expanded="'+(renderProps._doneOpen?'true':'false')+'"><span>Completed · '+doneCount+' — most recent first</span><span class="doneChev">'+(renderProps._doneOpen?'▴':'▾')+'</span></button>':'<div style="margin:10px 0 0;font-size:11px;font-weight:800;letter-spacing:.07em;color:'+(rk===0?'#92400e':'#64748b')+'">'+(rk===0?'NEEDS YOUR VERDICT — NEWEST FIRST':'HELD AT THEIR DESK')+'</div>'}var st=statusChip(r);
-  var meta='From '+esc(fromLabel(r))+' · '+(TYPE_LABEL[r.type]||'IDEA')+' · for Shortz VS'+(r.at?' · '+new Date(r.at).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'');
+  var meta='From '+esc(fromLabel(r))+' · '+(TYPE_LABEL[r.type]||'IDEA')+' · for '+bizName()+''+(r.at?' · '+new Date(r.at).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'');
   var ex=execLine(r),res=resultLine(r);
   if(rk===2&&!renderProps._doneOpen)return head;return head+'<div class="asgRow"><b>'+esc(r.title)+'<span class="asgStatus '+st[1]+'">'+st[0]+'</span></b><span class="asgMeta">'+meta+'</span>'+(r.desc?'<span class="asgMeta">'+esc(r.desc)+'</span>':'')+checksHTML(r)+(ex?'<span class="asgMeta">'+ex+'</span>':'')+(res?'<span class="asgMeta"><b>'+res+'</b></span>':'')+((r.status==='pending'&&r.queue!=='held')?'<div class="asgBtns"><button class="gold" data-present-prop="'+id+'">Present it — Blueprint Room</button></div>':(r.status==='pending'?'<span class="asgMeta">Held at their desk — promotes the moment a presented proposal from '+esc(queueKey(r))+' gets a verdict.</span>':''))+'</div>'}).join('')
- :'<div class="item">No proposals yet — when the crew thinks up the next Shortz VS idea in their lane, it lands here first.</div>';var db=wrap.querySelector('[data-donebar]');if(db)db.onclick=function(){renderProps._doneOpen=!renderProps._doneOpen;renderProps()}}
+ :'<div class="item">No proposals yet — when the crew thinks up the next '+bizName()+' idea in their lane, it lands here first.</div>';var db=wrap.querySelector('[data-donebar]');if(db)db.onclick=function(){renderProps._doneOpen=!renderProps._doneOpen;renderProps()}}
 /* ---------- the queue: two presented per agent, the rest held ---------- */
 function reconcileQueue(initial){var pend=Object.keys(props).map(function(id){return{id:id,rec:props[id].rec}}).filter(function(p){return p.rec.status==='pending'});
  pend.sort(function(a,b){return (a.rec.at||0)-(b.rec.at||0)});
@@ -5658,7 +5665,7 @@ function reconcileQueue(initial){var pend=Object.keys(props).map(function(id){re
  pend.forEach(function(p){var k=queueKey(p.rec);counts[k]=(counts[k]||0)+1;var want=counts[k]<=2?'presented':'held';
   if(p.rec.queue!==want){var was=p.rec.queue;p.rec.queue=want;propFieldWrite(p.id,'queue',want);
    if(!initial&&was==='held'&&want==='presented')promoted.push(p)}});
- promoted.forEach(function(p){if(typeof logTalk==='function')logTalk(queueKey(p.rec),'Held proposal promoted — "'+p.rec.title+'" is now presented in Activity, Craig.')});
+ promoted.forEach(function(p){if(typeof logTalk==='function')logTalk(queueKey(p.rec),'Held proposal promoted — "'+p.rec.title+'" is now presented in Activity, '+ownerName()+'.')});
  if(promoted.length&&typeof ALERTS!=='undefined'){promoted.forEach(function(p){ALERTS.unshift({ico:'✦',bg:'#fdf8ec',fg:'#92400e',t:'Proposal promoted: '+p.rec.title,d:'From '+fromLabel(p.rec)+' — a verdict freed a slot, so the held proposal is now presented.',unread:true,propId:p.id})});if(typeof updateBadge==='function')updateBadge();if(typeof renderAlerts==='function')renderAlerts()}
  renderProps()}
 /* ---------- presentation in the Blueprint Room ---------- */
@@ -5675,29 +5682,29 @@ function closePropLayer(){if(layerEl)layerEl.classList.remove('show');var pid=pr
  if(pid&&props[pid])fromList(props[pid].rec).forEach(function(nm){var N=String(nm).toUpperCase();if(typeof ORDER!=='undefined'&&ORDER[N])delete ORDER[N]});
  if(typeof updateModeUI==='function')updateModeUI()}
 function presentProposal(id){var p=props[id];if(!p||p.rec.status!=='pending'||p.rec.queue==='held')return;presentedId=id;ensureLayer();
- document.getElementById('propKicker').textContent='PROPOSAL · '+(TYPE_LABEL[p.rec.type]||'IDEA')+' · SHORTZ VS · '+(typeof NAMES!=='undefined'?NAMES.planning.toUpperCase():'THE BLUEPRINT ROOM');
+ document.getElementById('propKicker').textContent='PROPOSAL · '+(TYPE_LABEL[p.rec.type]||'IDEA')+' · '+bizName().toUpperCase()+' · '+(typeof NAMES!=='undefined'?NAMES.planning.toUpperCase():'THE BLUEPRINT ROOM');
  document.getElementById('propTitle').textContent=p.rec.title;
  document.getElementById('propLead').textContent='Brought by '+fromLabel(p.rec)+' — gathered in '+(typeof NAMES!=='undefined'?NAMES.planning:'the Blueprint Room')+' to present it';
  var body='<div class="prIdea"><span class="prNum">1</span><div><b>The proposal</b><span>'+esc(p.rec.desc||p.rec.title)+'</span></div></div>';
- if(p.rec.type==='content-find'&&p.rec.checks)body+='<div class="prIdea"><span class="prNum">2</span><div><b>Sanaa\u2019s checks — carried on the record</b><span>✓ Verified not in the Shortz VS catalog (75,769 titles checked)<br>✓ Playable source verified</span></div></div>';
- body+='<div class="prIdea"><span class="prNum">'+(p.rec.type==='content-find'?3:2)+'</span><div><b>Why it matters</b><span>Shortz VS is this office\u2019s current project — the first product out of Cre∞tor VibeZ HQ, the one we will be showing off.</span></div></div>';
+ if(p.rec.type==='content-find'&&p.rec.checks)body+='<div class="prIdea"><span class="prNum">2</span><div><b>Sanaa\u2019s checks — carried on the record</b><span>✓ Verified not in the '+bizName()+' catalog (75,769 titles checked)<br>✓ Playable source verified</span></div></div>';
+ body+='<div class="prIdea"><span class="prNum">'+(p.rec.type==='content-find'?3:2)+'</span><div><b>Why it matters</b><span>'+(officeId()==='craig-hq'?'Shortz VS is this office\u2019s current project — the first product out of Cre∞tor VibeZ HQ, the one we will be showing off.':(bizName()+' is this office\u2019s current project — the work this office is building and showing off.'))+'</span></div></div>';
  document.getElementById('propBody').innerHTML=body;
  document.getElementById('propGateNote').innerHTML=p.rec.type==='content-find'?'<b>Greenlight = add it:</b> the add executes through the standing Shortz VS ingest gates (free-only · dedupe · playability) and the result — added, with the new catalog count, or why it failed — is written back onto this record. You do nothing beyond the green light.'
-  :p.rec.type==='clip'?'<b>Greenlight = cut it:</b> the clip gets cut and posted for @shortz_vs, and the result is written back onto this record. Pay still moves only on delivered work, at the product gate.'
+  :p.rec.type==='clip'?'<b>Greenlight = cut it:</b> the clip gets cut and posted for '+(officeId()==='craig-hq'?'@shortz_vs':bizName())+', and the result is written back onto this record. Pay still moves only on delivered work, at the product gate.'
   :'<b>The two-gate law:</b> green light moves no money and starts no paid work — it only marks this idea approved in the freshness ledger, forever.';
  document.getElementById('propMsg').textContent='';
  layerEl.classList.add('show');
  try{var names=fromList(p.rec).map(function(n){return String(n).toUpperCase()}).filter(function(n){return typeof NAME_KEYS!=='undefined'&&NAME_KEYS[n]});
   if(names.length&&typeof placeSlots==='function'&&typeof ORDER!=='undefined'){var slots=placeSlots('planning',names.length);names.forEach(function(nm,i){var sl=slots[i%slots.length];ORDER[nm]={x:sl.x,z:sl.z,mode:sl.mode||'idle',label:(typeof NAMES!=='undefined'?NAMES.planning:'Blueprint Room'),place:'planning',seq:++orderSeq}})}
   if(typeof goZone==='function')goZone('planning');if(typeof updateModeUI==='function')updateModeUI()}catch(e){}
- if(typeof logTalk==='function')logTalk(fromList(p.rec)[0],'Presenting "'+p.rec.title+'" — the board is up in the Blueprint Room, Craig.');
+ if(typeof logTalk==='function')logTalk(fromList(p.rec)[0],'Presenting "'+p.rec.title+'" — the board is up in the Blueprint Room, '+ownerName()+'.');
  return p}
 /* ---------- backends: live database, or this device — same path ---------- */
 var doorMode='boot',propRef=null,ledgerRef=null;
-function pLocal(){try{return JSON.parse(localStorage.getItem('hqProposalsDoor')||'{}')}catch(e){return{}}}
-function pLocalSave(m){try{localStorage.setItem('hqProposalsDoor',JSON.stringify(m))}catch(e){}}
-function lLocal(){try{return JSON.parse(localStorage.getItem('hqProposalLedger')||'{}')}catch(e){return{}}}
-function lLocalSave(m){try{localStorage.setItem('hqProposalLedger',JSON.stringify(m))}catch(e){}}
+function pLocal(){try{return JSON.parse(localStorage.getItem(pLocalKey())||'{}')}catch(e){return{}}}
+function pLocalSave(m){try{localStorage.setItem(pLocalKey(),JSON.stringify(m))}catch(e){}}
+function lLocal(){try{return JSON.parse(localStorage.getItem(lLocalKey())||'{}')}catch(e){return{}}}
+function lLocalSave(m){try{localStorage.setItem(lLocalKey(),JSON.stringify(m))}catch(e){}}
 function seedLedgerLocal(){var m=lLocal();var dirty=false;Object.keys(RETIRED_LEDGER).forEach(function(k){if(!m[k]){m[k]=RETIRED_LEDGER[k];dirty=true}});if(dirty)lLocalSave(m);return m}
 function ledgerHas(key){return !!(ledger[key]||RETIRED_LEDGER[key])}
 function ledgerWrite(key,entry){ledger[key]=entry;
@@ -5718,8 +5725,8 @@ function verdict(id,status){if(!id||!props[id])return;var p=props[id];if(p.rec.s
   p.rec.exec={state:'queued',at:Date.now()};propFieldWrite(id,'exec',p.rec.exec)}
  p.rec.verdictAt=Date.now();propFieldWrite(id,'verdictAt',p.rec.verdictAt);
  propStatusWrite(id,status);
- if(typeof logTalk==='function'){if(status==='greenlit')logTalk('Craig',(p.rec.type==='content-find'?'Greenlit — add it: ':'Greenlit: ')+p.rec.title,'me');else logTalk('Craig','Passed: '+p.rec.title+' — sent back. The ledger keeps it, so it never comes around again.','me');
-  logTalk(fromList(p.rec)[0],status==='greenlit'?(p.rec.type==='content-find'?'Greenlit — adding "'+p.rec.title+'" through the ingest gates now. The result lands on the record.':'Greenlit — "'+p.rec.title+'" is in the book. Thank you, Craig.'):'Understood — "'+p.rec.title+'" is passed and stays in the ledger. We bring fresh ones only.')}
+ if(typeof logTalk==='function'){if(status==='greenlit')logTalk(ownerName(),(p.rec.type==='content-find'?'Greenlit — add it: ':'Greenlit: ')+p.rec.title,'me');else logTalk(ownerName(),'Passed: '+p.rec.title+' — sent back. The ledger keeps it, so it never comes around again.','me');
+  logTalk(fromList(p.rec)[0],status==='greenlit'?(p.rec.type==='content-find'?'Greenlit — adding "'+p.rec.title+'" through the ingest gates now. The result lands on the record.':'Greenlit — "'+p.rec.title+'" is in the book. Thank you, '+ownerName()+'.'):'Understood — "'+p.rec.title+'" is passed and stays in the ledger. We bring fresh ones only.')}
  closePropLayer();reconcileQueue(false)}
 /* execution completion — the chat side ran the real gates and writes
    the result back onto the record; the loop closes in Activity */
@@ -5748,11 +5755,11 @@ function onPropRecord(id,rec){if(!rec||!rec.title)return;
     file — the record that created the entry (its recId) restores
     freely, which is what makes away-accumulation work */
  var le=ledger[key]||RETIRED_LEDGER[key];
- if(le&&le.recId!==id)return blockProp(id,rec,'duplicate','A proposal was blocked by the freshness ledger — "'+rec.title+'" was already presented. It never reaches Craig.');
+ if(le&&le.recId!==id)return blockProp(id,rec,'duplicate','A proposal was blocked by the freshness ledger — "'+rec.title+'" was already presented. It never reaches '+ownerName()+'.');
  if(solo){var lane=laneFor(from[0]);
-  if(lane!=='idea'&&type!==lane)return blockProp(id,rec,'off-lane','A proposal was blocked as off-lane — "'+rec.title+'" is a '+(TYPE_LABEL[type]||'IDEA')+' but '+from[0]+'\u2019s lane is '+(TYPE_LABEL[lane]||'IDEA')+'. It never reaches Craig.')}
+  if(lane!=='idea'&&type!==lane)return blockProp(id,rec,'off-lane','A proposal was blocked as off-lane — "'+rec.title+'" is a '+(TYPE_LABEL[type]||'IDEA')+' but '+from[0]+'\u2019s lane is '+(TYPE_LABEL[lane]||'IDEA')+'. It never reaches '+ownerName()+'.')}
  else{var lanes={};from.forEach(function(n){lanes[laneFor(n)]=true});
-  if(type!=='idea'&&!lanes[type])return blockProp(id,rec,'off-lane','A group proposal was blocked as off-lane — "'+rec.title+'" matches none of the attendees\u2019 lanes. It never reaches Craig.')}
+  if(type!=='idea'&&!lanes[type])return blockProp(id,rec,'off-lane','A group proposal was blocked as off-lane — "'+rec.title+'" matches none of the attendees\u2019 lanes. It never reaches '+ownerName()+'.')}
  if(type==='content-find'&&!rec.checks){rec.checks={notInCatalog:true,playableSource:true,by:from[0]}}
  /* fresh: into the ledger FIRST (stamped with this record's id),
     then it surfaces through the queue */
@@ -5764,23 +5771,39 @@ function onPropRecord(id,rec){if(!rec||!rec.title)return;
     talk lines are only for proposals that arrive while the office
     is open */
  if(!reconciled)return;
- if(typeof ALERTS!=='undefined'&&rec.queue!=='held'){ALERTS.unshift({ico:'✦',bg:'#fdf8ec',fg:'#92400e',t:'New proposal: '+rec.title,d:fromLabel(rec)+' · '+(TYPE_LABEL[type]||'IDEA')+' — for Shortz VS. Present it from the Proposals board in Activity.',unread:true,propId:id});if(typeof updateBadge==='function')updateBadge();if(typeof renderAlerts==='function')renderAlerts()}
+ if(typeof ALERTS!=='undefined'&&rec.queue!=='held'){ALERTS.unshift({ico:'✦',bg:'#fdf8ec',fg:'#92400e',t:'New proposal: '+rec.title,d:fromLabel(rec)+' · '+(TYPE_LABEL[type]||'IDEA')+' — for '+bizName()+'. Present it from the Proposals board in Activity.',unread:true,propId:id});if(typeof updateBadge==='function')updateBadge();if(typeof renderAlerts==='function')renderAlerts()}
  if(typeof showActivity==='function'&&rec.queue!=='held')showActivity('run','New proposal',fromLabel(rec)+': '+rec.title);
- if(typeof logTalk==='function')logTalk(from[0],rec.queue==='held'?('New proposal for Shortz VS: "'+rec.title+'" — held at my desk until a presented slot frees, Craig.'):('New proposal for Shortz VS: "'+rec.title+'" — it is on the Proposals board in Activity when you want it, Craig.'))}
-function goLocal(){if(doorMode!=='boot')return;doorMode='local';
- ledger=seedLedgerLocal();
+ if(typeof logTalk==='function')logTalk(from[0],rec.queue==='held'?('New proposal for '+bizName()+': "'+rec.title+'" — held at my desk until a presented slot frees, '+ownerName()+'.'):('New proposal for '+bizName()+': "'+rec.title+'" — it is on the Proposals board in Activity when you want it, '+ownerName()+'.'))}
+var boundLocalKey=null;
+function loadLocal(){reconciled=false;props={};blockedSeen={};try{closePropLayer()}catch(e){} /* a presentation opened under the previous office never lingers into this one */ ledger=seedLedgerLocal();
  var lm=lLocal();Object.keys(lm).forEach(function(k){ledger[k]=lm[k]});
  var m=pLocal();Object.keys(m).sort(function(a,b){return (m[a].at||0)-(m[b].at||0)}).forEach(function(id){onPropRecord(id,m[id])});
- reconciled=true;reconcileQueue(true);
+ reconciled=true;reconcileQueue(true);boundLocalKey=pLocalKey();renderProps()}
+function goLocal(){if(doorMode!=='boot')return;doorMode='local';
+ loadLocal();
  if(typeof logTalk==='function')logTalk('HQ','The proposals door is running on this device (local preview) — same records, same freshness ledger; it goes live with the wire.','sys')}
-function goLive(db){if(doorMode!=='boot')return;doorMode='live';propRef=db.ref(propPath());ledgerRef=db.ref(ledgerPath());
- ledgerRef.once('value',function(s){var v=s.val()||{};Object.keys(v).forEach(function(k){ledger[k]=v[k]});
+var doorDb=null,boundPath=null;
+function bindLive(){if(propRef){try{propRef.off()}catch(e){}} if(ledgerRef){try{ledgerRef.off()}catch(e){}}
+ propRef=doorDb.ref(propPath());ledgerRef=doorDb.ref(ledgerPath());boundPath=propPath();
+ ledgerRef.once('value',function(s){ledger={};var v=s.val()||{};Object.keys(v).forEach(function(k){ledger[k]=v[k]});
   Object.keys(RETIRED_LEDGER).forEach(function(k){if(!ledger[k])ledgerWrite(k,RETIRED_LEDGER[k])});
+  props={};blockedSeen={};reconciled=false;try{closePropLayer()}catch(e){}
   propRef.on('child_added',function(sn){onPropRecord(sn.key,sn.val())});
   propRef.on('child_changed',function(sn){var p=props[sn.key];if(p){p.rec=sn.val();renderProps()}});
   setTimeout(function(){reconciled=true;reconcileQueue(true)},2500)});
- renderProps();
- if(typeof logTalk==='function')logTalk('HQ','The proposals door is LIVE — new Shortz VS proposals arrive on their own, ledger-checked.','sys')}
+ renderProps()}
+function goLive(db){if(doorMode!=='boot')return;doorMode='live';doorDb=db;bindLive();
+ if(typeof logTalk==='function')logTalk('HQ','The proposals door is LIVE — new '+bizName()+' proposals arrive on their own, ledger-checked.','sys')}
+ /* REBIND WATCH \u2014 the door binds its path once at boot, but a player can
+   be created or adopted AFTER that (the entrance runs first). If this
+   device's office changes under the door, the door follows it: live refs
+   rebind to the new office's path, the local store reloads from the new
+   office's key. Craig's office never changes key, so his door never
+   rebinds. */
+setInterval(function(){try{
+  if(doorMode==='live'&&doorDb&&propPath()!==boundPath)bindLive();
+  else if(doorMode==='local'&&boundLocalKey&&pLocalKey()!==boundLocalKey)loadLocal();
+ }catch(e){}},3000);
 function loadFs(src){return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
 (function startDoor(){
  var waited=0;
@@ -5794,8 +5817,8 @@ function loadFs(src){return new Promise(function(res,rej){var s=document.createE
  setTimeout(function(){goLocal()},14000);
 })();
 window.addEventListener('storage',function(e){
- if(e.key==='hqProposalLedger'){var m=lLocal();Object.keys(m).forEach(function(k){ledger[k]=m[k]})}
- if(e.key!=='hqProposalsDoor'||doorMode!=='local')return;var m=pLocal();
+ if(e.key===lLocalKey()||e.key==='hqProposalLedger'){var m=lLocal();Object.keys(m).forEach(function(k){ledger[k]=m[k]})}
+ if(e.key!==pLocalKey()||doorMode!=='local')return;var m=pLocal();
  Object.keys(m).forEach(function(id){onPropRecord(id,m[id])})});
 /* ---------- the crew thinks, in their lanes, through the door ---------- */
 function crewIdeaTick(){try{
@@ -5999,7 +6022,8 @@ var TUT_SUBS=['Step 1 of 6 · What this app is','Step 2 of 6 · Your character i
 function buildLooks(){var w=$('wireLooks');if(!w||w.children.length)return;w.innerHTML=LOOK_KEYS.map(function(k){return '<button type="button" class="wireLook" data-look="'+k+'"><img src="assets/char-'+k+'-head.png" alt="'+esc(lookLabel(k))+' look"><span>'+esc(lookLabel(k))+'</span></button>'}).join('');
  w.querySelectorAll('[data-look]').forEach(function(b){b.onclick=function(){gateLook=b.dataset.look;w.querySelectorAll('.wireLook').forEach(function(x){x.classList.toggle('sel',x===b)});gateMsg('')}})}
 function gateMsg(t,ok){var m=$('wireGateMsg');if(m){m.textContent=t||'';m.className='wireMsg'+(ok?' ok':'')}}
-function gateShowStep(){var tut=$('wireTutorial');
+function gateShowStep(){try{sessionStorage.setItem('hqGatePos',JSON.stringify({s:gateStep,t:gateTut}))}catch(e){} /* the entrance remembers where this person left off, in this tab — a Google sign-in is a full page trip away and back, and landing back at tutorial step 1 every time is the loop new owners were stuck in */
+ var tut=$('wireTutorial');
  if(gateStep===0){ /* TUTORIAL — one idea per screen, before any setup */
   if(tut)tut.style.display='';[1,2,3].forEach(function(i){var el=$('wireStep'+i);if(el)el.style.display='none'});
   if(tut)tut.querySelectorAll('.tutStep').forEach(function(s){s.classList.toggle('on',+s.dataset.tut===gateTut)});
@@ -6016,19 +6040,22 @@ function gateShowStep(){var tut=$('wireTutorial');
  var gs2=$('wireGateSub');if(gs2)gs2.textContent=gateStep===1?'Pick who you are in the office — then name your business, and that business becomes your office, connected to the one that invited you.':gateStep===2?'That name goes on your office door — and that business becomes your office.':'Check it over — then your office opens.';
  $('wireNext').textContent=gateStep===1?'Next — name your business':gateStep===2?'Next — review':'Create my office'}
 function openGate(preview){if(!preview&&window.__hqSavedPlayerEarly){closeGate();return} /* the entrance is for strangers only — a device with a saved player is never gated, whoever asks */
- gatePreview=!!preview;gateStep=0;gateTut=1;gateLook=null;buildLooks();var w=$('wireLooks');if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.remove('sel')});
+ gatePreview=!!preview;gateStep=0;gateTut=1;
+ if(!preview){try{var returning=sessionStorage.getItem('hqAuthTry')||sessionStorage.getItem('hqAuthNote');var gp=JSON.parse(sessionStorage.getItem('hqGatePos')||'null');if(returning&&gp&&(gp.s>0||gp.t>1)){gateStep=gp.s;gateTut=gp.t}}catch(e){}} /* returning from the Google trip: back to the exact screen they left — never restarted at the tutorial's first step */
+ gateLook=null;buildLooks();var w=$('wireLooks');if(w)w.querySelectorAll('.wireLook').forEach(function(x){x.classList.remove('sel')});
  $('wireGateX').style.display=gatePreview?'':'none';gateMsg('');gateShowStep();var g=$('wireGate');g.classList.add('show');g.classList.toggle('hqPreviewOK',!!preview)}
 function closeGate(){var g=$('wireGate');g.classList.remove('show');g.classList.remove('hqPreviewOK')}
 function gateCreate(){var name=$('wireName').value.trim(),biz=$('wireBiz').value.trim();
  var oid='ofc-'+rnd(6);profile={id:'u-'+rnd(8),name:name,business:biz,look:gateLook,officeId:oid,createdAt:Date.now()};uid=profile.id;
  try{localStorage.setItem('hqVisitor',JSON.stringify(profile))}catch(e){}
- var rec={id:oid,ownerName:name,business:biz,look:gateLook,code:rnd(6).toUpperCase(),createdAt:Date.now()};Store.offices[oid]=rec;BACK.putOffice(rec);
+ var rec={id:oid,ownerName:name,business:biz,look:gateLook,code:rnd(6).toUpperCase(),createdAt:Date.now()};if(authUser&&authUser.email)rec.ownerEmail=authUser.email; /* the owner's email rides ON the office record itself — a later sign-in on any device finds this office by the record, even if the account binding never landed */
+ Store.offices[oid]=rec;BACK.putOffice(rec);
  if(authUser&&authUser.email)bindAccount(authUser.email,oid); /* signed in at the entrance: this account owns the new office, on every device */
  ensureLinkKey(oid,false);
  sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
  reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
  document.body.classList.remove('noPlayer'); /* entrance lock lifts — this device now has its OWN player and its OWN office */
- try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning')}catch(e){}
+ try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning');sessionStorage.removeItem('hqGatePos')}catch(e){}
  closeGate();
  var target=pendingVisit||oid;if(pendingVisit&&pendingVisit!==oid)linkOffices(oid,pendingVisit);
  pendingVisit=null;enterOffice(target,{teleport:true});
@@ -6154,8 +6181,14 @@ var authUser=null,authInst=null,authTried=false;
 function emailKey(e){return String(e||'').toLowerCase().replace(/[^a-z0-9]/g,'_')}
 function acctLocal(){try{return JSON.parse(localStorage.getItem('hqWireAccounts')||'{}')}catch(e){return{}}}
 function bindAccount(email,officeId){if(!validOfficeId(officeId))return; /* a binding to nowhere is worse than no binding at all — it strands the account on a phantom office at every sign-in, on every device */ var k=emailKey(email);var rec={email:email,officeId:officeId,at:Date.now()};
- if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).set(rec);return}catch(e){}}
- var m=acctLocal();m[k]=rec;try{localStorage.setItem('hqWireAccounts',JSON.stringify(m))}catch(e){}}
+ /* the binding is written BOTH ways, always: to the live wire (so every
+    device finds it) AND mirrored on this device (so this device finds it
+    even before the wire answers, or if sign-in resolves while the
+    backend is still the local store). Writing it only where the moment's
+    backend pointed is how an account ended up bound on one phone and
+    unknown on the next. */
+ var m=acctLocal();m[k]=rec;try{localStorage.setItem('hqWireAccounts',JSON.stringify(m))}catch(e){}
+ if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).set(rec)}catch(e){}}}
 function readBinding(email,cb){var k=emailKey(email);
  if(BACK.mode==='live'&&LiveBack.db){try{LiveBack.db.ref('wire/accounts/'+k).once('value',function(s){cb(s.val()||null)});return}catch(e){}}
  cb(acctLocal()[k]||null)}
@@ -6180,7 +6213,7 @@ function myOfficeRec(){return Store.offices[myHomeId()]||null}
 function freshOfficeCode(){var c='';do{c=rnd(6).toUpperCase()}while(Object.keys(Store.offices).some(function(k){return Store.offices[k]&&Store.offices[k].code===c}));return c}
 function myOfficeRecord(){var id=myHomeId();if(!validOfficeId(id))return null;var rec=Store.offices[id]||null;
  if(rec){if(!rec.code){rec.code=(id===OWNER_OFFICE)?'VIBEZ1':freshOfficeCode();try{BACK.putOffice(rec)}catch(e){}}return rec}
- if(profile&&profile.officeId===id){rec={id:id,ownerName:profile.name||'Owner',business:profile.business||'Your office',look:profile.look||'craig',code:(id===OWNER_OFFICE)?'VIBEZ1':freshOfficeCode(),createdAt:Date.now()};if(authUser&&authUser.email)rec.ownerEmail=authUser.email;Store.offices[id]=rec;try{BACK.putOffice(rec)}catch(e){}return rec}
+ if(profile&&profile.officeId===id){rec={id:id,ownerName:profile.name||'Owner',business:profile.business||'Your office',look:profile.look||(id===OWNER_OFFICE?'craig':'dex'),code:(id===OWNER_OFFICE)?'VIBEZ1':freshOfficeCode(),createdAt:Date.now()};if(authUser&&authUser.email)rec.ownerEmail=authUser.email;Store.offices[id]=rec;try{BACK.putOffice(rec)}catch(e){}return rec}
  return null}
 function myOfficeCode(){var rec=myOfficeRecord();return rec&&rec.code?String(rec.code):''}
 function ensureLinkKey(oid,regen){var rec=Store.offices[oid];if(!rec)return linkKeyFor(oid);
@@ -6213,10 +6246,10 @@ function renderConnectUI(){
 }
 function adoptOffice(oid,user,tries){if(!validOfficeId(oid))return;var rec=Store.offices[oid];
  if(!rec&&(tries||0)<6){setTimeout(function(){adoptOffice(oid,user,(tries||0)+1)},1500);return}
- rec=rec||{id:oid,business:'Your office',ownerName:(user&&user.displayName)||'Owner',look:'craig'};
- profile={id:uid,name:rec.ownerName||(user&&user.displayName)||'Owner',business:rec.business||'',look:rec.look||'craig',officeId:oid,createdAt:Date.now(),email:user?user.email:''};
+ rec=rec||{id:oid,business:'Your office',ownerName:(user&&user.displayName)||'Owner',look:(oid===OWNER_OFFICE?'craig':'dex')};
+ profile={id:uid,name:rec.ownerName||(user&&user.displayName)||'Owner',business:rec.business||'',look:rec.look||(oid===OWNER_OFFICE?'craig':'dex'),officeId:oid,createdAt:Date.now(),email:user?user.email:''};
  try{localStorage.setItem('hqVisitor',JSON.stringify(profile))}catch(e){}
- try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning')}catch(e){} /* this device has its player now — the entrance never opens on it again */
+ try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning');try{sessionStorage.removeItem('hqGatePos')}catch(e){}}catch(e){} /* this device has its player now — the entrance never opens on it again */
  sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
  reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
  try{closeGate()}catch(e){}
@@ -6234,15 +6267,41 @@ function resolveAccount(user,tries){if(!user||!user.email)return;
   if(b&&validOfficeId(b.officeId)){adoptOffice(b.officeId,user);return}
   var ownedId=null;Object.keys(Store.offices).forEach(function(id){var r=Store.offices[id];if(r&&validOfficeId(id)&&r.ownerEmail&&String(r.ownerEmail).toLowerCase()===String(user.email).toLowerCase())ownedId=id});
   if(ownedId){bindAccount(user.email,ownedId);adoptOffice(ownedId,user);return}
-  if(profile&&validOfficeId(profile.officeId)){bindAccount(user.email,profile.officeId);renderConnectUI();
+  if(profile&&validOfficeId(profile.officeId)){bindAccount(user.email,profile.officeId);
+   /* THIS DEVICE HAS THE PLAYER \u2014 sign-in ADOPTS it, fully: the email is
+      stamped onto the office record (so any other device finds this
+      office by the record alone), the session goes active, the player is
+      reskinned as themselves, the entrance CLOSES and they land inside
+      their own office. The old branch only bound the account and stopped
+      \u2014 the person stayed standing at the entrance, and every sign-in
+      dropped them back into the tutorial. That was the loop. */
+   var myRec=Store.offices[profile.officeId];if(myRec&&!myRec.ownerEmail){myRec.ownerEmail=user.email;try{BACK.putOffice(myRec)}catch(e){}}
+   sessionActive=true;try{sessionStorage.setItem('hqWireSession','1')}catch(e){}
+   try{window.__hqSavedPlayerEarly=profile;document.documentElement.classList.remove('hqNew');document.documentElement.classList.add('hqReturning');document.body.classList.remove('noPlayer')}catch(e){}
+   try{sessionStorage.removeItem('hqGatePos')}catch(e){}
+   reskin();try{if(window.__hqHires&&__hqHires.rekey)__hqHires.rekey()}catch(e){}
+   try{closeGate()}catch(e){}
+   enterOffice(profile.officeId,{teleport:true});renderConnectUI();
    try{logTalk('HQ','Google connected \u2014 '+user.email+' is now bound to your office ('+(Store.offices[profile.officeId]?Store.offices[profile.officeId].business:profile.officeId)+'). Sign in with it on any device and this office opens.','sys')}catch(e){}
    return}
   /* The office records may still be arriving from the wire — the home
      office's identity lands with the first syncs. A signed-in owner
      gets a few seconds of retries before being treated as brand new,
      so a slow wire never costs him his office. */
-  if(BACK.mode==='live'&&(tries||0)<4){var gm=$('gateGoogleMsg');if(gm)gm.textContent='Signed in as '+user.email+' \u2014 finding your office\u2026';setTimeout(function(){resolveAccount(user,(tries||0)+1)},2000);return}
-  openGate(false);var m=$('gateGoogleMsg');if(m)m.textContent='Signed in as '+user.email+' \u2014 now create your character and your office below; this account will own it.'})}
+  /* The records may still be arriving \u2014 from the wire, or from the local
+     store the backend is still standing up. Retry on a fresh registry
+     sync EITHER way: gating the retries on the live backend alone meant
+     a sign-in that resolved a beat early (the auth door loads on its own
+     script) fell straight through to "brand new" and restarted the
+     tutorial \u2014 on every single sign-in. */
+  if((tries||0)<6){var gm2=$('gateGoogleMsg');if(gm2)gm2.textContent='Signed in as '+user.email+' \u2014 finding your office\u2026';try{BACK.syncRegistry()}catch(e){} setTimeout(function(){resolveAccount(user,(tries||0)+1)},2000);return}
+  /* Genuinely no office for this account anywhere: say so WITHOUT
+     restarting anything. If the entrance is already open it stays on the
+     screen the person is looking at; the tutorial is never slammed back
+     to step 1 under a signed-in person. */
+  var gateOpen=false;try{gateOpen=$('wireGate')&&$('wireGate').classList.contains('show')}catch(e){}
+  if(!gateOpen)openGate(false);
+  var m=$('gateGoogleMsg');if(m)m.textContent='Signed in as '+user.email+' \u2014 no office is bound to this account yet. Create your character and your office here and this account will own it.'})}
 /* Plain-words sign-in reporting: whatever Google/Firebase answers —
    success, refusal or silence — is said HERE, on the entrance screen
    (and in Settings), in plain words. The person is never stranded on
@@ -6832,7 +6891,7 @@ if(typeof objects!=='undefined'){objects.push({x:-6.8,z:-6.9,draw:function(t){
 /* ---------- (6) clip proposal loop — greenlight posts, send-back revises ---------- */
 var clipSeen={},clipRev={},clipSeeded=false;
 function baseTitle(t){return String(t||'').replace(/ — the better cut, take \d+$/,'')}
-function seedClipProposal(){if(clipSeeded)return;var P=window.__hqProposals;if(!P||!P.add||!P.list)return;
+function seedClipProposal(){if(clipSeeded)return;try{var _vpF=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(!_vpF||!_vpF.officeId||_vpF.officeId!=='craig-hq'){clipSeeded=true;return}}catch(e){clipSeeded=true;return} /* this proposal is HQ's own \u2014 it seeds ONLY on a device whose saved player owns craig-hq. A device still sitting at the entrance (no player yet) is a stranger's until proven otherwise: seeding there put Craig's clip on the board behind the lock, and it surfaced the moment a new owner walked into their own office. */ /* HQ-ONLY SEED \u2014 Craig's clip proposal never seeds into another owner's office. */ var P=window.__hqProposals;if(!P||!P.add||!P.list)return;
  var title='Neon live — the loudest reaction, cut for @shortz_vs';
  try{var led=P.ledger?P.ledger():{};Object.keys(led).forEach(function(k){if(led[k]&&led[k].title===title)title='Neon live — the loudest reaction, tonight\u2019s cut for @shortz_vs'})}catch(e){}
  P.add({title:title,desc:'A clip the Clipper team put together from Neon\u2019s Kick live — the live on the Numbers Lab screen — cut in the Numbers Lab: hook in the first two seconds, captions checked by ear, the moment the chat went wild. Source: Neon\u2019s live on Kick (the screen\u2019s current assignment) — the preview is that same source, never another stream. Credit: Rico from Shortz VS. Greenlight makes the clip; it posts only after Craig\u2019s preview-okay. Send it back and we re-cut it better — it comes back as a new proposal, not a shrug.',from:'Rico',at:Date.now(),status:'pending',type:'clip',source:'Neon',sourcePlatform:'kick',sourceChannel:'n3on',credit:'Rico from Shortz VS'});
@@ -7012,13 +7071,16 @@ var museCfg={name:'Muse',hair:'fade',hairColor:'#22252d',outfit:'#c96f4a',pants:
    She borrows Sanaa's render figure (the Library is her floor; the
    Blueprint Room is Muse's) so her person is actually in the office. */
 (function(){var mt=0;var mi=setInterval(function(){mt++;['stand','back','head','front'].forEach(function(k){if(SPRITES['sanaa-'+k]&&!SPRITES['muse-'+k])SPRITES['muse-'+k]=SPRITES['sanaa-'+k]});if(SPRITES['muse-back']||mt>30)clearInterval(mi)},300)})();
-if(typeof objects!=='undefined'){objects.push({x:MUSE_SPOT.x,z:MUSE_SPOT.z,cx:MUSE_SPOT.x,cz:MUSE_SPOT.z,mapName:'MUSE',mapColor:'#9a4a1f',mapVisible:true,queue:[],curKey:'muse',draw:function(t){
+function museFreshHide(){try{var p=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(p&&p.officeId)return p.officeId!=='craig-hq';if(window.__hqOfficeNeutral&&__hqOfficeNeutral())return true;return false}catch(e){return false}}
+var museObj=null;
+if(typeof objects!=='undefined'){museObj={x:MUSE_SPOT.x,z:MUSE_SPOT.z,cx:MUSE_SPOT.x,cz:MUSE_SPOT.z,mapName:'MUSE',mapColor:'#9a4a1f',mapVisible:true,queue:[],curKey:'muse',draw:function(t){
+ if(museFreshHide())return; /* Muse is the HQ owner's AI — she stands in HIS office only. A fresh office has no Muse at the handoff desk, no Muse name on the floor, until ITS owner connects their own AI. */
  /* the handoff desk — inside the owner's office, west of nobody: a real
     desk with Muse's name on it, Muse seated at it facing the room */
  var dp=proj(MUSE_DESK.x,.42,MUSE_DESK.z);if(dp){try{isoBox(MUSE_DESK.x,MUSE_DESK.z,.95,.6,.42,'#8a5a33');isoBox(MUSE_DESK.x,MUSE_DESK.z,.8,.45,.3,'#a06a3a',.42)}catch(e){}
   ctx.save();ctx.font='800 '+Math.max(8,cam.zoom*.17)+'px system-ui';ctx.textAlign='center';ctx.fillStyle='#5b3a1a';ctx.fillText('MUSE · HANDOFF DESK',dp[0],dp[1]-cam.zoom*.5);ctx.restore()}
  var p=proj(MUSE_SPOT.x,.05,MUSE_SPOT.z);if(p)drawPixel(p[0],p[1],cam.zoom*.44,museCfg,t,'sit',MUSE_SPOT.x,MUSE_SPOT.z);
-}})}
+}};objects.push(museObj);setInterval(function(){if(museObj)museObj.mapVisible=!museFreshHide()},1500)}
 function museSay(msg){talk('Muse',msg)}
 window.__hqMuse={desk:MUSE_DESK,spot:MUSE_SPOT,working:function(){return museWork},last:function(){return museLast}};
 /* Muse answers when named — one voice, both chats */
@@ -7030,13 +7092,13 @@ function museReply(surface){var line;
  try{if(surface==='live')logTalk('Muse',line);else typingThen('Muse',line,60)}catch(e){}}
 var museSeen=new WeakSet();
 function scanForMuse(root,surface){if(!root||!root.querySelectorAll)return;var nodes=root.querySelectorAll(surface==='live'?'.clLine':'.msg');nodes.forEach(function(m){if(museSeen.has(m))return;var whoEl=m.querySelector(surface==='live'?'.clWho':'b');var tx=m.textContent||'';if(whoEl&&UP(whoEl.textContent)==='CRAIG'&&/\bmuse\b/i.test(tx)){museSeen.add(m);setTimeout(function(){museReply(surface)},650)}})}
-setInterval(function(){scanForMuse($('chatList'),'hq');scanForMuse($('clBody'),'live')},1200);
+setInterval(function(){if(museFreshHide())return;scanForMuse($('chatList'),'hq');scanForMuse($('clBody'),'live')},1200);
 
 /* ---------- (4) the ceremony: presented in person, in his office ---------- */
 var cerSeen={},cerStage={},cerLastPresent={};
 function craigInOffice(){try{if(typeof craigObj==='undefined'||!craigObj)return false;return craigObj.cx>=12.2&&craigObj.cx<=20.8&&craigObj.cz>=-10.8&&craigObj.cz<=-4.2}catch(e){return false}}
 function fromName(rec){var f=rec&&rec.from;if(Array.isArray(f))f=f[0];return f?String(f):''}
-setInterval(function(){var P=window.__hqProposals;if(!P||!P.list)return;var L=P.list();
+setInterval(function(){try{var _cp=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(!_cp||!_cp.officeId||_cp.officeId!=='craig-hq')return}catch(e){return} if(typeof museFreshHide==='function'&&museFreshHide())return; /* the handoff ceremony is the HQ owner's \u2014 Muse's desk, his name in the lines. It never runs in a fresh office. */ var P=window.__hqProposals;if(!P||!P.list)return;var L=P.list();
  Object.keys(L).forEach(function(id){var rec=L[id];if(!rec)return;
   /* presentation: pending + presented-queued + owner in his office */
   if(rec.status==='pending'&&rec.queue==='presented'&&!cerStage[id]){
@@ -7451,7 +7513,7 @@ function studioBuild(){
  try{
   if(typeof objects==='undefined'||typeof isoBox!=='function')return false;
   /* carpet island: gold underlay, charcoal top */
-  objects.push({x:-8.35,z:7.75,draw:function(){try{isoBox(-8.35,7.75,4.9,4.6,0.03,'#8a6d2f');isoBox(-8.35,7.75,4.66,4.36,0.05,'#22262f')}catch(e){}}});
+  objects.push({x:-8.35,z:7.75,floor:true,draw:function(){try{isoBox(-8.35,7.75,4.9,4.6,0.03,'#8a6d2f');isoBox(-8.35,7.75,4.66,4.36,0.05,'#22262f')}catch(e){}}});
   /* design-desk row along the north edge: two desks, screens up */
   objects.push({x:-8.55,z:6.05,draw:function(){try{
    isoBox(-9.9,6.05,1.7,0.62,0.74,'#2c313c');isoBox(-7.2,6.05,1.7,0.62,0.74,'#2c313c');
@@ -7493,8 +7555,16 @@ var MERCH_CREW=[
  {name:'Vance',role:'Lead Designer — Merch',slot:'merch',look:'dex'},
  {name:'Lena',role:'Designer — Merch',slot:'merch',look:'sanaa'},
  {name:'Omar',role:'The Seller — Merch',slot:'merch',look:'marco'}];
+/* --- figure keeper: the three MUST render bodies, not just plates.
+   Their figures are borrowed looks (Dex, Sanaa, Marco); keep the
+   borrow alive until every sprite exists on this device. --- */
+(function(){var mt=0;var mi=setInterval(function(){mt++;var done=true;
+ [['dex','vance'],['sanaa','lena'],['marco','omar']].forEach(function(pair){
+  ['stand','back','head'].forEach(function(k){if(SPRITES[pair[0]+'-'+k]&&!SPRITES[pair[1]+'-'+k])SPRITES[pair[1]+'-'+k]=SPRITES[pair[0]+'-'+k];if(!SPRITES[pair[1]+'-'+k])done=false})});
+ if(done||mt>200)clearInterval(mi)},300)})();
 var hireTries=0;
 var hireIv=setInterval(function(){hireTries++;
+ try{var _vpF=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(_vpF&&_vpF.officeId&&_vpF.officeId!=='craig-hq')return}catch(e){} /* HQ-ONLY SEED \u2014 this content is Craig's office's own (his crew, his projects). On another owner's device it never seeds: a fresh office starts empty and fills only with what its own owner adds. */ 
  var H=window.__hqHires;
  if(!H||!H.add||!H.list){if(hireTries>40)clearInterval(hireIv);return}
  clearInterval(hireIv);
@@ -7634,7 +7704,7 @@ function salesBuild(){
   if(typeof objects==='undefined'||typeof isoBox!=='function')return false;
   /* carpet island: gold underlay, slate top — on the open floor
      south of the Main Floor, clear of the gong (x 11) to its east */
-  objects.push({x:7.1,z:7.85,draw:function(){try{isoBox(7.1,7.85,6.2,1.5,0.03,'#8a6d2f');isoBox(7.1,7.85,5.96,1.26,0.05,'#2e3440')}catch(e){}}});
+  objects.push({x:7.1,z:7.85,floor:true,draw:function(){try{isoBox(7.1,7.85,6.2,1.5,0.03,'#8a6d2f');isoBox(7.1,7.85,5.96,1.26,0.05,'#2e3440')}catch(e){}}});
   /* desk row along the north edge: three desks, screens up */
   objects.push({x:7.4,z:7.5,draw:function(){try{
    [5.5,7.4,9.3].forEach(function(dx){isoBox(dx,7.5,0.86,0.6,0.74,'#2c313c');isoBox(dx,7.5,0.9,0.64,0.05,'#3a4150',0.74)});
@@ -7658,6 +7728,7 @@ var SALES_CREW=[
  {name:'Trey',role:'Sales Tracker — money & payouts',slot:'sales',look:'marco'}];
 var sHireTries=0;
 var sHireIv=setInterval(function(){sHireTries++;
+ try{var _vpF=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(_vpF&&_vpF.officeId&&_vpF.officeId!=='craig-hq')return}catch(e){} /* HQ-ONLY SEED \u2014 this content is Craig's office's own (his crew, his projects). On another owner's device it never seeds: a fresh office starts empty and fills only with what its own owner adds. */ 
  var H=window.__hqHires;
  if(!H||!H.add||!H.list){if(sHireTries>40)clearInterval(sHireIv);return}
  clearInterval(sHireIv);
@@ -7780,6 +7851,7 @@ var HUNTER2_CREW=[
  {name:'Rhea',role:'Fresh Hunter \u2014 hunts new releases and trending titles for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in \u2014 Sanaa\u2019s standard',slot:'hunters',look:'sanaa'}];
 var h2HireTries=0;
 var h2HireIv=setInterval(function(){h2HireTries++;
+ try{var _vpF=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(_vpF&&_vpF.officeId&&_vpF.officeId!=='craig-hq')return}catch(e){} /* HQ-ONLY SEED \u2014 this content is Craig's office's own (his crew, his projects). On another owner's device it never seeds: a fresh office starts empty and fills only with what its own owner adds. */ 
  var H=window.__hqHires;
  if(!H||!H.add||!H.list){if(h2HireTries>40)clearInterval(h2HireIv);return}
  clearInterval(h2HireIv);
@@ -8091,6 +8163,14 @@ var RECORDS=[
 var SEED_IDS={rico:'rico',sanaa:'sanaa',dex:'dex',milo:'milo',tessa:'test-six',marco:'marco',dev:'dev'};
 function ensureCrew(){
  try{
+  /* THE HQ CREW BELONGS TO HQ ONLY — this backstop restores CRAIG's named
+     crew (Rico, Sanaa, Dex, the hunters, all of them) on CRAIG's device.
+     On any other owner's device it must NEVER run: seeding these people
+     into a fresh office is exactly how his crew ended up standing in
+     somebody else's office. A fresh office starts empty and fills only
+     with people its own owner adds. */
+  var _vp=null;try{_vp=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+  if(_vp&&_vp.officeId&&_vp.officeId!=='craig-hq')return;
   var H=window.__hqHires;if(!H||!H.add||!H.list||!H.mode)return;
   if(H.mode()==='boot')return; /* never race the door: adding during boot
      lands a second record under the slugged id (Tessa is seeded as
@@ -8266,6 +8346,20 @@ var PEOPLE_GROUPS=[
 function renderPeople(){
  var st=crewState();var wrap=$('gPeopleList');if(!wrap)return;
  var gb=$('guideBody');var keepY=gb?gb.scrollTop:0;
+ /* FRESH OFFICE \u2014 the People list is THIS office's people only. The
+    static CREW array below is Craig's HQ roster (his clipper team, his
+    sales team, his merch team, his hunters); rendering it here put his
+    whole staff list inside every new owner's office. A fresh office
+    lists the people its own owner hired \u2014 or an honest empty. */
+ try{var _vp=JSON.parse(localStorage.getItem('hqVisitor')||'null');
+  if(_vp&&_vp.officeId&&_vp.officeId!=='craig-hq'){
+   var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};
+   var ks=Object.keys(L);
+   if(!ks.length){wrap.innerHTML='<p class="gNote">No crew yet \u2014 your office starts empty. Add people one by one: in Chat, type \u201chire Name \u00b7 Role \u00b7 slot \u00b7 look\u201d.</p>'}
+   else{wrap.innerHTML=ks.map(function(k){var r=L[k];return '<div class="gRow" style="cursor:default"><span class="meta"><b>'+esc(r.name)+'</b><span>'+esc(String(r.role||'Worker').split('\u2014')[0].trim())+'</span></span></div>'}).join('')}
+   if(gb)gb.scrollTop=keepY;
+   return;
+  }}catch(e){}
  wrap.innerHTML='';
  PEOPLE_GROUPS.forEach(function(g){
   var h=document.createElement('div');h.className='gGroupHead';h.textContent=g.title;wrap.appendChild(h);
@@ -8772,6 +8866,15 @@ function freshPass(){
   if(neutralOffice||freshOffice()){var ds0=document.getElementById('destSub');if(ds0&&/craig/i.test(ds0.textContent))ds0.textContent='Walking there'}}catch(e){}
  if(!freshOffice())return;
  try{
+  /* Guide room list — the Blueprint Room's line names the HQ owner's AI
+     and her handoff desk. That desk does not exist in a fresh office:
+     the room is just the big room here. */
+  document.querySelectorAll('[data-room="planning"] .meta>span').forEach(function(sp){if(/muse/i.test(sp.textContent))sp.textContent='The big room — presentations and meetings gather here'});
+  /* Guide room list \u2014 the other rooms' lines name the HQ owner's crew
+     and his business. None of those people work here: every room line in
+     a fresh office describes the room, never his people. */
+  var roomSubs={huddles:'Where calls, clips and numbers come together',movie:'The big screen — watch together here',gaming:'Game rigs and play-testing',library:'Reading, research and the catalog',lobby:'Design studio and the front lobby'};
+  Object.keys(roomSubs).forEach(function(rid){document.querySelectorAll('[data-room="'+rid+'"] .meta>span').forEach(function(sp){if(sp.textContent!==roomSubs[rid])sp.textContent=roomSubs[rid]})});
   /* Destination pill — its resting line names the walker, and here
      the walker is this office's owner, never Craig */
   var ds=document.getElementById('destSub');if(ds&&ds.textContent==='Craig is walking there')ds.textContent='Walking there';
@@ -9069,6 +9172,15 @@ window.__hqFreshLock={locked:function(){return document.documentElement.classLis
    walking is the app's real procedural movement (ORDER routes through
    stepToward — no teleporting), the talk is Office Talk, in character.
 
+   GROUP RULE (the owner's correction, 2026-10-29 ~23:50 CDT, from his
+   phone while a solo tour ran): the ceremony NEVER tours one hire at
+   a time. Everyone waiting at the door goes TOGETHER as one group —
+   greeted together at the door, introduced to the staff together,
+   toured through every room together with the greeters leading and
+   the whole group following (real walking, nobody left behind at the
+   door) — and the group splits only at the very end, when each hire
+   settles at their own desk. Same in every office.
+
    LET-IN, the owner's ways in: say it in chat ("let them in", "let Eli
    in", "greenlight the hunters"), or the rig handle
    window.__hqCeremony.admit(name) / .admitAll().
@@ -9100,36 +9212,62 @@ function ord(nm,x,z,mode){try{ORDER[nm]={x:x,z:z,mode:mode||'idle',label:'Door c
 function unord(nm){try{delete ORDER[nm]}catch(e){}}
 function say(who,msg,delay){setTimeout(function(){try{logTalk(who,msg)}catch(e){}},delay||0)}
 function distTo(o,x,z){return Math.hypot(o.cx-x,o.cz-z)}
-function startCeremony(nm){
- var rec=hireRec(nm);var H=bodyOf(nm);
- if(!H){setTimeout(function(){if(!admitted[nm]&&(!cer.active||cer.active.hire!==nm))startCeremony(nm)},5000);cer.active=null;return}
- var g1=slotHolder('audit')||anyCrew([nm]);            /* the watchdog */
- var g2=slotHolder('highlights')||anyCrew([nm,g1]);     /* the catalog lead */
- if(!g1||!g2||g1===g2){settleDesk(nm,rec);try{logTalk('HQ',nice(nm)+' is in — at their desk.','sys')}catch(e){}cer.active=null;pump();return}
- var roleShort=rec?String(rec.role||'').split('—')[0].trim():'';
- var hx=H.cx,hz=H.cz;
- var desk=(rec&&rec.slot==='hunters')?catalogSeatFor(nm):null;
- /* one tour stop: the whole group walks there together (real ORDER
-    routes, no teleporting), the named greeter names the room, and the
-    stop dwells just long enough for the owner to SEE the room before
-    the group walks on to the next one */
- function tour(x,z,who,line,label){return{label:label,dwell:3000,timeout:16000,
-  go:function(){ord(g1,x-1.05,z-0.85);ord(nm,x,z);ord(g2,x+1.05,z-0.85)},
+function grpNames(list){var n=list.map(nice);if(n.length<=1)return n.join('');if(n.length===2)return n.join(' and ');return n.slice(0,-1).join(', ')+' and '+n[n.length-1]}
+function moversOf(a){return [a.g1,a.g2].concat(a.hires)}
+function startCeremony(names){
+ if(!Array.isArray(names))names=[names];
+ var want=[];names.forEach(function(nm){nm=UP(nm);if(nm&&want.indexOf(nm)<0&&!admitted[nm])want.push(nm)});
+ if(!want.length){cer.active=null;pump();return}
+ /* bodies can lag a beat behind their hire records while a hire is
+    still spawning: a name with no body yet waits in the queue and its
+    group-mates do not leave it behind at the door — the next group
+    out of the queue picks it up as soon as its body exists */
+ var hires=[],missing=[];
+ want.forEach(function(nm){if(bodyOf(nm))hires.push(nm);else missing.push(nm)});
+ missing.forEach(function(nm){if(cer.queue.indexOf(nm)<0)cer.queue.push(nm)});
+ if(!hires.length){setTimeout(function(){if(!cer.active)pump()},4000);return}
+ var recs={};hires.forEach(function(nm){recs[nm]=hireRec(nm)});
+ var g1=slotHolder('audit')||anyCrew(hires);            /* the watchdog */
+ var g2=slotHolder('highlights')||anyCrew(hires.concat([g1]));     /* the catalog lead */
+ if(!g1||!g2||g1===g2){hires.forEach(function(nm){settleDesk(nm,recs[nm])});try{logTalk('HQ',grpNames(hires)+' are in — at their desks.','sys')}catch(e){}cer.active=null;pump();return}
+ /* the door anchor: where the group is standing right now */
+ var hx=0,hz=0;hires.forEach(function(nm){var b=bodyOf(nm);hx+=b.cx;hz+=b.cz});hx/=hires.length;hz/=hires.length;
+ /* each hire's own desk, assigned up front in group order so two
+    hunters never aim at the same Catalog chair */
+ var desks={},taken={};var DS0=(window.__hqDepts&&window.__hqDepts.seats)||{};Object.keys(DS0).forEach(function(k){taken[DS0[k].x+','+DS0[k].z]=true});
+ hires.forEach(function(nm){var rec=recs[nm];
+  if(rec&&rec.slot==='hunters'){var seat=null;for(var i=0;i<CATALOG_SEATS.length;i++){var c=CATALOG_SEATS[i];if(!taken[c.x+','+c.z]){seat=c;taken[c.x+','+c.z]=true;break}}desks[nm]=seat||CATALOG_SEATS[0]}
+  else{var hd=(typeof HUDDLES!=='undefined'&&HUDDLES[nm])?HUDDLES[nm]:null;desks[nm]=hd?{x:hd.x,z:hd.z}:null}});
+ /* THE FORMATION — one shape for every stop: the hires walk as a row,
+    the two greeters lead from the front corners. Nobody walks alone,
+    nobody waits at the previous stop: every ORDER in a step is issued
+    to the WHOLE group at once (real routes, no teleporting). */
+ function form(x,z){
+  var n=hires.length,spread=(n-1)*1.2/2;
+  hires.forEach(function(nm,i){ord(nm,x+(i-(n-1)/2)*1.2,z+0.45)});
+  ord(g1,x-spread-1.15,z-0.6);ord(g2,x+spread+1.15,z-0.6)}
+ /* one tour stop: the whole group walks there together, the named
+    greeter names the room, and the stop dwells just long enough for
+    the owner to SEE the room before the group walks on */
+ function tour(x,z,who,line,label){return{label:label,dwell:3000,timeout:22000,
+  go:function(){form(x,z)},
   say:function(){say(who,line,0)}}}
+ var introList=hires.map(function(nm){var r=recs[nm];var rs=r?String(r.role||'').split('—')[0].trim():'';return nice(nm)+(rs?' — our new '+rs:'')}).join(', ');
+ var anyHunter=hires.some(function(nm){return recs[nm]&&recs[nm].slot==='hunters'});
  var steps=[
-  {label:'Greeting at the door',dwell:5600,timeout:20000, /* (1) TOGETHER at the door — both greeters come to the hire */
-   go:function(){ord(g1,hx-1.05,hz-0.95);ord(g2,hx+1.05,hz-0.95);ord(nm,hx,hz)},
+  {label:'Greeting at the door',dwell:5600,timeout:32000, /* (1) TOGETHER at the door — both greeters come to the WHOLE group */
+   go:function(){form(hx,hz)},
    say:function(){try{WAVE[g1]=performance.now()+2600;WAVE[g2]=performance.now()+2600}catch(e){}
-    say(g1,nice(nm)+' — welcome in. I\u2019m '+nice(g1)+', I keep watch over this office: if anything breaks, I see it first.',0);
-    say(g2,'And I\u2019m '+nice(g2)+' — I run the catalog here. We\u2019ve been expecting you; the door\u2019s done with you now.',1700);
-    say(nm,'Thank you — both of you. Glad to be in.',3400)}},
-  {label:'Introductions — meet the crew',dwell:5600,timeout:20000, /* (2) TOGETHER they introduce the hire to the rest of the staff */
-   go:function(){ord(g1,2.35,2.55);ord(nm,3.5,3.65);ord(g2,4.65,2.55)},
-   say:function(){var third=anyCrew([nm,g1,g2]);
-    say(g2,'Everyone — this is '+nice(nm)+(roleShort?', our new '+roleShort:'')+'. '+nice(nm)+', this is the crew: they\u2019ll look after you.',0);
-    if(third)say(third,'Welcome aboard, '+nice(nm)+' — shout if you need anything.',1800);
-    say(g1,'Introductions done. Now the tour — every room, stay with us.',3600)}},
-  /* (3) the tour, together — EVERY room of THIS office, in walking order */
+    say(g1,grpNames(hires)+' — welcome in, all of you. I\u2019m '+nice(g1)+', I keep watch over this office: if anything breaks, I see it first.',0);
+    say(g2,'And I\u2019m '+nice(g2)+' — I run the catalog here. We\u2019ve been expecting all of you; the door\u2019s done with you now.',1700);
+    say(hires[0],'Thank you — both of you. From all of us: glad to be in.',3400)}},
+  {label:'Introductions — meet the crew',dwell:5600,timeout:24000, /* (2) TOGETHER they introduce the whole group to the rest of the staff */
+   go:function(){form(3.5,3.1)},
+   say:function(){var third=anyCrew(hires.concat([g1,g2]));
+    say(g2,'Everyone — meet who just came in: '+introList+'. Crew, look after them — all of them.',0);
+    if(third)say(third,'Welcome aboard, all of you — shout if you need anything.',1800);
+    say(g1,'Introductions done. Now the tour — every room, everybody stay with us.',3600)}},
+  /* (3) the tour, together — EVERY room of THIS office, in walking order, the whole group at every stop */
   tour(-8.5,9.6,g2,'The Lobby and the Welcome Lounge — the front door, the welcome desk, and where guests land first.','Tour — the Lobby & Welcome Lounge'),
   tour(-10.2,-7.85,g1,'The Brew Lab — coffee, the round table, quick huddles over a fresh brew.','Tour — Brew Lab'),
   tour(-6.8,-7.85,g2,'The Deep Work Den — books on the table, clock on the wall, quiet on purpose. Heads-down work lives here.','Tour — Deep Work Den'),
@@ -9143,21 +9281,26 @@ function startCeremony(nm){
   tour(13.5,9.7,g2,'The Movie Room — the Shortz VS screen plays here, with theater chairs for the whole crew.','Tour — Movie Room'),
   tour(0.5,11.1,g1,'Lounge & Focus — couch corner, focus pods, the kitchenette and the fish tank.','Tour — Lounge & Focus'),
   tour(0.5,17.35,g2,'And the Library — the catalog lives here, checked title by title, shelves wall to wall.','Tour — the Library'),
-  {label:'To their desk',dwell:5600,timeout:20000, /* (4) to their desk — or the desk they claim */
-   go:function(){if(desk){ord(nm,desk.x,desk.z,'sit');ord(g1,desk.x-1.15,desk.z-0.85);ord(g2,desk.x+1.15,desk.z-0.85)}else{var hd=(typeof HUDDLES!=='undefined'&&HUDDLES[nm])?HUDDLES[nm]:{x:hx,z:hz};ord(nm,hd.x,hd.z,'sit');ord(g1,hd.x-1.15,hd.z-0.85);ord(g2,hd.x+1.15,hd.z-0.85)}},
-   say:function(){if(desk)say(g2,'Your desk — the Catalog row, right here with the team. Finds come to me for the check before anything counts.',0);else say(g2,'And this is your desk — claim it, make it yours.',0);
-    say(nm,'Perfect. I\u2019ll get to work.',1900);
-    say(g1,nice(nm)+' is in — greeted, introduced, toured and desked. That\u2019s how we treat a new hire here.',3800)}}
+  {label:'To their desks',dwell:5600,timeout:45000, /* (4) the group splits HERE, only here — each hire to their OWN desk */
+   go:function(){var cx=0,cz=0,cnt=0;hires.forEach(function(nm){var d=desks[nm];if(d){ord(nm,d.x,d.z,'sit');cx+=d.x;cz+=d.z;cnt++}else ord(nm,hx,hz,'sit')});
+    if(cnt){cx/=cnt;cz/=cnt;ord(g1,cx-1.3,cz-1.0);ord(g2,cx+1.3,cz-1.0)}else{ord(g1,hx-1.15,hz-0.85);ord(g2,hx+1.15,hz-0.85)}},
+   say:function(){if(anyHunter)say(g2,'Your desks — the Catalog row, right here with the team, one each. Finds come to me for the check before anything counts.',0);else say(g2,'And these are your desks — claim yours, make it yours.',0);
+    say(hires[0],'Perfect. We\u2019ll get to work.',1900);
+    say(g1,grpNames(hires)+' are in — greeted together, introduced together, toured together, and each at their own desk. That\u2019s how we treat new hires here.',3800)}}
  ];
- cer.active={hire:nm,g1:g1,g2:g2,rec:rec,steps:steps,desk:desk};
+ cer.active={hires:hires,g1:g1,g2:g2,recs:recs,desks:desks,steps:steps};
  cer.step=-1;cer.said=false;
- cerPillShow('Door ceremony — '+nice(g1)+' and '+nice(g2)+' are bringing '+nice(nm)+' in.');
- try{logTalk('HQ',nice(g1)+' and '+nice(g2)+' are bringing '+nice(nm)+' in — the door ceremony.','sys')}catch(e){}
+ cerPillShow('Door ceremony — '+nice(g1)+' and '+nice(g2)+' are bringing '+grpNames(hires)+' in together.');
+ try{logTalk('HQ',nice(g1)+' and '+nice(g2)+' are bringing '+grpNames(hires)+' in together — the door ceremony, the whole group at once.','sys')}catch(e){}
 }
-function pump(){if(cer.active)return;var nx=cer.queue.shift();if(nx)startCeremony(nx)}
-function admit(nm){nm=UP(nm);if(!nm||admitted[nm])return false;if(cer.active){if(cer.active.hire!==nm&&cer.queue.indexOf(nm)<0)cer.queue.push(nm);return true}cerCamHold=false;startCeremony(nm);return true}
+function pump(){if(cer.active)return;if(!cer.queue.length)return;var grp=cer.queue.splice(0,cer.queue.length);startCeremony(grp)}
+function admit(nm){nm=UP(nm);if(!nm||admitted[nm])return false;
+ if(cer.active){if(cer.active.hires.indexOf(nm)<0&&cer.queue.indexOf(nm)<0)cer.queue.push(nm);return true}
+ /* GROUP RULE: letting one waiting hire in lets the whole waiting
+    group in — the ceremony is never a solo tour */
+ cerCamHold=false;var grp=waiting();if(grp.indexOf(nm)<0)grp.unshift(nm);startCeremony(grp);return true}
 function waiting(){var out=[];try{var H=window.__hqHires;if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(id){var r=L[id];if(r&&r.slot==='hunters'&&!admitted[UP(r.name)])out.push(UP(r.name))})}}catch(e){}return out}
-function admitAll(){var w=waiting();w.forEach(function(nm){admit(nm)});return w}
+function admitAll(){var w=waiting();if(cer.active){w.forEach(function(nm){if(cer.active.hires.indexOf(nm)<0&&cer.queue.indexOf(nm)<0)cer.queue.push(nm)})}else if(w.length){cerCamHold=false;startCeremony(w)}return w}
 setInterval(function(){
  if(!cer.active)return;
  var a=cer.active;
@@ -9167,17 +9310,17 @@ setInterval(function(){
     are read back off the bodies' own route ends), or a long timeout —
     the ceremony never jams on one walker */
  var arrived=true;
- [a.g1,a.g2,a.hire].forEach(function(nm){var o=bodyOf(nm);if(!o){arrived=false;return}try{var t=ORDER[nm];if(t&&distTo(o,t.x,t.z)>0.95)arrived=false}catch(e){}});
+ moversOf(a).forEach(function(nm){var o=bodyOf(nm);if(!o){arrived=false;return}try{var t=ORDER[nm];if(t&&distTo(o,t.x,t.z)>0.95)arrived=false}catch(e){}});
  var age=Date.now()-cer.issuedAt;
  if(!cer.said&&(arrived||age>(st.timeout||15000))){cer.said=true;cer.saidAt=Date.now();try{st.say()}catch(e){}
-  cerPillShow('Door ceremony — '+nice(a.hire)+': '+(st.label||'on the move')+(cer.queue.length?' · '+cer.queue.length+' more after this one':' · last one in'))}
+  cerPillShow('Door ceremony — '+grpNames(a.hires)+': '+(st.label||'on the move')+(cer.queue.length?' · '+cer.queue.length+' more in the next group':' · the whole group, together'))}
  if(cer.said&&Date.now()-cer.saidAt>(st.dwell||5600)){
-  if(cer.step>=a.steps.length-1){ /* settle: orders clear, desk is home */
-   settleDesk(a.hire,a.rec);unord(a.g1);unord(a.g2);unord(a.hire);
-   var doneHire=a.hire;cer.active=null;
+  if(cer.step>=a.steps.length-1){ /* settle: orders clear, each desk is home */
+   a.hires.forEach(function(nm){settleDesk(nm,a.recs[nm]);unord(nm)});unord(a.g1);unord(a.g2);
+   var doneGroup=grpNames(a.hires);cer.active=null;
    /* the door board + bench come down once nobody is left waiting */
    if(!waiting().length&&!cer.queue.length){try{for(var i=objects.length-1;i>=0;i--){if(objects[i]&&objects[i].x===-9.9&&(objects[i].z===12.6||objects[i].z===13.35)){objects.splice(i,1)}}}catch(e){}
-    cerPillShow(nice(doneHire)+' is desked — everybody is in. The ceremony is done.',true)}
+    cerPillShow(doneGroup+' are desked — everybody is in. The ceremony is done.',true)}
    pump();return}
   cer.step++;cer.said=false;a.steps[cer.step].go();cer.issuedAt=Date.now()}
 },650);
@@ -9185,8 +9328,8 @@ setInterval(function(){
    The owner's way in, on screen: tap the WAITING AT THE DOOR board
    (or the bench, or any waiting hire standing by it) and a panel
    opens listing who is waiting, with one big gold START CEREMONY
-   button. Tapping it runs admitAll() — the full visible ceremony
-   above, one hire at a time in queue — while the camera follows the
+   button. Tapping it runs admitAll() — the full visible GROUP
+   ceremony above: everyone waiting, together — while the camera follows the
    group and a status pill names each stage, so the owner SEES the
    greeting, the introductions, every room of the tour and the desk
    landing from wherever he is standing. Role-driven like the rest
@@ -9228,16 +9371,16 @@ var ASSIGN_SHORT={ELI:'Movie Hunter — feature films',MARA:'Show Hunter — ser
 function renderCerPanel(){
  var w=waiting(),g1=slotHolder('audit'),g2=slotHolder('highlights');
  var rows;
- if(cer.active){rows='<div class="cerRow"><b>'+nice(cer.active.hire)+'</b><span>Being brought in right now — greetings, introductions, the full tour, then their desk. '+(cer.queue.length?cer.queue.length+' more waiting after this one.':'')+'</span></div>'
-  +w.filter(function(nm){return nm!==cer.active.hire&&cer.queue.indexOf(nm)<0}).map(function(nm){return '<div class="cerRow"><b>'+nice(nm)+'</b><span>'+(ASSIGN_SHORT[nm]||'Waiting at the door')+' — still at the door</span></div>'}).join('')}
+ if(cer.active){rows=cer.active.hires.map(function(nm){var r=hireRec(nm);var rs=r?String(r.role||'').split('—')[0].trim():'';return '<div class="cerRow"><b>'+nice(nm)+'</b><span>'+(ASSIGN_SHORT[nm]||rs||'New hire')+' — being brought in right now, with the whole group: greetings, introductions, the full tour, then their own desk</span></div>'}).join('')
+  +w.filter(function(nm){return cer.active.hires.indexOf(nm)<0}).map(function(nm){return '<div class="cerRow"><b>'+nice(nm)+'</b><span>'+(ASSIGN_SHORT[nm]||'Waiting at the door')+' — still at the door, in the next group</span></div>'}).join('')}
  else if(w.length){rows=w.map(function(nm){var r=hireRec(nm);var rs=r?String(r.role||'').split('—')[0].trim():'';return '<div class="cerRow"><b>'+nice(nm)+'</b><span>'+(ASSIGN_SHORT[nm]||rs||'New hire')+' — waiting at the door</span></div>'}).join('')}
  else{rows='<div class="cerRow"><span>Nobody is waiting at the door right now — everyone who arrived has been brought in and desked.</span></div>'}
  var btn;
- if(cer.active)btn='<button id="cerStart" disabled>CEREMONY RUNNING — '+nice(cer.active.hire).toUpperCase()+' IS BEING BROUGHT IN…</button>';
+ if(cer.active)btn='<button id="cerStart" disabled>CEREMONY RUNNING — BRINGING '+cer.active.hires.map(nice).join(', ').toUpperCase()+' IN TOGETHER…</button>';
  else if(w.length)btn='<button id="cerStart">START CEREMONY</button>';
  else btn='<button id="cerStart" disabled>EVERYONE IS IN</button>';
  cerPanelEl.innerHTML='<div style="display:flex;align-items:flex-start;gap:10px"><div><h2>Waiting at the door</h2><div class="cerSub">'
-  +(g1&&g2?nice(g1)+' and '+nice(g2)+' greet each hire <b>together</b> at the door, introduce them to the rest of the staff, tour them through <b>every room</b>, then walk them to their desk — watch it happen on the floor. One at a time, in order.':'The office greeters bring each hire in: greetings together at the door, introductions, a tour of every room, then their desk.')
+  +(g1&&g2?nice(g1)+' and '+nice(g2)+' greet the whole group <b>together</b> at the door, introduce them to the rest of the staff <b>together</b>, tour them through <b>every room</b> as one group, then walk each of them to their own desk — watch it happen on the floor. Everybody waiting goes together — nobody is toured alone.':'The office greeters bring the whole waiting group in together: greetings at the door, introductions, a tour of every room, then each hire to their own desk.')
   +'</div></div><button class="cerX" id="cerClose" aria-label="Close">✕</button></div>'
   +'<div style="margin-top:8px">'+rows+'</div>'+btn
   +'<div class="cerSub" style="margin-top:9px">The camera follows the group the whole way. Drag the floor and the camera is yours — following stops and a gold FOLLOW CEREMONY chip appears; tap it, or tap this panel or the door board again, to follow the group again.</div>';
@@ -9247,9 +9390,9 @@ function renderCerPanel(){
 }
 function openCerPanel(){if(cer.active)cerCamHold=false;renderCerPanel();try{hideRoomCard()}catch(e){}cerPanelEl.classList.add('show')}
 /* keep an open panel honest while a ceremony runs */
-var cerPanelKey='';setInterval(function(){if(!cerPanelEl.classList.contains('show'))return;var k=(cer.active?cer.active.hire+'/'+cer.step:'idle')+'|'+waiting().join(',');if(k!==cerPanelKey){cerPanelKey=k;renderCerPanel()}},800);
+var cerPanelKey='';setInterval(function(){if(!cerPanelEl.classList.contains('show'))return;var k=(cer.active?cer.active.hires.join('+')+'/'+cer.step:'idle')+'|'+waiting().join(',');if(k!==cerPanelKey){cerPanelKey=k;renderCerPanel()}},800);
 /* CAMERA FOLLOW — while a ceremony runs, the camera rides with the
-   group: it pans to the three walkers' centre and, if the owner is
+   group: it pans to the whole group's centre and, if the owner is
    zoomed out at the map / lot view, eases in until the people are
    readable. Following is ON by default at ceremony start. The MOMENT
    the owner swipes/drags the view (or wheel-zooms) himself, following
@@ -9271,7 +9414,7 @@ setInterval(function(){
  cerFollowChip.classList.toggle('show',!!cerCamHold);
  if(cerCamHold)return;
  var a=cer.active,pts=[];
- [a.g1,a.g2,a.hire].forEach(function(nm){var o=bodyOf(nm);if(o)pts.push(o)});
+ moversOf(a).forEach(function(nm){var o=bodyOf(nm);if(o)pts.push(o)});
  if(!pts.length)return;
  var cx=0,cz=0;pts.forEach(function(o){cx+=o.cx;cz+=o.cz});cx/=pts.length;cz/=pts.length;
  try{camTween=null;cam.tx+=(cx-cam.tx)*0.16;cam.tz+=(cz-cam.tz)*0.16;clampPan();
@@ -9315,7 +9458,7 @@ var hintTries=0;var hintIv=setInterval(function(){hintTries++;var w=waiting();if
  var g1=slotHolder('audit'),g2=slotHolder('highlights');
  setTimeout(function(){if(g1&&g2){try{logTalk(g1,'We have '+w.map(nice).join(', ')+' waiting at the door. Tap the WAITING AT THE DOOR board and hit START CEREMONY — or say "let them in" — and '+nice(g2)+' and I will bring them in proper: greetings together, introductions, the tour, then their desks.')}catch(e){}}},9000);
 },1500);
-window.__hqCeremony={admit:admit,admitAll:admitAll,waiting:waiting,active:function(){return cer.active?cer.active.hire:null},greeters:function(){return[slotHolder('audit'),slotHolder('highlights')]},openPanel:openCerPanel,startAll:function(){var w=admitAll();cerPanelEl.classList.remove('show');return w},step:function(){return cer.active?{hire:cer.active.hire,step:cer.step,label:(cer.active.steps[cer.step]?cer.active.steps[cer.step].label||'':'')}:null}};
+window.__hqCeremony={admit:admit,admitAll:admitAll,waiting:waiting,active:function(){return cer.active?cer.active.hires.slice():null},greeters:function(){return[slotHolder('audit'),slotHolder('highlights')]},openPanel:openCerPanel,startAll:function(){var w=admitAll();cerPanelEl.classList.remove('show');return w},step:function(){return cer.active?{hires:cer.active.hires.slice(),hire:cer.active.hires[0],step:cer.step,label:(cer.active.steps[cer.step]?cer.active.steps[cer.step].label||'':'')}:null}};
 })();
 </script>
 </body>
