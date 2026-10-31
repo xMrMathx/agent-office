@@ -15,31 +15,6 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Agent Office (AO)</title>
 <script>
-/* VPC EMBED — the Virtual PC's right screen loads this office with
-   ?embed=vpc. The PC is the owner's own desk, so the embed boots the
-   office exactly as it boots on the owner's own devices: HIS saved
-   player (office craig-hq) is seeded first, and the app's own rules
-   take it from there — straight onto his office floor, his crew
-   seeded by the app's HQ door, no gate, no tutorial, no sign-up,
-   no create-an-office. It seeds ONLY when this device has no saved
-   player yet, or the saved player is already his; another owner's
-   player is never touched. A visit without ?embed=vpc behaves
-   exactly as it always has. */
-(function(){try{
- if(!/[?&]embed=vpc(&|#|$)/.test(location.search))return;
- window.__hqEmbedVPC=true;
- var p=null;try{p=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
- if(p&&p.officeId){
-   var his=(p.officeId==='craig-hq')||/^(craig|craig moore|mr\.? moore)$/i.test(String(p.name||'').trim());
-   if(!his)return; /* a different owner's office lives on this device — not ours to move */
- } else {
-   var prof={id:'u-vpcowner',name:'Craig',business:'Cre\u221etor VibeZ HQ',look:'craig',officeId:'craig-hq',createdAt:Date.now(),email:'craigjrbb@gmail.com',viaEmbed:'vpc'};
-   try{localStorage.setItem('hqVisitor',JSON.stringify(prof))}catch(e){}
- }
- document.documentElement.classList.add('hqEmbed');
-}catch(e){}})();
-</script>
-<script>
 /* RETURNING-PLAYER CHECK — runs in the head, before a single element
    of the page is parsed or painted. A device with a saved player is
    marked hqReturning and the entrance gate is CSS-barred from ever
@@ -1155,7 +1130,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v52";(function(){try{var k='aoFreshV52';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
+<script>window.AO_BUILD="v56";(function(){try{var k='aoFreshV56';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
@@ -3877,7 +3852,7 @@ function openAlertDetail(aid){const a=ALERTS.find(x=>x.aid===aid);if(!a)return;i
  const d=alertDetailData(a);const det=document.getElementById('alertDetail');if(!det)return;
  det.innerHTML=detailShell({ico:a.ico,bg:a.bg,fg:a.fg,title:a.t,sub:a.d,facts:factRows([['Who',d.who],['When',fmtClock(a.at||Date.now())],['Where',d.where]]),origin:originHTML(convoForAlert(a)),story:d.story,specTitle:d.specTitle,spec:d.spec,extra:d.extra||''});
  showDetail()}
-function crewArea(k){return {rico:'Numbers Lab \u2014 Clipper Department',marco:'Numbers Lab \u2014 Clipper Department',dev:'Numbers Lab \u2014 Clipper Department',sanaa:'Catalog workspace \u2014 the Library',dex:'Audit \u2014 Deep Work Den',tessa:'Rankings \u2014 Numbers Lab',milo:'Game Testing \u2014 Gaming Room rigs',vance:'Merch Studio \u2014 the Lobby',lena:'Merch Studio \u2014 the Lobby',omar:'Merch Studio \u2014 the Spring store desk',kian:'Sales Desk \u2014 south of the Main Floor',sofia:'Sales Desk \u2014 south of the Main Floor',trey:'Sales Desk \u2014 south of the Main Floor',eli:'At the office door \u2014 waiting to be let in',mara:'At the office door \u2014 waiting to be let in',hugo:'At the office door \u2014 waiting to be let in',rhea:'At the office door \u2014 waiting to be let in'}[k]||'Main Floor'}
+function crewArea(k){return {rico:'Numbers Lab \u2014 Clipper Department',marco:'Numbers Lab \u2014 Clipper Department',dev:'Numbers Lab \u2014 Clipper Department',sanaa:'Catalog workspace \u2014 the Library',dex:'Audit \u2014 Deep Work Den',tessa:'Rankings \u2014 Numbers Lab',milo:'Game Testing \u2014 Gaming Room rigs',vance:'Merch Studio \u2014 the Lobby',lena:'Merch Studio \u2014 the Lobby',omar:'Merch Studio \u2014 the Spring store desk',kian:'Sales Desk \u2014 south of the Main Floor',sofia:'Sales Desk \u2014 south of the Main Floor',trey:'Sales Desk \u2014 south of the Main Floor',eli:'At the office door \u2014 waiting to be let in',mara:'At the office door \u2014 waiting to be let in',hugo:'At the office door \u2014 waiting to be let in',rhea:'At the office door \u2014 waiting to be let in',silas:'Gaming Room \u2014 at the rigs (ALLON Team)',petra:'Gaming Room \u2014 at the rigs (ALLON Team)',felix:'Gaming Room \u2014 at the rigs (ALLON Team)',wren:'Gaming Room \u2014 at the rigs (ALLON Team)'}[k]||'Main Floor'}
 function kindStory(kind,p){switch(kind){
  case 'clip':return 'Finished and staged for your okay. The work itself is below — watch it before a single VibeZ moves.';
  case 'rankings':return 'The board was rebuilt from the latest numbers. The refreshed board is below, so you can see exactly what you are paying for.';
@@ -5264,7 +5239,7 @@ var SEED={
  'test-six':{name:'Tessa',role:'Rankings Watch — watches rankings and Top 10 movements',slot:'rankings',look:'tessa'},
  marco:{name:'Marco',role:'Clipper — watches live streams with Rico, calls out the moments worth clipping',slot:'clipper',look:'marco'},
  dev:{name:'Dev',role:'Clipper — timestamps and captions in the Numbers Lab, readies every cut for Rico',slot:'clipper',look:'dev'}};
-var OWNER_CREW={rico:1,sanaa:1,dex:1,milo:1,'test-six':1,marco:1,dev:1,vance:1,lena:1,omar:1,kian:1,sofia:1,trey:1,eli:1,mara:1,hugo:1,rhea:1};
+var OWNER_CREW={rico:1,sanaa:1,dex:1,milo:1,'test-six':1,marco:1,dev:1,vance:1,lena:1,omar:1,kian:1,sofia:1,trey:1,eli:1,mara:1,hugo:1,rhea:1,silas:1,petra:1,felix:1,wren:1};
 var BALS={rico:90,sanaa:70,dex:80,milo:40};
 var WISHES={rico:['rig3','neon','leafy'],sanaa:['books','globe'],dex:['banner','goldrecord'],milo:['rig2','stringlights','trophy']};
 var LINES={
@@ -5274,6 +5249,7 @@ var LINES={
  gaming:['New JOUST build on the rig — running it now','Found what works — and what does not','Agents are learning the lane — testing the counters','Match notes go straight to Craig','Bug hunt: found one, wrote it plain'],
  merch:['Designing at the screens — mascot tees for Shortz VS','Colorways, variants, and the next drop','The Spring store stays stocked and listed'],
  hunters:['Waiting at the office door — ready to hunt movies & shows for Shortz VS once I am let in','At the door with my assignment — Sanaa\u2019s standard: not in the catalog, plays free, complete','Waiting to be let in — no desk yet','At the door — my finds get Sanaa\u2019s three-part check before anything counts','Waiting at the door — ready when Craig says go'],
+ allon:['Waiting at the office door — ALLON team, bound for the Gaming Room rigs once I am let in','At the door with my assignment — ALLON Virtual PCs, from the Gaming Room','Waiting to be let in — my post is at the rigs in the Gaming Room','At the door — the ALLON team works the PCs in the Gaming Room','Waiting at the door — ready when Craig says go'],
  sales:['Running the daily sales report — Shortz VS store','Units, revenue, best seller — counted, not guessed','Store open — products still in draft, watching for the first sale','Orders and units tracked as they land','Payouts tracked to the cent'],
  generic:['On the job — first pass underway','Working my section','Checking in with the crew','Heads down on the current run']};
 var DESCS={
@@ -5283,6 +5259,7 @@ var DESCS={
  gaming:'Plays the JOUST builds, hunts bugs, and reports in plain words what works and what does not. Slot: the Gaming Room rigs.',
  merch:'Designs the Shortz VS mascot tees and runs the Spring storefront — designs, colorways, listings. Slot: the Merch Studio.',
  hunters:'Hunts movies and shows Shortz VS does not have yet, verifies each one is not already in the catalog and actually plays before it counts, and brings the finds to Craig for the green light. WAITING AT THE OFFICE DOOR — no desk yet, until Craig lets them in.',
+ allon:'Works the ALLON Virtual PC line from the Gaming Room, at the rigs: the line itself, the rooms built for buyers, setup and onboarding, and the care plan that keeps every sold PC running. WAITING AT THE OFFICE DOOR — no post yet, until Craig lets them in.',
  sales:'Tracks the Shortz VS store on Amaze — orders, units, revenue and payouts — and posts the daily sales report with the real numbers only. Slot: the Sales Desk.',
  generic:'A hired hand on Craig\u2019s projects, working from their slot in the office.'};
 var SLOTS={
@@ -5296,7 +5273,8 @@ var SLOTS={
  library:{seat:{x:14,z:17.3},huddle:{x:14,z:17.3,mode:'sit'}},
  lobby:{seat:{x:-10.6,z:11.76},huddle:{x:-10.6,z:11.76,mode:'sit'}},
  sales:{seat:{x:7.4,z:8.15},huddle:{x:7.4,z:8.15,mode:'sit'}},
- hunters:{seat:{x:-10.4,z:13.1},huddle:{x:-10.4,z:13.1,mode:'sit'}}};
+ hunters:{seat:{x:-10.4,z:13.1},huddle:{x:-10.4,z:13.1,mode:'sit'}},
+ allon:{seat:{x:-6.7,z:12.5},huddle:{x:-6.7,z:12.5,mode:'sit'}}};
 var LOOK_LABEL={rico:'#065f46',sanaa:'#b45309',dex:'#1f2937',milo:'#334155',dev:'#9d174d',marco:'#1d4ed8',craig:'#111827',tessa:'#8a2326',muse:'#9a4a1f',vance:'#1f2937',lena:'#b45309',omar:'#1d4ed8',kian:'#0f766e',sofia:'#7c2d12',trey:'#334155'};
 var LOOK_OUTFIT={rico:'#059669',sanaa:'#b45309',dex:'#1f2937',milo:'#475569',dev:'#be185d',marco:'#2563eb',craig:'#1e293b',tessa:'#a3272e',muse:'#c96f4a',vance:'#1f2937',lena:'#b45309',omar:'#2563eb',kian:'#0f766e',sofia:'#9a3412',trey:'#475569'};
 /* Sanaa takes the Highlights cube, Dex the Audit cube — their desk
@@ -5324,8 +5302,8 @@ function peopleCount(){var h=document.querySelector('.fsec[data-sec="people"] h3
    team's people under it, then the next title — one list, scrolled top
    to bottom. Rows land in their team's block no matter what order the
    hire door delivers them in; a block with nobody in it is removed. */
-var PPL_GROUPS=[['sales','SALES TEAM'],['merch','MERCH TEAM'],['hunters','HUNT TEAM'],['clipper','CLIPPER TEAM'],['hq','HQ TEAM']];
-function pplGroupKey(slot){return slot==='sales'?'sales':slot==='merch'?'merch':slot==='hunters'?'hunters':slot==='clipper'?'clipper':'hq'}
+var PPL_GROUPS=[['sales','SALES TEAM'],['merch','MERCH TEAM'],['hunters','HUNT TEAM'],['allon','ALLON TEAM'],['clipper','CLIPPER TEAM'],['hq','HQ TEAM']];
+function pplGroupKey(slot){return slot==='sales'?'sales':slot==='merch'?'merch':slot==='hunters'?'hunters':slot==='allon'?'allon':slot==='clipper'?'clipper':'hq'}
 function pplGroupEl(key){var wrap=document.getElementById('hireRows');if(!wrap)return null;
  var g=document.getElementById('pplGroup_'+key);if(g)return g;
  g=document.createElement('div');g.className='pplGroup';g.id='pplGroup_'+key;
@@ -7402,6 +7380,9 @@ function cbDeptTask(NAME){var K=window.__hqKick||{};
  if(NAME==='MARA')return 'Waiting at the office door \u2014 Show Hunter (shows & full seasons), waiting to be let in';
  if(NAME==='HUGO')return 'Waiting at the office door \u2014 Movie Hunter (classics & deep cuts), waiting to be let in';
  if(NAME==='RHEA')return 'Waiting at the office door \u2014 Show Hunter (new & trending), waiting to be let in';
+ if(NAME==='SILAS'||NAME==='PETRA'||NAME==='FELIX'||NAME==='WREN'){var adm=[];try{adm=JSON.parse(localStorage.getItem('hqCeremonyAdmitted')||'[]')}catch(e){}
+  var inAllon=adm.indexOf(NAME)>=0;var job={SILAS:'Running the ALLON line \u2014 pricing, tiers, roadmap',PETRA:'Building buyer Virtual PCs \u2014 screens, layout, branding',FELIX:'Setup & onboarding \u2014 installs, apps wired, buyers taught',WREN:'Care & support \u2014 the $79/mo plan: updates, fixes, check-ins'}[NAME];
+  return inAllon?(job+' \u2014 Gaming Room rigs'):('Waiting at the office door \u2014 ALLON Team ('+job+'), waiting to be let in; post is the Gaming Room rigs')}
  if(NAME==='KIAN')return 'Running the daily sales report \u2014 Sales Desk';
  if(NAME==='SOFIA')return 'Tracking orders & units \u2014 Sales Desk';
  if(NAME==='TREY')return 'Tracking money & payouts \u2014 Sales Desk';
@@ -7903,6 +7884,117 @@ window.__hqHunters2={crew:HUNTER2_CREW,lead:'Sanaa',desk:'At the office door \u2
 })();
 </script>
 
+<script>
+/* =====================================================================
+   THE ALLON TEAM — Silas (ALLON Lead — runs the ALLON line: pricing,
+   tiers, roadmap), Petra (Room Builder — builds each buyer's Virtual
+   PC: screens, layout, branding), Felix (Setup & Onboarding — installs
+   for buyers, wires their apps onto the screens, teaches them the room)
+   and Wren (Care & Support — runs the $79/mo care plan: updates, fixes,
+   check-ins). Hired through the same door as everyone else (slot:
+   allon). OWNER'S DOOR RULE: they WAIT AT THE OFFICE DOOR — names and
+   assignments on their own door board beside the Hunt Team's, no posts
+   yet — until he lets them in with the START CEREMONY (Dex and Sanaa
+   greet together, one group ceremony, full tour, then the group splits
+   to their posts). Their floor is the GAMING ROOM, at the rigs: they're
+   selling PCs, so they sit with the PCs — Silas and Petra at the west
+   and east rigs, Felix and Wren at the front posts, Milo's centre rig
+   untouched.
+   ===================================================================== */
+(function(){
+'use strict';
+/* --- waiting seats AT THE OFFICE DOOR (south wall of the Lobby, east of
+   the Hunt Team's bench) — the four wait here, no posts, until the
+   owner lets them in --- */
+try{
+ var DS=(window.__hqDepts&&window.__hqDepts.seats)||null;
+ if(DS){
+  if(!DS.SILAS)DS.SILAS={x:-7.3,z:13.1,lines:['Waiting at the office door — ALLON Lead: I run the ALLON line, pricing, tiers and roadmap, to be run from the Gaming Room rigs','At the door, waiting to be let in — no post yet; mine is the Gaming Room','Waiting at the door — my assignment: the ALLON line, worked from the rigs in the Gaming Room']};
+  if(!DS.PETRA)DS.PETRA={x:-6.1,z:13.1,lines:['Waiting at the office door — Room Builder: I build each buyer\u2019s Virtual PC, screens, layout and branding, from the Gaming Room rigs','At the door, waiting to be let in — no post yet; mine is the Gaming Room','Waiting at the door — my assignment: buyer rooms, built at the rigs']};
+  if(!DS.FELIX)DS.FELIX={x:-7.3,z:11.95,lines:['Waiting at the office door — Setup & Onboarding: I install ALLON for buyers, wire their apps onto the screens and teach them the room, from the Gaming Room rigs','At the door, waiting to be let in — no post yet; mine is the Gaming Room','Waiting at the door — my assignment: setups and onboarding, run from the rigs']};
+  if(!DS.WREN)DS.WREN={x:-6.1,z:11.95,lines:['Waiting at the office door — Care & Support: I run the $79/mo care plan, updates, fixes and check-ins, from the Gaming Room rigs','At the door, waiting to be let in — no post yet; mine is the Gaming Room','Waiting at the door — my assignment: care and support for every sold PC']};
+ }
+ /* --- crew board + levels pick them up --- */
+ if(typeof window.__hqRegisterCrew==='function'){
+  window.__hqRegisterCrew([['silas','Silas','ALLON Lead · ALLON Team'],['petra','Petra','Room Builder · ALLON Team'],['felix','Felix','Setup & Onboarding · ALLON Team'],['wren','Wren','Care & Support · ALLON Team']]);
+ }
+ /* --- profile-card figures --- */
+ if(typeof PROF_FIGURES!=='undefined'){
+  if(!PROF_FIGURES.silas)PROF_FIGURES.silas={img:'assets/profile/silas.png',role:'ALLON Lead · ALLON Team'};
+  if(!PROF_FIGURES.petra)PROF_FIGURES.petra={img:'assets/profile/petra.png',role:'Room Builder · ALLON Team'};
+  if(!PROF_FIGURES.felix)PROF_FIGURES.felix={img:'assets/profile/felix.png',role:'Setup & Onboarding · ALLON Team'};
+  if(!PROF_FIGURES.wren)PROF_FIGURES.wren={img:'assets/profile/wren.png',role:'Care & Support · ALLON Team'};
+ }
+}catch(e){}
+/* --- the ALLON door board: who is waiting, and their assignments --- */
+function drawAllonBoard(x,z){try{
+ var p=proj(x,1.45,z);var w=3.1*cam.zoom,h=1.5*cam.zoom;
+ rr(p[0]-w/2,p[1]-h/2,w,h,6);ctx.fillStyle='#0f172a';ctx.fill();
+ ctx.fillStyle='#eef2fb';ctx.fillRect(p[0]-w/2+5,p[1]-h/2+5,w-10,h-10);
+ text('WAITING AT THE DOOR · ALLON TEAM',p[0],p[1]-h*.27,Math.min(12,w*.06),'#92400e','center',800);
+ text('Silas · the line   Petra · builds the rooms',p[0],p[1]+1,Math.min(12,w*.055),'#334155','center',700);
+ text('Felix · setup & onboarding   Wren · care & support · bound for the Gaming Room rigs',p[0],p[1]+h*.28,Math.min(11,w*.052),'#64748b','center',600);
+}catch(e){}}
+function allonBuild(){
+ try{
+  if(typeof objects==='undefined'||typeof isoBox!=='function')return false;
+  /* AT THE DOOR — the owner's standing rule: the ALLON four WAIT at the
+     office door until he lets them in. NO posts yet: a waiting bench
+     just inside the front door, east of the Hunt Team's bench, and
+     their own door board carrying names + assignments. */
+  objects.push({x:-6.7,z:13.35,draw:function(){try{
+   isoBox(-6.7,13.42,2.9,0.5,0.42,'#5b4632');isoBox(-6.7,13.42,3.0,0.56,0.07,'#6d573f',0.42);
+   [-7.3,-6.1].forEach(function(dx){isoBox(dx,13.3,0.8,0.4,0.5,'#3a4150')});
+   [-7.3,-6.1].forEach(function(dx){isoBox(dx,11.9,0.8,0.4,0.5,'#3a4150')});
+  }catch(e){}}});
+  /* their door board standing east of the bench: names + assignments */
+  objects.push({x:-5.2,z:12.6,draw:function(){try{isoBox(-5.2,12.6,0.09,0.09,1.15,'#4b5563');drawAllonBoard(-5.2,12.6)}catch(e){}}});
+  return true;
+ }catch(e){return false}
+}
+if(!allonBuild()){var aTries=0;var aIv=setInterval(function(){aTries++;if(allonBuild()||aTries>20)clearInterval(aIv)},600)}
+/* --- the hires: through the door, once, wherever this office opens --- */
+var ALLON_CREW=[
+ {name:'Silas',role:'ALLON Lead — runs the ALLON line: pricing, tiers, roadmap; the ALLON team works from the Gaming Room, at the rigs',slot:'allon',look:'dex'},
+ {name:'Petra',role:'Room Builder — builds each buyer\u2019s ALLON Virtual PC: screens, layout, branding; works from the Gaming Room, at the rigs',slot:'allon',look:'tessa'},
+ {name:'Felix',role:'Setup & Onboarding — installs ALLON for buyers, wires their apps onto the screens, teaches them the room; works from the Gaming Room, at the rigs',slot:'allon',look:'marco'},
+ {name:'Wren',role:'Care & Support — runs the $79/mo ALLON care plan: updates, fixes, check-ins; works from the Gaming Room, at the rigs',slot:'allon',look:'dev'}];
+/* --- figure keeper: the four MUST render bodies, not just plates.
+   Their figures are borrowed looks (Dex, Tessa, Marco, Dev); keep the
+   borrow alive until every sprite exists on this device. --- */
+(function(){var at=0;var ai=setInterval(function(){at++;var done=true;
+ [['dex','silas'],['tessa','petra'],['marco','felix'],['dev','wren']].forEach(function(pair){
+  ['stand','back','head'].forEach(function(k){if(SPRITES[pair[0]+'-'+k]&&!SPRITES[pair[1]+'-'+k])SPRITES[pair[1]+'-'+k]=SPRITES[pair[0]+'-'+k];if(!SPRITES[pair[1]+'-'+k])done=false})});
+ if(done||at>200)clearInterval(ai)},300)})();
+var aHireTries=0;
+var aHireIv=setInterval(function(){aHireTries++;
+ try{var _vpF=JSON.parse(localStorage.getItem('hqVisitor')||'null');if(_vpF&&_vpF.officeId&&_vpF.officeId!=='craig-hq')return}catch(e){} /* HQ-ONLY SEED — this content is Craig's office's own (his crew, his projects). On another owner's device it never seeds: a fresh office starts empty and fills only with what its own owner adds. */
+ var H=window.__hqHires;
+ if(!H||!H.add||!H.list){if(aHireTries>40)clearInterval(aHireIv);return}
+ clearInterval(aHireIv);
+ var have={};try{var L=H.list();Object.keys(L).forEach(function(k){have[String(L[k].name||'').toLowerCase()]=true})}catch(e){}
+ ALLON_CREW.forEach(function(rec,i){
+  if(have[rec.name.toLowerCase()])return;
+  setTimeout(function(){try{H.add({name:rec.name,role:rec.role,slot:rec.slot,look:rec.look})}catch(e){}},5200+i*1800)});
+},700);
+/* --- Dex announces the team once all four are in the building --- */
+var aRepTries=0;
+var aRepIv=setInterval(function(){aRepTries++;
+ var H=window.__hqHires,ready=0;
+ try{if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(k){if(['silas','petra','felix','wren'].indexOf(String(L[k].name||'').toLowerCase())>=0)ready++})}}catch(e){}
+ if(ready>=4||aRepTries>60){clearInterval(aRepIv);if(ready<1)return;
+  try{if(typeof ALERTS!=='undefined'){
+   var t='ALLON Team — Silas, Petra, Felix and Wren are waiting at the door',ex=null;
+   for(var i=0;i<ALERTS.length;i++)if(ALERTS[i].t===t)ex=ALERTS[i];
+   if(!ex){ALERTS.unshift({ico:'\u25a4',bg:'#fef3c7',fg:'#92400e',t:t,d:'Silas (ALLON Lead — pricing, tiers, roadmap), Petra (Room Builder — builds each buyer\u2019s Virtual PC), Felix (Setup & Onboarding — installs, wires apps, teaches the room) and Wren (Care & Support — the $79/mo care plan) are WAITING AT THE OFFICE DOOR — no posts yet, until Craig lets them in. Their floor is the Gaming Room, at the rigs: they sell PCs, so they sit with the PCs. Tap the WAITING AT THE DOOR board and hit START CEREMONY and Dex and Sanaa bring all four in together.',unread:true,at:Date.now()});if(typeof updateBadge==='function')updateBadge();if(typeof renderAlerts==='function')renderAlerts()}
+  }}catch(e){}
+  try{if(typeof logTalk==='function')logTalk('Dex','The ALLON team is at the door, Mr. Moore — waiting to be let in: Silas running the line, Petra building the rooms, Felix on setup and onboarding, Wren on care and support. No posts yet. Their floor is the Gaming Room, at the rigs — say the word and Sanaa and I bring all four in together.')}catch(e){}
+ }
+},1200);
+window.__hqAllon={crew:ALLON_CREW,lead:'Silas',desk:'Gaming Room — at the rigs',waiting:'At the office door — waiting to be let in (no posts yet)'};
+})();
+</script>
+
 <!-- ================================================================
      TESSA BUILD — (a) CREW GUARANTEE + 14 HOME DESKS
      (b) THE GUIDE MENU — one-of-one of the crowned xbox-menus demo:
@@ -8151,7 +8243,11 @@ var CREW=[
  {key:'eli',name:'Eli',role:'Movie Hunter · Movie Hunters',short:'Movie Hunter',dept:'At the door'},
  {key:'mara',name:'Mara',role:'Show Hunter · Movie Hunters',short:'Show Hunter',dept:'At the door'},
  {key:'hugo',name:'Hugo',role:'Deep-Cut Hunter · Movie Hunters',short:'Deep-Cut Hunter',dept:'At the door'},
- {key:'rhea',name:'Rhea',role:'Fresh Hunter · Movie Hunters',short:'Fresh Hunter',dept:'At the door'}
+ {key:'rhea',name:'Rhea',role:'Fresh Hunter · Movie Hunters',short:'Fresh Hunter',dept:'At the door'},
+ {key:'silas',name:'Silas',role:'ALLON Lead · ALLON Team',short:'ALLON Lead',dept:'Gaming Room'},
+ {key:'petra',name:'Petra',role:'Room Builder · ALLON Team',short:'Room Builder',dept:'Gaming Room'},
+ {key:'felix',name:'Felix',role:'Setup & Onboarding · ALLON Team',short:'Setup & Onboarding',dept:'Gaming Room'},
+ {key:'wren',name:'Wren',role:'Care & Support · ALLON Team',short:'Care & Support',dept:'Gaming Room'}
 ];
 var MUSE={key:'muse',name:'Muse',role:'Your AI · Blueprint Room',short:'Your AI',dept:'Blueprint Room'};
 function picFor(key){return 'assets/profile/'+key+'.png'}
@@ -8183,7 +8279,11 @@ var RECORDS=[
  {name:'Eli',role:'Movie Hunter — hunts feature films for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'rico'},
  {name:'Mara',role:'Show Hunter — hunts series and full seasons for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'tessa'},
  {name:'Hugo',role:'Deep-Cut Hunter — hunts classics, hidden gems, and complete collections for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'milo'},
- {name:'Rhea',role:'Fresh Hunter — hunts new releases and trending titles for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'sanaa'}
+ {name:'Rhea',role:'Fresh Hunter — hunts new releases and trending titles for the Shortz VS catalog; every find verified not already in the catalog (checked against all 75,769 titles) and free + playable before it is brought in — Sanaa’s standard',slot:'hunters',look:'sanaa'},
+ {name:'Silas',role:'ALLON Lead — runs the ALLON line: pricing, tiers, roadmap; the ALLON team works from the Gaming Room, at the rigs',slot:'allon',look:'dex'},
+ {name:'Petra',role:'Room Builder — builds each buyer\u2019s ALLON Virtual PC: screens, layout, branding; works from the Gaming Room, at the rigs',slot:'allon',look:'tessa'},
+ {name:'Felix',role:'Setup & Onboarding — installs ALLON for buyers, wires their apps onto the screens, teaches them the room; works from the Gaming Room, at the rigs',slot:'allon',look:'marco'},
+ {name:'Wren',role:'Care & Support — runs the $79/mo ALLON care plan: updates, fixes, check-ins; works from the Gaming Room, at the rigs',slot:'allon',look:'dev'}
 ];
 var SEED_IDS={rico:'rico',sanaa:'sanaa',dex:'dex',milo:'milo',tessa:'test-six',marco:'marco',dev:'dev'};
 function ensureCrew(){
@@ -8242,6 +8342,10 @@ var HOME_DESKS={
  MARA:{x:-10.4,z:13.1,desk:'-10.4,13.1',label:"Mara — Waiting at the Door · Show Hunter (series & seasons)"},
  HUGO:{x:-9.4,z:13.1,desk:'-9.4,13.1',label:"Hugo — Waiting at the Door · Deep-Cut Hunter (classics)"},
  RHEA:{x:-8.4,z:13.1,desk:'-8.4,13.1',label:"Rhea — Waiting at the Door · Fresh Hunter (new & trending)"},
+ SILAS:{x:13.8,z:-0.7,desk:'13.8,-0.7',label:"Silas's Post — Gaming Room · ALLON Lead (at the rigs)"},
+ PETRA:{x:19.2,z:-0.7,desk:'19.2,-0.7',label:"Petra's Post — Gaming Room · Room Builder (at the rigs)"},
+ FELIX:{x:14.9,z:0.55,desk:'14.9,0.55',label:"Felix's Post — Gaming Room · Setup & Onboarding (at the rigs)"},
+ WREN:{x:18.1,z:0.55,desk:'18.1,0.55',label:"Wren's Post — Gaming Room · Care & Support (at the rigs)"},
  MUSE:{x:19.9,z:-9.25,desk:'19.9,-10.0',label:'Muse · Handoff Desk — Blueprint Room'}
 };
 window.__hqHomeDesks=HOME_DESKS;
@@ -8335,7 +8439,7 @@ var ROOMS=[
  {id:'planning',name:'Blueprint Room',sub:"Your office — Muse's handoff desk is here",tag:'BP',col:'#5a4a8a'},
  {id:'main',name:'Main Floor',sub:'Desk row, cubes and the open floor',tag:'MF',col:'#8a6a2f'},
  {id:'movie',name:'Movie Room',sub:'Shortz VS on the big screen',tag:'MV',col:'#2f5d6b'},
- {id:'gaming',name:'Gaming Room',sub:'Milo and the JOUST rigs',tag:'GM',col:'#6b2f4a'},
+ {id:'gaming',name:'Gaming Room',sub:'Milo at the JOUST rigs · the ALLON team at the PCs',tag:'GM',col:'#6b2f4a'},
  {id:'library',name:'The Library',sub:'Sanaa hunts the catalog here',tag:'LB',col:'#4a4a42'},
  {id:'lobby',name:'Merch Studio · Lobby',sub:'Vance, Lena & Omar — the mascot tees',tag:'MS',col:'#6b4a2f'},
  {id:'overview',name:'Parking Lot',sub:'The zoomed-out view of everything',tag:'PL',col:'#3a3a42'}
@@ -8365,6 +8469,7 @@ var PEOPLE_GROUPS=[
  {title:'SALES TEAM',keys:['kian','sofia','trey']},
  {title:'MERCH TEAM',keys:['vance','lena','omar']},
  {title:'HUNT TEAM',keys:['eli','mara','hugo','rhea']},
+ {title:'ALLON TEAM',keys:['silas','petra','felix','wren']},
  {title:'CLIPPER TEAM',keys:['rico','marco','dev']},
  {title:'HQ TEAM',keys:['dex','sanaa','milo','tessa']}
 ];
@@ -8498,6 +8603,10 @@ var POOLS={
  mara:['Waiting at the office door — Show Hunter, ready to hunt shows and full seasons once I am let in.','At the door with my assignment — episodes all there and numbered right, for Sanaa’s check.'],
  hugo:['Waiting at the office door — Deep-Cut Hunter, ready to hunt classics and deep cuts once I am let in.','At the door with my assignment — no desk yet, waiting on the word.'],
  rhea:['Waiting at the office door — Fresh Hunter, ready to hunt new and trending titles once I am let in.','At the door with my assignment — no desk yet, waiting on the word.'],
+ silas:['Waiting at the office door — I run the ALLON line: pricing, tiers, what gets built next. My post is the Gaming Room, at the rigs, once I am let in.','At the door with the ALLON team — no post yet, waiting on the word.'],
+ petra:['Waiting at the office door — I build each buyer\u2019s ALLON room: screens, layout, their name on it. I work from the Gaming Room rigs once I am let in.','At the door with my assignment — no post yet, waiting on the word.'],
+ felix:['Waiting at the office door — I set ALLON up for buyers: install it, wire their apps onto the screens, teach them the room. Based at the Gaming Room rigs once I am let in.','At the door with my assignment — no post yet, waiting on the word.'],
+ wren:['Waiting at the office door — I run ALLON care and support: the $79/mo plan, updates, fixes, check-ins. Based at the Gaming Room rigs once I am let in.','At the door with my assignment — no post yet, waiting on the word.'],
  muse:['At my desk in the Blueprint Room — hand me the work and it comes back finished.','Muse here — I\u2019m at the handoff desk, next to yours.']
 };
 var THREADS={};
@@ -9091,7 +9200,7 @@ $('museDisconnectBtn').onclick=function(){
 };
 $('museDoneBtn').onclick=closeConnect;
 /* ---------- add-a-person form (fresh offices, one by one) ---------- */
-var SLOTS=['clipper','highlights','audit','gaming','rankings','events','anime','library','lobby','sales','merch','hunters'];
+var SLOTS=['clipper','highlights','audit','gaming','rankings','events','anime','library','lobby','sales','merch','hunters','allon'];
 var LOOKS=['rico','marco','dev','sanaa','dex','milo','tessa']; /* neutral looks only \u2014 the owner's own look is never a default for a new player */
 var LOOK_WORDS={rico:'Red cap · green top',marco:'Blue cap · blue top',dev:'Dark hair · pink top',sanaa:'Top bun · amber top',dex:'Dark hair · black top',milo:'Spiky hair · slate top',tessa:'Bun · red top'};
 function hireFormPass(){
@@ -9135,7 +9244,7 @@ setInterval(function(){if(!isFresh())return;
     strip any line from one of his people who is not YOUR hire, and
     take down his Neon watch board if it rendered here */
  try{var mine={};var L=(window.__hqHires&&__hqHires.list)?__hqHires.list():{};Object.keys(L).forEach(function(k){mine[String(L[k].name||'').toUpperCase()]=1});
-  var CREW=['RICO','MARCO','DEV','SANAA','DEX','MILO','TESSA','VANCE','LENA','OMAR','KIAN','SOFIA','TREY','ELI','MARA','HUGO','RHEA'];
+  var CREW=['RICO','MARCO','DEV','SANAA','DEX','MILO','TESSA','VANCE','LENA','OMAR','KIAN','SOFIA','TREY','ELI','MARA','HUGO','RHEA','SILAS','PETRA','FELIX','WREN'];
   document.querySelectorAll('#clBody .clLine, #chatList .msg').forEach(function(n){if(n.classList&&n.classList.contains('me'))return; /* this office owner's own lines are theirs — never stripped */
    var b=n.querySelector('b');if(!b)return;var who=b.textContent.trim().toUpperCase();if(CREW.indexOf(who)>=0&&!mine[who]){n.remove();return}
    /* system lines that report on one of Craig's people by name (a
@@ -9226,11 +9335,15 @@ function saveAdmitted(){try{localStorage.setItem('hqCeremonyAdmitted',JSON.strin
    next free chair; the catalog lead's own seat is in the same row. */
 var CATALOG_SEATS=[{x:-6,z:17.3},{x:-7.2,z:18.5},{x:-4.8,z:18.5},{x:-6,z:19.7}];
 function catalogSeatFor(nm){var DS=(window.__hqDepts&&window.__hqDepts.seats)||{};var used={};Object.keys(DS).forEach(function(k){if(k!==nm)used[DS[k].x+','+DS[k].z]=true});for(var i=0;i<CATALOG_SEATS.length;i++){var s=CATALOG_SEATS[i];if(!used[s.x+','+s.z])return s}return CATALOG_SEATS[0]}
-function workLines(rec){if(rec&&rec.slot==='hunters')return['Working the Catalog row in the Library — hunting titles this office does not have yet','Every find verified before it counts: not in the catalog, plays free, complete and numbered right','At my desk in the Library — finds go to the catalog lead for the check'];return['At my desk — on the work','Settled in — part of the crew now']}
-function settleDesk(nm,rec){try{var seat=null;if(rec&&rec.slot==='hunters'){seat=catalogSeatFor(nm);var DS=(window.__hqDepts&&window.__hqDepts.seats);if(DS)DS[nm]={x:seat.x,z:seat.z,lines:workLines(rec)};if(typeof HUDDLES!=='undefined')HUDDLES[nm]={x:seat.x,z:seat.z,mode:'sit',lines:workLines(rec)}}admitted[nm]=true;saveAdmitted()}catch(e){}}
+/* the ALLON posts in the Gaming Room — one per ALLON hire, at the rigs:
+   Silas and Petra take the west and east rigs, Felix and Wren the two
+   front posts facing them; Milo keeps the centre rig. */
+var ALLON_DESKS={SILAS:{x:13.8,z:-0.7},PETRA:{x:19.2,z:-0.7},FELIX:{x:14.9,z:0.55},WREN:{x:18.1,z:0.55}};
+function workLines(rec){if(rec&&rec.slot==='hunters')return['Working the Catalog row in the Library — hunting titles this office does not have yet','Every find verified before it counts: not in the catalog, plays free, complete and numbered right','At my desk in the Library — finds go to the catalog lead for the check'];if(rec&&rec.slot==='allon')return['At my post in the Gaming Room — ALLON work, at the rigs','Working the ALLON line from the Gaming Room — PCs up, screens live','Settled at the rigs — part of the ALLON team now'];return['At my desk — on the work','Settled in — part of the crew now']}
+function settleDesk(nm,rec){try{var seat=null;if(rec&&rec.slot==='hunters'){seat=catalogSeatFor(nm);var DS=(window.__hqDepts&&window.__hqDepts.seats);if(DS)DS[nm]={x:seat.x,z:seat.z,lines:workLines(rec)};if(typeof HUDDLES!=='undefined')HUDDLES[nm]={x:seat.x,z:seat.z,mode:'sit',lines:workLines(rec)}}else if(rec&&rec.slot==='allon'){seat=ALLON_DESKS[nm]||null;if(seat){var DS2=(window.__hqDepts&&window.__hqDepts.seats);if(DS2)DS2[nm]={x:seat.x,z:seat.z,lines:workLines(rec)};if(typeof HUDDLES!=='undefined')HUDDLES[nm]={x:seat.x,z:seat.z,mode:'sit',lines:workLines(rec)}}}admitted[nm]=true;saveAdmitted()}catch(e){}}
 /* a reload must not send an admitted hire back to the door: re-seat
    them on the Catalog row as soon as their records are readable */
-var reseatTries=0;var reseatIv=setInterval(function(){reseatTries++;var done=true;Object.keys(admitted).forEach(function(nm){var rec=hireRec(nm);if(!rec){done=false;return}if(rec.slot==='hunters'){var DS=(window.__hqDepts&&window.__hqDepts.seats)||{};var cur=DS[nm];if(!cur||cur.z<15)settleDesk(nm,rec)}});if(done&&reseatTries>3||reseatTries>40)clearInterval(reseatIv)},1200);
+var reseatTries=0;var reseatIv=setInterval(function(){reseatTries++;var done=true;Object.keys(admitted).forEach(function(nm){var rec=hireRec(nm);if(!rec){done=false;return}if(rec.slot==='hunters'){var DS=(window.__hqDepts&&window.__hqDepts.seats)||{};var cur=DS[nm];if(!cur||cur.z<15)settleDesk(nm,rec)}if(rec.slot==='allon'){var DS3=(window.__hqDepts&&window.__hqDepts.seats)||{};var cur3=DS3[nm];var want3=ALLON_DESKS[nm];if(!cur3||(want3&&(cur3.x!==want3.x||cur3.z!==want3.z)))settleDesk(nm,rec)}});if(done&&reseatTries>3||reseatTries>40)clearInterval(reseatIv)},1200);
 /* ---------- the ceremony engine ---------- */
 var cer={active:null,queue:[],step:-1,issuedAt:0,said:false};
 function ord(nm,x,z,mode){try{ORDER[nm]={x:x,z:z,mode:mode||'idle',label:'Door ceremony',place:'ceremony',seq:++orderSeq}}catch(e){}}
@@ -9262,6 +9375,7 @@ function startCeremony(names){
  var desks={},taken={};var DS0=(window.__hqDepts&&window.__hqDepts.seats)||{};Object.keys(DS0).forEach(function(k){taken[DS0[k].x+','+DS0[k].z]=true});
  hires.forEach(function(nm){var rec=recs[nm];
   if(rec&&rec.slot==='hunters'){var seat=null;for(var i=0;i<CATALOG_SEATS.length;i++){var c=CATALOG_SEATS[i];if(!taken[c.x+','+c.z]){seat=c;taken[c.x+','+c.z]=true;break}}desks[nm]=seat||CATALOG_SEATS[0]}
+  else if(rec&&rec.slot==='allon'){desks[nm]=ALLON_DESKS[nm]||null}
   else{var hd=(typeof HUDDLES!=='undefined'&&HUDDLES[nm])?HUDDLES[nm]:null;desks[nm]=hd?{x:hd.x,z:hd.z}:null}});
  /* THE FORMATION — one shape for every stop: the hires walk as a row,
     the two greeters lead from the front corners. Nobody walks alone,
@@ -9279,6 +9393,7 @@ function startCeremony(names){
   say:function(){say(who,line,0)}}}
  var introList=hires.map(function(nm){var r=recs[nm];var rs=r?String(r.role||'').split('—')[0].trim():'';return nice(nm)+(rs?' — our new '+rs:'')}).join(', ');
  var anyHunter=hires.some(function(nm){return recs[nm]&&recs[nm].slot==='hunters'});
+ var anyAllon=hires.some(function(nm){return recs[nm]&&recs[nm].slot==='allon'});
  var steps=[
   {label:'Greeting at the door',dwell:5600,timeout:32000, /* (1) TOGETHER at the door — both greeters come to the WHOLE group */
    go:function(){form(hx,hz)},
@@ -9309,7 +9424,7 @@ function startCeremony(names){
   {label:'To their desks',dwell:5600,timeout:45000, /* (4) the group splits HERE, only here — each hire to their OWN desk */
    go:function(){var cx=0,cz=0,cnt=0;hires.forEach(function(nm){var d=desks[nm];if(d){ord(nm,d.x,d.z,'sit');cx+=d.x;cz+=d.z;cnt++}else ord(nm,hx,hz,'sit')});
     if(cnt){cx/=cnt;cz/=cnt;ord(g1,cx-1.3,cz-1.0);ord(g2,cx+1.3,cz-1.0)}else{ord(g1,hx-1.15,hz-0.85);ord(g2,hx+1.15,hz-0.85)}},
-   say:function(){if(anyHunter)say(g2,'Your desks — the Catalog row, right here with the team, one each. Finds come to me for the check before anything counts.',0);else say(g2,'And these are your desks — claim yours, make it yours.',0);
+   say:function(){if(anyHunter)say(g2,'Your desks — the Catalog row, right here with the team, one each. Finds come to me for the check before anything counts.',0);else if(anyAllon)say(g2,'Your posts — the Gaming Room, at the rigs with the PCs. That is where the ALLON team works: selling PCs, you sit with the PCs.',0);else say(g2,'And these are your desks — claim yours, make it yours.',0);
     say(hires[0],'Perfect. We\u2019ll get to work.',1900);
     say(g1,grpNames(hires)+' are in — greeted together, introduced together, toured together, and each at their own desk. That\u2019s how we treat new hires here.',3800)}}
  ];
@@ -9324,7 +9439,7 @@ function admit(nm){nm=UP(nm);if(!nm||admitted[nm])return false;
  /* GROUP RULE: letting one waiting hire in lets the whole waiting
     group in — the ceremony is never a solo tour */
  cerCamHold=false;var grp=waiting();if(grp.indexOf(nm)<0)grp.unshift(nm);startCeremony(grp);return true}
-function waiting(){var out=[];try{var H=window.__hqHires;if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(id){var r=L[id];if(r&&r.slot==='hunters'&&!admitted[UP(r.name)])out.push(UP(r.name))})}}catch(e){}return out}
+function waiting(){var out=[];try{var H=window.__hqHires;if(H&&H.list){var L=H.list();Object.keys(L).forEach(function(id){var r=L[id];if(r&&(r.slot==='hunters'||r.slot==='allon')&&!admitted[UP(r.name)])out.push(UP(r.name))})}}catch(e){}return out}
 function admitAll(){var w=waiting();if(cer.active){w.forEach(function(nm){if(cer.active.hires.indexOf(nm)<0&&cer.queue.indexOf(nm)<0)cer.queue.push(nm)})}else if(w.length){cerCamHold=false;startCeremony(w)}return w}
 setInterval(function(){
  if(!cer.active)return;
@@ -9344,7 +9459,7 @@ setInterval(function(){
    a.hires.forEach(function(nm){settleDesk(nm,a.recs[nm]);unord(nm)});unord(a.g1);unord(a.g2);
    var doneGroup=grpNames(a.hires);cer.active=null;
    /* the door board + bench come down once nobody is left waiting */
-   if(!waiting().length&&!cer.queue.length){try{for(var i=objects.length-1;i>=0;i--){if(objects[i]&&objects[i].x===-9.9&&(objects[i].z===12.6||objects[i].z===13.35)){objects.splice(i,1)}}}catch(e){}
+   if(!waiting().length&&!cer.queue.length){try{for(var i=objects.length-1;i>=0;i--){if(objects[i]&&((objects[i].x===-9.9&&(objects[i].z===12.6||objects[i].z===13.35))||(objects[i].x===-5.2&&objects[i].z===12.6)||(objects[i].x===-6.7&&objects[i].z===13.35))){objects.splice(i,1)}}}catch(e){}
     cerPillShow(doneGroup+' are desked — everybody is in. The ceremony is done.',true)}
    pump();return}
   cer.step++;cer.said=false;a.steps[cer.step].go();cer.issuedAt=Date.now()}
@@ -9392,7 +9507,7 @@ cerPanelEl.id='cerPanel';cerPanelEl.setAttribute('aria-label','Waiting at the do
 document.body.appendChild(cerPanelEl);
 /* tapping the ceremony panel hands the camera back to the group */
 cerPanelEl.addEventListener('pointerdown',function(){if(cer.active)cerCamHold=false});
-var ASSIGN_SHORT={ELI:'Movie Hunter — feature films',MARA:'Show Hunter — series & full seasons',HUGO:'Deep-Cut Hunter — classics & deep cuts',RHEA:'Fresh Hunter — new & trending'};
+var ASSIGN_SHORT={ELI:'Movie Hunter — feature films',MARA:'Show Hunter — series & full seasons',HUGO:'Deep-Cut Hunter — classics & deep cuts',RHEA:'Fresh Hunter — new & trending',SILAS:'ALLON Lead — runs the ALLON line (pricing, tiers, roadmap)',PETRA:'Room Builder — builds each buyer\u2019s Virtual PC',FELIX:'Setup & Onboarding — installs, wires apps, teaches the room',WREN:'Care & Support — runs the $79/mo care plan'};
 function renderCerPanel(){
  var w=waiting(),g1=slotHolder('audit'),g2=slotHolder('highlights');
  var rows;
@@ -9456,6 +9571,7 @@ try{
    var w=screenToWorld(sx,sy),wx=w[0],wz=w[1];
    var wl=waiting();
    if((wl.length||cer.active)&&Math.abs(wx+9.9)<2.3&&Math.abs(wz-12.95)<1.75){openCerPanel();return}
+   if((wl.length||cer.active)&&Math.abs(wx+5.2)<2.3&&Math.abs(wz-12.6)<1.75){openCerPanel();return}
    for(var i=0;i<wl.length;i++){var b=bodyOf(wl[i]);if(b&&Math.hypot(wx-b.cx,wz-b.cz)<0.95){openCerPanel();return}}
   }catch(e){}
   _cerPrevTap(sx,sy)};
