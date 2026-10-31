@@ -15,6 +15,31 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Agent Office (AO)</title>
 <script>
+/* VPC EMBED — the Virtual PC's right screen loads this office with
+   ?embed=vpc. The PC is the owner's own desk, so the embed boots the
+   office exactly as it boots on the owner's own devices: HIS saved
+   player (office craig-hq) is seeded first, and the app's own rules
+   take it from there — straight onto his office floor, his crew
+   seeded by the app's HQ door, no gate, no tutorial, no sign-up,
+   no create-an-office. It seeds ONLY when this device has no saved
+   player yet, or the saved player is already his; another owner's
+   player is never touched. A visit without ?embed=vpc behaves
+   exactly as it always has. */
+(function(){try{
+ if(!/[?&]embed=vpc(&|#|$)/.test(location.search))return;
+ window.__hqEmbedVPC=true;
+ var p=null;try{p=JSON.parse(localStorage.getItem('hqVisitor')||'null')}catch(e){}
+ if(p&&p.officeId){
+   var his=(p.officeId==='craig-hq')||/^(craig|craig moore|mr\.? moore)$/i.test(String(p.name||'').trim());
+   if(!his)return; /* a different owner's office lives on this device — not ours to move */
+ } else {
+   var prof={id:'u-vpcowner',name:'Craig',business:'Cre\u221etor VibeZ HQ',look:'craig',officeId:'craig-hq',createdAt:Date.now(),email:'craigjrbb@gmail.com',viaEmbed:'vpc'};
+   try{localStorage.setItem('hqVisitor',JSON.stringify(prof))}catch(e){}
+ }
+ document.documentElement.classList.add('hqEmbed');
+}catch(e){}})();
+</script>
+<script>
 /* RETURNING-PLAYER CHECK — runs in the head, before a single element
    of the page is parsed or painted. A device with a saved player is
    marked hqReturning and the entrance gate is CSS-barred from ever
@@ -1130,7 +1155,7 @@ body.forceLand .profileCard.cleanCard{left:50%;top:50%;bottom:auto;transform:tra
  #pipHome .pipSpacer{flex-basis:45vh}
 }
 </style>
-<script>window.AO_BUILD="v51";(function(){try{var k='aoFreshV51';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
+<script>window.AO_BUILD="v52";(function(){try{var k='aoFreshV52';if(sessionStorage.getItem(k))return;fetch('version.txt?x='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){t=t.trim();if(t&&t!==window.AO_BUILD){sessionStorage.setItem(k,'1');location.reload();}}).catch(function(){});}catch(e){}})();</script>
 </head>
 <body>
 <div id="hqFrame"><canvas id="scene"></canvas><div class="roomTV" id="roomTV" aria-hidden="true"><iframe id="roomTVFrame" title="Movie Room TV — Shortz VS playing" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
